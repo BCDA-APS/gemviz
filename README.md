@@ -11,3 +11,5 @@ Data visualization for tiled
 
 - https://github.com/bluesky/tiled
 - https://github.com/bluesky/bluesky-widgets
+- [Tiled Python Client Demonstration](https://github.com/BCDA-APS/bdp-tiled/blob/main/demo_client.ipynb) - shows the JSON API between tiled server and client
+- [Tiled Python Client Python API](https://github.com/BCDA-APS/bdp-tiled/blob/main/pyapi_client.py) - terse example using `tiled.client` libary
