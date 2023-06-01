@@ -1,5 +1,6 @@
 # tiled-viz2023
-Data visualization for tiled
+
+Python Qt5 application to visualize Bluesky data from tiled server.
 
 ## Goals
 
