@@ -17,5 +17,5 @@ test_catalog_1 = {'cat1':5,'cat2':2000,'cat3':10}
 
 
 # how do I ask for a variable within the "catalog" variable
-print(test_catalog_1['cat1'], test_catalog_1['cat2'], test_catalog_1['cat3'])
+# print(test_catalog_1['cat1'], test_catalog_1['cat2'], test_catalog_1['cat3'])
 # porblem is that it requres the user to know what the variable is. How do we allow it to 
