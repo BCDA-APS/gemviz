@@ -1,14 +1,22 @@
-from PyQt5 import QtWidgets
-from pydm.QtWidgets import QApplication,QMainwindow 
+import typing
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *  
+from PyQt5.QtGui import *
 import sys
 
+from PyQt5.QtWidgets import QWidget
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(442, 474)
-        self.centralwidget = QWidget(MainWindow)
+
+class Ui_MainWindow(MainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setupUi()
+
+    def setupUi(self):
+        self.setObjectName(u"MainWindow")
+        self.resize(442, 474)
+        self.centralwidget = QWidget(self)
         self.centralwidget.setObjectName(u"centralwidget")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
@@ -79,21 +87,21 @@ class Ui_MainWindow(object):
         self.TabWidgetPage2 = QWidget()
         self.TabWidgetPage2.setObjectName(u"TabWidgetPage2")
         self.tabWidget.addTab(self.TabWidgetPage2, "")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QStatusBar(MainWindow)
+        self.setCentralWidget(self.centralwidget)
+        self.statusbar = QStatusBar(self)
         self.statusbar.setObjectName(u"statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        self.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi()
 
         self.tabWidget.setCurrentIndex(0)
 
 
-        QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(self)
     # setupUi
 
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+    def retranslateUi(self):
+        self.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.InputLabel1.setText(QCoreApplication.translate("MainWindow", u"Input 1", None))
         self.InputLabel2.setText(QCoreApplication.translate("MainWindow", u"Input 2", None))
         self.InputLabel3.setText(QCoreApplication.translate("MainWindow", u"Input 1", None))
@@ -107,4 +115,19 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.TabWidgetPage1), "")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.TabWidgetPage2), QCoreApplication.translate("MainWindow", u"Page", None))
     # retranslateUi
+
+
+
+def gui():
+    """display the main widget"""
+    app = QApplication(sys.argv)
+    main_window = Ui_MainWindow()
+    # print(f"{main_window.label=}")
+    # print(f"{main_window.label.text()=}")
+    main_window.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    gui()
 
