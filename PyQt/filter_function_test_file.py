@@ -33,7 +33,7 @@ class MyMainWindow(QMainWindow):
         myLoadUi(ui_file, self)
         self.add_catalog_names()
         self.InputBox1.activated.connect(self.show_selected_catalog)
-        #self.InputBox1.activated.connect(self.show_selected_catalog_status)
+        self.InputBox1.activated.connect(self.show_selected_catalog_scan_id)
 
     def add_catalog_names(self):    # write to the pull down menu
         self.tf = test_function()
@@ -49,10 +49,13 @@ class MyMainWindow(QMainWindow):
         print(f"{self.tf[key] = }") 
         self.statusbar.showMessage(str(len(self.tf[key])) + " entries")
 
-    # def show_selected_catalog_status(self, itemnumber):
-    #     print(f"\n{itemnumber = }") 
-    #     print(f"{self.InputBox1.currentText() = }") 
-    #     key = self.InputBox1.currentText()  
+    def show_selected_catalog_scan_id(self):   
+        selected_catalog_key = self.InputBox1.currentText()  
+        selected_catalog_value = self.tf[selected_catalog_key]
+        scan_id_list=[str(selected_catalog_value[k]['scan_id']) for k in selected_catalog_value.keys()]
+        self.InputBox2.clear()
+        self.InputBox2.addItems(scan_id_list)
+
 
 
 
