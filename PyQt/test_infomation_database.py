@@ -44,11 +44,11 @@ cat1['dataset2']={'status':'success', 'plan':'rel_scan','scan_id':2, 'time': 'so
 cat1['dataset3']={'status':'success', 'plan':'exafs',   'scan_id':10,'time': 'sometimestamp','uid':'cf8ee704e5e5d079c2aaa664'}
 
 cat2={}
-cat2['dataset1']={'status':'success', 'plan':'scan_y',  'scan_id':3, 'time': 'sometimestamp','uid':'815b703bba126ffea26b0b9d'}
-cat2['dataset2']={'status':'success', 'plan':'ct',      'scan_id':4, 'time': 'sometimestamp','uid':'d8398d2c1129b553e0812689'}
-cat2['dataset3']={'status':'aborted', 'plan':'xanes',   'scan_id':5, 'time': 'sometimestamp','uid':'5f03341a5f2563f73fab068c'}
-cat2['dataset4']={'status':'aborted', 'plan':'scan_z',  'scan_id':6, 'time': 'sometimestamp','uid':'cf8ee704e5e5d079c2aaa664'}
-cat2['dataset5']={'status':'success', 'plan':'exafs',   'scan_id':8, 'time': 'sometimestamp','uid':'4075b3e71529e20626c329df'}
+cat2['dataset1']={'status':'success', 'plan':'scan_y',  'scan_id':3, 'time': 1687579870.141821,'uid':'815b703bba126ffea26b0b9d'}
+cat2['dataset2']={'status':'success', 'plan':'ct',      'scan_id':4, 'time': 1687569870.101097,'uid':'d8398d2c1129b553e0812689'}
+cat2['dataset3']={'status':'aborted', 'plan':'xanes',   'scan_id':5, 'time': 1687559870.212121,'uid':'5f03341a5f2563f73fab068c'}
+cat2['dataset4']={'status':'aborted', 'plan':'scan_z',  'scan_id':6, 'time': 1687549870.135789,'uid':'cf8ee704e5e5d079c2aaa664'}
+cat2['dataset5']={'status':'success', 'plan':'exafs',   'scan_id':8, 'time': 1687569870.141890,'uid':'4075b3e71529e20626c329df'}
 
 cat3={}
 cat3['dataset1']={'status':'success', 'plan':'scan_th', 'scan_id':1, 'time': 'sometimestamp','uid':'964c81960b5bd2434075b3es'}
