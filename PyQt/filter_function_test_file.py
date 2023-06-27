@@ -45,12 +45,9 @@ class MyMainWindow(QMainWindow):
         self.InputBox1.clear()
         self.InputBox1.addItems(self.tf.keys())
 
-    def show_selected_catalog(self, itemnumber):    # read selected value from pull down menu
-        #print(f"\n{itemnumber = }") 
-        #print(f"{self.InputBox1.currentText() = }") 
-        key = self.InputBox1.currentText()  
-        #print(f"{self.tf[key] = }") 
-        num_entries = len(self.tf[key])
+    def show_selected_catalog(self):    # read selected value from pull down menu
+        cat = self.InputBox1.currentText()  
+        num_entries = len(self.tf[cat])
         self.statusbar.showMessage("There are " +str(num_entries) + " entries")
 
         # ib2 = self.InputBox1.currentText()
@@ -68,15 +65,16 @@ class MyMainWindow(QMainWindow):
             self.InputBox4.clear()
             self.InputBox18.clear()      
     
-    def show_selected_catalog_scan(self, itemnumber):
-        print(f"\n{itemnumber = }") 
-        print(f"{self.InputBox2.currentText() = }") 
+    def show_selected_catalog_scan(self):
+        IB1 = self.InputBox1.currentText()  
         IB2 = self.InputBox2.currentText()
-        #print(f"{self.tf[IB2] = }")
-        print(f"{IB2}")
-        print(f"{type(IB2)= }")
-        #IB2_entires = str(self.tf[IB2])
-        self.statusbar.showMessage("Scan ID is " + IB2)
+        mystatus = "?"
+        for values in self.tf[IB1].values():
+            if values['scan_id'] == int(IB2):     # selected_id is a str, we need to make it an int to compare to what is in the dictionnary
+                print(f"{values['status']}")
+                mystatus = values['status']
+        message = "Scan ID is " + IB2 + "; status = " + mystatus
+        self.statusbar.showMessage(message)
 
     
 
