@@ -68,13 +68,15 @@ class MyMainWindow(QMainWindow):
     def show_selected_catalog_scan(self):
         IB1 = self.InputBox1.currentText()  
         IB2 = self.InputBox2.currentText()
-        mystatus = "?"
-        for values in self.tf[IB1].values():
-            if values['scan_id'] == int(IB2):     # selected_id is a str, we need to make it an int to compare to what is in the dictionnary
-                print(f"{values['status']}")
-                mystatus = values['status']
-        message = "Scan ID is " + IB2 + "; status = " + mystatus
-        self.statusbar.showMessage(message)
+        if IB2 != "":  
+            mystatus = "?"
+            for values in self.tf[IB1].values():
+                if values['scan_id'] == int(IB2):     # selected_id is a str, we need to make it an int to compare to what is in the dictionnary
+                    print(f"{values['status']}")
+                    mystatus = values['status']
+            message = "Scan ID is " + IB2 + "; status = " + mystatus
+            self.statusbar.showMessage(message)
+            #TODO clear status bar when blank is selected
 
     
 
