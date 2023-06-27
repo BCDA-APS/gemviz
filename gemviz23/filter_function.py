@@ -1,6 +1,6 @@
 ### I want to inport the information from the test database filter through and find key words and info
 
-from test_infomation_database import test_catalog_2
+from dummy_database import test_catalog_2
 
 def test_function():
     return (test_catalog_2)
@@ -30,7 +30,7 @@ class MyMainWindow(QMainWindow):
         self.max_num_of_entries = 100
         super().__init__()
         #import UI file
-        ui_file = pathlib.Path(__file__).parent / "Filter_Window.ui"
+        ui_file = pathlib.Path(__file__).parent / "ui_files/Filter_Window.ui"
         myLoadUi(ui_file, self)
         self.add_catalog_names()
         self.InputBox1.activated.connect(self.show_selected_catalog)
