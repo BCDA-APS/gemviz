@@ -18,6 +18,20 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 
 # this is what we customize:
 class MyMainWindow(QMainWindow):
+    def __init__(self):
+        self.max_num_of_entries = 100
+        super().__init__()
+        #import UI file
+        ui_file = pathlib.Path(__file__).parent / "ui_files/result_window.ui"
+        myLoadUi(ui_file, self)
+
+    #def horizontal_header():
+        # use the function horizontalHeader()
+    
+    #def vertical_header():
+        # use the function verticalHeader()
+
+        
 
 
 
