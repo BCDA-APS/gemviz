@@ -6,6 +6,7 @@ from app_settings import settings
 
 UI_FILE = utils.getUiFileName(__file__)
 LOCALHOST_URL = "http://localhost:5000"
+TILED_SERVER_SETTINGS_KEY = "tiled_server"
 
 
 class TiledServerDialog(QDialog):
@@ -32,7 +33,7 @@ class TiledServerDialog(QDialog):
     @staticmethod
     def getServer(parent):
         dialog = TiledServerDialog(parent)
-        server = settings.getKey("tiled_server") or ""
+        server = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         if server != "":
             dialog.url_button.setText(server)
             dialog.url_button.setChecked(True)
@@ -63,7 +64,7 @@ class TiledServerDialog(QDialog):
         url = QUrl(selected)
         print(f"{url=} {url.isValid()=} {url.isRelative()=}")
         if url.isValid() and not url.isRelative():
-            settings.setKey("tiled_server", selected)
+            settings.setKey(TILED_SERVER_SETTINGS_KEY, selected)
         else:
             return
 
