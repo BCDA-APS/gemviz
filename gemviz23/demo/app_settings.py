@@ -31,7 +31,7 @@ This module uses QtCore.QSettings.
 
 import datetime
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 
 import __init__
 
@@ -172,7 +172,8 @@ class ApplicationQSettings(QtCore.QSettings):
             return
 
         # is this window on any available screen?
-        qdw = QtGui.QDesktopWidget()
+        qdw = QtWidgets.QDesktopWidget()
+        # qdw = QApplication.desktop()
         x_onscreen = False
         y_onscreen = False
         for screen_num in range(qdw.screenCount()):

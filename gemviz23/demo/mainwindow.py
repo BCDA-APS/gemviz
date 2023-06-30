@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow
 
+from app_settings import settings
 import __init__
 import utils
 
@@ -24,6 +25,8 @@ class MainWindow(QMainWindow):
 
         # FIXME: I'm not happy with this way to add the filter UI yet.
         self.filter_layout.addWidget(FilterPanel(self))
+
+        settings.restoreWindowGeometry(self)
 
     @property
     def status(self):
@@ -52,7 +55,7 @@ class MainWindow(QMainWindow):
         #     if self.confirmAbandonChangesNotOk():
         #         return
 
-        # self.saveWindowGeometry()
+        settings.saveWindowGeometry(self)
         # self.closeSubwindows()
         self.close()
 
@@ -68,3 +71,17 @@ class MainWindow(QMainWindow):
         else:
             self.status = f"tiled {server=!r}"
             # TODO: do something, such as connect with the server
+
+    # def saveWindowGeometry(self):
+    #     '''
+    #     remember where the window was
+    #     '''
+    #     if settings is not None:
+    #         settings.saveWindowGeometry(self)
+
+    # def restoreWindowGeometry(self):
+    #     '''
+    #     put the window back where it was
+    #     '''
+    #     if settings is not None:
+    #         settings.restoreWindowGeometry(self)
