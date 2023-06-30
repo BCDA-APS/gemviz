@@ -24,7 +24,7 @@ class TiledServerDialog(QDialog):
     @staticmethod
     def getServer(parent, default=None):
         dialog = TiledServerDialog(parent)
-        if default == "url":
+        if default not in ("localhost", None):
             dialog.url_button.setChecked(True)
         else:
             dialog.localhost_button.setChecked(True)
