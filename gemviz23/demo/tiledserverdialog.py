@@ -21,6 +21,9 @@ class TiledServerDialog(QDialog):
         pass
 
     # static method to create the dialog and return selected server URL
+    # ref: https://stackoverflow.com/questions/18196799
+    # How can I show a PyQt modal dialog and get data
+    # out of its controls once it's closed?
     @staticmethod
     def getServer(parent, default=None):
         dialog = TiledServerDialog(parent)
