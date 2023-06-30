@@ -31,12 +31,13 @@ class TiledServerDialog(QDialog):
         dialog.url_button.setText(TILED_SERVER_URL)
 
         choices = {
-            dialog.localhost_button : "http://localhost:5000",
-            dialog.url_button : TILED_SERVER_URL,
+            dialog.localhost_button: "http://localhost:5000",
+            dialog.url_button: TILED_SERVER_URL,
         }
 
         parent.status = "Choose which tiled server to use ..."
         result = dialog.exec_()
+        # FIXME: Is this truly modal?
 
         selected = None
         for button, server in choices.items():
@@ -44,5 +45,3 @@ class TiledServerDialog(QDialog):
                 selected = server
 
         return selected
-
-
