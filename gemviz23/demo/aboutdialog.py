@@ -1,7 +1,7 @@
-import gemviz23.demo.textwindow as textwindow
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog
 
+import textwindow
 import utils
 
 # UI file name matches this module, different extension
@@ -19,7 +19,6 @@ class AboutDialog(QDialog):
         super().__init__(mainwindow)
         utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setup()
-        self.setModal(False)
 
     def setup(self):
         import os
@@ -40,6 +39,8 @@ class AboutDialog(QDialog):
         self.docs_pb.clicked.connect(self.doDocsUrl)
         self.issues_pb.clicked.connect(self.doIssuesUrl)
         self.license_pb.clicked.connect(self.doLicense)
+
+        self.setModal(False)
 
     def closeEvent(self, event):
         """
