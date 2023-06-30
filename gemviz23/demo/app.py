@@ -6,11 +6,11 @@ gemviz23: Python Qt5 application to demonstrate multiple UI files.
 
 import sys
 
-from PyQt5.QtWidgets import QApplication
-
 
 def gui():
     """Display the main window"""
+    from PyQt5.QtWidgets import QApplication
+
     from mainwindow import MainWindow
 
     app = QApplication(sys.argv)
