@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QHBoxLayout, QMainWindow
+from PyQt5.QtWidgets import QMainWindow
 
 import utils
 
