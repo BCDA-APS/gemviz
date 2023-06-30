@@ -119,3 +119,8 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
         ui_file = UI_DIR / ui_file
 
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
+
+
+def getUiFileName(py_file_name):
+    """UI file name matches the Python file, different extension."""
+    return f"{pathlib.Path(py_file_name).stem}.ui"

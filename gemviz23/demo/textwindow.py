@@ -1,6 +1,3 @@
-# Copyright (c) 2009 - 2016, UChicago Argonne, LLC.
-# See LICENSE file for details.
-
 """
 show text in a GUI window
 """
@@ -9,7 +6,8 @@ from PyQt5.QtWidgets import QWidget
 
 import utils
 
-UI_FILE = "textwindow.ui"
+# UI file name matches this module, different extension
+UI_FILE = utils.getUiFileName(__file__)
 
 
 class TextWindow(QWidget):

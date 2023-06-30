@@ -1,10 +1,11 @@
+import gemviz23.demo.textwindow as textwindow
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog
 
-import gemviz23.demo.textwindow as textwindow
 import utils
 
-UI_FILE = "aboutdialog.ui"
+# UI file name matches this module, different extension
+UI_FILE = utils.getUiFileName(__file__)
 
 
 class AboutDialog(QDialog):

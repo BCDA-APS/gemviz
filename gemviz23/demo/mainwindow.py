@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QMainWindow
 
-from utils import APP_TITLE, myLoadUi
+import utils
 
-UI_FILE = "mainwindow.ui"
+UI_FILE = utils.getUiFileName(__file__)
 
 
 class MainWindow(QMainWindow):
@@ -10,15 +10,16 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        myLoadUi(UI_FILE, baseinstance=self)
+        utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setup()
 
     def setup(self):
         from filterpanel import FilterPanel
 
-        self.title.setText(APP_TITLE)
+        self.title.setText(utils.APP_TITLE)
+        self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
-        self.actionQuit.triggered.connect(self.doClose)
+        self.actionExit.triggered.connect(self.doClose)
 
         self.filter_layout.addWidget(FilterPanel(self))
 
@@ -52,3 +53,15 @@ class MainWindow(QMainWindow):
         # self.saveWindowGeometry()
         # self.closeSubwindows()
         self.close()
+
+    def doOpen(self, *args, **kw):
+        """
+        User chose to open (connect with) a tiled server.
+        """
+        from tiledserverdialog import TiledServerDialog
+
+        self.status = "TODO: Open connection with a tiled server ..."
+        self.status = "before"
+        server = TiledServerDialog.getServer(self)
+        self.status = "after"
+        print(f"{server=}")

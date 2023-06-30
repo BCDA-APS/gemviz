@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QGroupBox
 
-from utils import myLoadUi
+import utils
 
-UI_FILE = "filterpanel.ui"
+# UI file name matches this module, different extension
+UI_FILE = utils.getUiFileName(__file__)
 
 
 class FilterPanel(QGroupBox):
@@ -10,7 +11,7 @@ class FilterPanel(QGroupBox):
 
     def __init__(self, mainwindow):
         super().__init__()
-        myLoadUi(UI_FILE, baseinstance=self)
+        utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setup()
 
     def setup(self):
