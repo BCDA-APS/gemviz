@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog
 
+import __init__
 import textwindow
 import utils
 
@@ -25,17 +26,17 @@ class AboutDialog(QDialog):
 
         pid = os.getpid()
 
-        self.title.setText(utils.APP_TITLE)
-        self.version.setText(f"version {utils.VERSION}")
-        self.description.setText(utils.APP_DESC)
-        self.authors.setText(", ".join(utils.AUTHOR_LIST))
-        self.copyright.setText(utils.COPYRIGHT_TEXT)
+        self.title.setText(__init__.APP_TITLE)
+        self.version.setText(f"version {__init__.VERSION}")
+        self.description.setText(__init__.APP_DESC)
+        self.authors.setText(", ".join(__init__.AUTHOR_LIST))
+        self.copyright.setText(__init__.COPYRIGHT_TEXT)
 
-        self.mainwindow.status = f"About {utils.APP_TITLE}, {pid=}"
+        self.mainwindow.status = f"About {__init__.APP_TITLE}, {pid=}"
 
         # handle the push buttons
-        self.docs_pb.setToolTip(utils.DOCS_URL)
-        self.issues_pb.setToolTip(utils.ISSUES_URL)
+        self.docs_pb.setToolTip(__init__.DOCS_URL)
+        self.issues_pb.setToolTip(__init__.ISSUES_URL)
         self.docs_pb.clicked.connect(self.doDocsUrl)
         self.issues_pb.clicked.connect(self.doIssuesUrl)
         self.license_pb.clicked.connect(self.doLicense)
@@ -59,18 +60,18 @@ class AboutDialog(QDialog):
     def doDocsUrl(self):
         """opening documentation URL in default browser"""
         self.mainwindow.status = "opening documentation URL in default browser"
-        self.doUrl(utils.DOCS_URL)
+        self.doUrl(__init__.DOCS_URL)
 
     def doIssuesUrl(self):
         """opening issues URL in default browser"""
         self.mainwindow.status = "opening issues URL in default browser"
-        self.doUrl(utils.ISSUES_URL)
+        self.doUrl(__init__.ISSUES_URL)
 
     def doLicense(self):
         """show the license"""
         if self.license_box is None:
             self.mainwindow.status = "opening License in new window"
-            license_text = open(utils.LICENSE_FILE, "r").read()
+            license_text = open(__init__.LICENSE_FILE, "r").read()
             # history.addLog('DEBUG: ' + license_text)
             ui = textwindow.TextWindow(None, "LICENSE", license_text, self.settings)
             ui.setMinimumSize(700, 500)

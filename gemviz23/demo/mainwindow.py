@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow
 
+import __init__
 import utils
 
 UI_FILE = utils.getUiFileName(__file__)
@@ -16,7 +17,7 @@ class MainWindow(QMainWindow):
     def setup(self):
         from filterpanel import FilterPanel
 
-        self.title.setText(utils.APP_TITLE)
+        self.title.setText(__init__.APP_TITLE)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
