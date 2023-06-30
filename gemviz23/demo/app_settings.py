@@ -73,8 +73,9 @@ class ApplicationQSettings(QtCore.QSettings):
             timestamp=str(datetime.datetime.now()),
         )
         for k, v in d.items():
-            if self.getKey(GLOBAL_GROUP + "/" + k) in ("", None):
-                self.setValue(GLOBAL_GROUP + "/" + k, v)
+            key = f"{GLOBAL_GROUP}/{k}"
+            if self.getKey(key) in ("", None):
+                self.setValue(key, v)
 
     def _keySplit_(self, full_key):
         """
@@ -101,6 +102,8 @@ class ApplicationQSettings(QtCore.QSettings):
         """
         Return the Python object of key or None if not found.
         """
+        if "/" not in key and not self.keyExists(key):
+            key = f"{GLOBAL_GROUP}/{key}"
         return self.value(key)
 
     def setKey(self, key, value):
