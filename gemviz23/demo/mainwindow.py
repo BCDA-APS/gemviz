@@ -60,8 +60,6 @@ class MainWindow(QMainWindow):
         """
         from tiledserverdialog import TiledServerDialog
 
-        self.status = "TODO: Open connection with a tiled server ..."
-        self.status = "before"
-        server = TiledServerDialog.getServer(self)
-        self.status = "after"
-        print(f"{server=}")
+        server = TiledServerDialog.getServer(self, default="url")
+        self.status = f"tiled {server=}"
+        # TODO: do something, such as connect with the server

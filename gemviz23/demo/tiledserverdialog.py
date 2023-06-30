@@ -23,19 +23,21 @@ class TiledServerDialog(QDialog):
     # static method to create the dialog and return selected server URL
     @staticmethod
     def getServer(parent, default=None):
+        dialog = TiledServerDialog(parent)
+        if default == "url":
+            dialog.url_button.setChecked(True)
+        else:
+            dialog.localhost_button.setChecked(True)
+        dialog.url_button.setText(TILED_SERVER_URL)
+
         choices = {
             dialog.localhost_button : "http://localhost:5000",
             dialog.url_button : TILED_SERVER_URL,
         }
 
-        dialog = TiledServerDialog(parent)
-        dialog.localhost_button.setChecked(True)  # TODO: consider default param
-        dialog.url_button.setText(TILED_SERVER_URL)
-
         parent.status = "Choose which tiled server to use ..."
         result = dialog.exec_()
 
-        parent.status = f"{(result == QDialog.Accepted)=}"
         selected = None
         for button, server in choices.items():
             if button.isChecked():
