@@ -1,9 +1,11 @@
+from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QDialog
 
 import utils
+from app_settings import settings
 
 UI_FILE = utils.getUiFileName(__file__)
-TILED_SERVER_URL = "http://otz.xray.aps.anl.gov:5000"  # TODO: use settings file
+LOCALHOST_URL = "http://localhost:5000"
 
 
 class TiledServerDialog(QDialog):
@@ -18,33 +20,51 @@ class TiledServerDialog(QDialog):
         self.setModal(True)
 
     def setup(self):
-        pass
+        self.other_button.toggled.connect(self.enableOther)
+
+    def enableOther(self):
+        self.other_url.setEnabled(self.other_button.isChecked())
 
     # static method to create the dialog and return selected server URL
     # ref: https://stackoverflow.com/questions/18196799
     # How can I show a PyQt modal dialog and get data
     # out of its controls once it's closed?
     @staticmethod
-    def getServer(parent, default=None):
+    def getServer(parent):
         dialog = TiledServerDialog(parent)
-        if default not in ("localhost", None):
+        server = settings.getKey("tiled_server") or ""
+        if server != "":
+            dialog.url_button.setText(server)
             dialog.url_button.setChecked(True)
         else:
+            dialog.url_button.setEnabled(False)
             dialog.localhost_button.setChecked(True)
-        dialog.url_button.setText(TILED_SERVER_URL)
 
         choices = {
-            dialog.localhost_button: "http://localhost:5000",
-            dialog.url_button: TILED_SERVER_URL,
+            dialog.localhost_button: LOCALHOST_URL,
+            dialog.url_button: server,
         }
 
         parent.status = "Choose which tiled server to use ..."
-        result = dialog.exec_()
+        ok_selected = dialog.exec_()
         # FIXME: Is this truly modal?
 
         selected = None
+        if not ok_selected:
+            return
         for button, server in choices.items():
             if button.isChecked():
                 selected = server
+                break
+        if selected is None and dialog.other_button.isChecked():
+            selected = dialog.other_url.text()
+
+        # check the value before accepting it
+        url = QUrl(selected)
+        print(f"{url=} {url.isValid()=} {url.isRelative()=}")
+        if url.isValid() and not url.isRelative():
+            settings.setKey("tiled_server", selected)
+        else:
+            return
 
         return selected

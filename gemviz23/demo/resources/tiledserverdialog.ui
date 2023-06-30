@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>138</height>
+    <height>194</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,6 +31,26 @@
        <widget class="QRadioButton" name="url_button">
         <property name="text">
          <string>URL</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="other_button">
+        <property name="text">
+         <string>Other ...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="other_url">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="placeholderText">
+         <string>http://tiled_server.domain.tld:5000</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
