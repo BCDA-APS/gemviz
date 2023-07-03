@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         from aboutdialog import AboutDialog
 
         about = AboutDialog(self)
-        about.show()
+        about.exec()
 
     def doClose(self, *args, **kw):
         """
