@@ -24,12 +24,21 @@ class MyMainWindow(QMainWindow):
         #import UI file
         ui_file = pathlib.Path(__file__).parent / "ui_files/result_window.ui"
         myLoadUi(ui_file, self)
+        #self.load_data
 
-    #def horizontal_header():
-        # use the function horizontalHeader()
+
+    def load_data(self):
+        cata = [{"Catalog":"1" , "Plan": "2" , "Scan ID":"333", "Status":"Success","Positioner":"4"}]        
+        row = 0
+        self.tableWidget.setRowCount(len(cata))
+        for catalog in cat:
+            self.tableWidget.setItem(row, 0, QtWidgets.QTableWidgetItem(catalog["Catalog"]))
+            row = row +1
+
+
+    #def horizontal_header():have to make this dynamic so that it takes information from tiled and adapts 
     
-    #def vertical_header():
-        # use the function verticalHeader()
+    #def vertical_header():have to make this dynamic so that it takes information from tiled and adapts
 
         
 
