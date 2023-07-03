@@ -25,7 +25,9 @@ class MainWindow(QMainWindow):
 
         self.filter_scroll.setWidget(FilterPanel(self))
 
-        settings.restoreWindowGeometry(self)
+        settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        settings.restoreSplitterDetails(self.hsplitter, "mainwindow_horizontal_splitter")
+        settings.restoreSplitterDetails(self.vsplitter, "mainwindow_vertical_splitter")
 
     @property
     def status(self):
@@ -48,13 +50,16 @@ class MainWindow(QMainWindow):
         """
         User chose exit (or quit), or closeEvent() was called.
         """
+        # FIXME: Close the window with the X did not get here.
         self.status = "Application quitting ..."
         # history.addLog('application exit requested', False)
         # if self.cannotProceed():
         #     if self.confirmAbandonChangesNotOk():
         #         return
 
-        settings.saveWindowGeometry(self)
+        settings.saveWindowGeometry(self, "mainwindow_geometry")
+        settings.saveSplitterDetails(self.hsplitter, "mainwindow_horizontal_splitter")
+        settings.saveSplitterDetails(self.vsplitter, "mainwindow_vertical_splitter")
         # self.closeSubwindows()
         self.close()
 
@@ -70,17 +75,3 @@ class MainWindow(QMainWindow):
         else:
             self.status = f"tiled {server=!r}"
             # TODO: do something, such as connect with the server
-
-    # def saveWindowGeometry(self):
-    #     '''
-    #     remember where the window was
-    #     '''
-    #     if settings is not None:
-    #         settings.saveWindowGeometry(self)
-
-    # def restoreWindowGeometry(self):
-    #     '''
-    #     put the window back where it was
-    #     '''
-    #     if settings is not None:
-    #         settings.restoreWindowGeometry(self)
