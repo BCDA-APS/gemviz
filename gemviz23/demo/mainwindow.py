@@ -23,8 +23,7 @@ class MainWindow(QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
 
-        # FIXME: I'm not happy with this way to add the filter UI yet.
-        self.filter_layout.addWidget(FilterPanel(self))
+        self.filter_scroll.setWidget(FilterPanel(self))
 
         settings.restoreWindowGeometry(self)
 
@@ -43,7 +42,7 @@ class MainWindow(QMainWindow):
         from aboutdialog import AboutDialog
 
         about = AboutDialog(self)
-        about.show()
+        about.exec()
 
     def doClose(self, *args, **kw):
         """
