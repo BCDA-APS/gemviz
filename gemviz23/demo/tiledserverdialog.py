@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QDialog
 import utils
 from app_settings import settings
 
-UI_FILE = utils.getUiFileName(__file__)
 LOCALHOST_URL = "http://localhost:5000"
 TILED_SERVER_SETTINGS_KEY = "tiled_server"
 
@@ -12,11 +11,14 @@ TILED_SERVER_SETTINGS_KEY = "tiled_server"
 class TiledServerDialog(QDialog):
     """User chooses which tiled server from a few options."""
 
+    # UI file name matches this module, different extension
+    ui_file = utils.getUiFileName(__file__)
+
     def __init__(self, mainwindow):
         self.mainwindow = mainwindow
 
         super().__init__(mainwindow)
-        utils.myLoadUi(UI_FILE, baseinstance=self)
+        utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
         self.setModal(True)
 

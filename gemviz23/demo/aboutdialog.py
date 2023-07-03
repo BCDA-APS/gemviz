@@ -5,12 +5,12 @@ import __init__
 import textwindow
 import utils
 
-# UI file name matches this module, different extension
-UI_FILE = utils.getUiFileName(__file__)
-
 
 class AboutDialog(QDialog):
-    """loads a custom .ui file"""
+    """Load a generic About... Dialog as a .ui file."""
+
+    # UI file name matches this module, different extension
+    ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, mainwindow):
         self.mainwindow = mainwindow
@@ -18,7 +18,7 @@ class AboutDialog(QDialog):
         self.settings = None  # TODO
 
         super().__init__(mainwindow)
-        utils.myLoadUi(UI_FILE, baseinstance=self)
+        utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
     def setup(self):
@@ -26,6 +26,7 @@ class AboutDialog(QDialog):
 
         pid = os.getpid()
 
+        self.setWindowTitle(f"About ... {__init__.APP_TITLE}")
         self.title.setText(__init__.APP_TITLE)
         self.version.setText(f"version {__init__.VERSION}")
         self.description.setText(__init__.APP_DESC)
@@ -73,7 +74,9 @@ class AboutDialog(QDialog):
             self.mainwindow.status = "opening License in new window"
             license_text = open(__init__.LICENSE_FILE, "r").read()
             # history.addLog('DEBUG: ' + license_text)
-            ui = textwindow.TextWindow(None, "LICENSE", license_text, self.settings)
+            # FIXME: Since "About" is now modal, cannot close this license window!
+            # Only closes when About closes.
+            ui = textwindow.TextWindow(None, "LICENSE", license_text)
             ui.setMinimumSize(700, 500)
             self.license_box = ui
         self.license_box.show()
