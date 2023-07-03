@@ -61,8 +61,8 @@ class ApplicationQSettings(QtCore.QSettings):
         ~updateTimeStamp
         ~saveWindowGeometry
         ~restoreWindowGeometry
-        ~saveSplitterDetails
-        ~restoreSplitterDetails
+        ~saveSplitter
+        ~restoreSplitter
     """
 
     def __init__(self, orgName, appName):
@@ -222,7 +222,7 @@ class ApplicationQSettings(QtCore.QSettings):
 
         window.setGeometry(QtCore.QRect(int(x), int(y), int(width), int(height)))
 
-    def saveSplitterDetails(self, splitter, label):
+    def saveSplitter(self, splitter, label):
         """
         remember where the splitter was
 
@@ -232,7 +232,7 @@ class ApplicationQSettings(QtCore.QSettings):
         sizes = map(int, splitter.sizes())
         self.setKey(f"{label}/sizes", " ".join(map(str, sizes)))
 
-    def restoreSplitterDetails(self, splitter, label):
+    def restoreSplitter(self, splitter, label):
         """
         put the splitter back where it was
 
