@@ -27,6 +27,11 @@ This module uses QtCore.QSettings.
     or learn how to edit the settings file.
 
 .. see:: https://github.com/prjemian/assign_gup/blob/master/src/Assign_GUP/settings.py
+
+.. autosummary::
+
+    ~ApplicationQSettings
+    ~settings
 """
 
 import datetime
@@ -42,7 +47,22 @@ class ApplicationQSettings(QtCore.QSettings):
     """
     Manage and preserve settings for this application using QSettings.
 
-    Use the .ini file format and save under user directory
+    Use the .ini file format and save under user directory.
+
+    .. autosummary::
+
+        ~to_dict
+        ~init_global_keys
+        ~_keySplit_
+        ~keyExists
+        ~getKey
+        ~setKey
+        ~resetDefaults
+        ~updateTimeStamp
+        ~saveWindowGeometry
+        ~restoreWindowGeometry
+        ~saveSplitterDetails
+        ~restoreSplitterDetails
     """
 
     def __init__(self, orgName, appName):
@@ -137,43 +157,39 @@ class ApplicationQSettings(QtCore.QSettings):
         """ """
         self.setKey("timestamp", str(datetime.datetime.now()))
 
-    def getGroupName(self, window, group):
-        return group or window.__class__.__name__ + "_geometry"
-
-    def saveWindowGeometry(self, window, group=None):
+    def saveWindowGeometry(self, window, label):
         """
-        remember where the window was
+        Remember the window's location.
 
         :param obj window: instance of QWidget
+        :param str label: group name to use in settings file
         """
-        group = self.getGroupName(window, group)
         geo = window.geometry()
-        self.setKey(group + "/x", geo.x())
-        self.setKey(group + "/y", geo.y())
-        self.setKey(group + "/width", geo.width())
-        self.setKey(group + "/height", geo.height())
+        self.setKey(f"{label}/x", geo.x())
+        self.setKey(f"{label}/y", geo.y())
+        self.setKey(f"{label}/width", geo.width())
+        self.setKey(f"{label}/height", geo.height())
 
-    def restoreWindowGeometry(self, window, group=None):
+    def restoreWindowGeometry(self, window, label):
         """
-        put the window back where it was
+        Put the window back in place.
 
         :param obj window: instance of QWidget
+        :param str label: group name to use in settings file
         """
-        group = self.getGroupName(window, group)
-        width = self.getKey(group + "/width")
-        height = self.getKey(group + "/height")
+        width = self.getKey(f"{label}/width")
+        height = self.getKey(f"{label}/height")
         if width is None or height is None:
             return
         window.resize(QtCore.QSize(int(width), int(height)))
 
-        x = self.getKey(group + "/x")
-        y = self.getKey(group + "/y")
+        x = self.getKey(f"{label}/x")
+        y = self.getKey(f"{label}/y")
         if x is None or y is None:
             return
 
         # is this window on any available screen?
         qdw = QtWidgets.QDesktopWidget()
-        # qdw = QApplication.desktop()
         x_onscreen = False
         y_onscreen = False
         for screen_num in range(qdw.screenCount()):
@@ -206,26 +222,26 @@ class ApplicationQSettings(QtCore.QSettings):
 
         window.setGeometry(QtCore.QRect(int(x), int(y), int(width), int(height)))
 
-    def saveSplitterDetails(self, window):
+    def saveSplitterDetails(self, splitter, label):
         """
         remember where the splitter was
 
-        :param obj window: instance of QWidget
+        :param obj splitter: instance of QSplitter
+        :param str label: group name to use in settings file
         """
-        group = self.__class__.__name__ + "_splitter"
-        sizes = map(int, window.splitter.sizes())
-        self.setKey(group + "/widths", " ".join(map(str, sizes)))
+        sizes = map(int, splitter.sizes())
+        self.setKey(f"{label}/sizes", " ".join(map(str, sizes)))
 
-    def restoreSplitterDetails(self, window):
+    def restoreSplitterDetails(self, splitter, label):
         """
         put the splitter back where it was
 
-        :param obj window: instance of QWidget
+        :param obj splitter: instance of QSplitter
+        :param str label: group name to use in settings file
         """
-        group = self.__class__.__name__ + "_splitter"
-        sizes = self.getKey(group + "/widths")
+        sizes = self.getKey(f"{label}/sizes")
         if sizes is not None:
-            window.splitter.setSizes(map(int, str(sizes).split()))
+            splitter.setSizes(map(int, str(sizes).split()))
 
 
 # create _the_ singleton object
@@ -234,7 +250,7 @@ settings = ApplicationQSettings(
 )
 
 
-def qmain():
+def main():
     ss = settings
     print(f"{ss=}")
 
@@ -250,4 +266,4 @@ def qmain():
 
 
 if __name__ == "__main__":
-    qmain()
+    main()
