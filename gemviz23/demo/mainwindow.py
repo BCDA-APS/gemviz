@@ -24,7 +24,8 @@ class MainWindow(QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
 
-        self.filter_scroll.setWidget(FilterPanel(self))
+        self.filter_panel = FilterPanel(self)
+        self.filter_scroll.setWidget(self.filter_panel)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         settings.restoreSplitter(self.hsplitter, "mainwindow_horizontal_splitter")
