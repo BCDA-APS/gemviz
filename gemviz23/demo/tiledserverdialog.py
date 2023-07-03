@@ -49,8 +49,7 @@ class TiledServerDialog(QDialog):
         }
 
         parent.status = "Choose which tiled server to use ..."
-        ok_selected = dialog.exec_()
-        # FIXME: Is this truly modal?
+        ok_selected = dialog.exec()
 
         selected = None
         if not ok_selected:

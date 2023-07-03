@@ -17,7 +17,7 @@ def gui():
     main_window = MainWindow()
     main_window.status = "Application started ..."
     main_window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
