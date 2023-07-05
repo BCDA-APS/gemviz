@@ -15,10 +15,9 @@ def gui():
 
     app = QApplication(sys.argv)
     main_window = MainWindow()
-    print(f"{main_window.status=}")
     main_window.status = "Application started ..."
     main_window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
