@@ -1,13 +1,12 @@
-from PyQt5.QtWidgets import QMainWindow
-
 import __init__
 import utils
 from app_settings import settings
+from PyQt5 import QtWidgets
 
 UI_FILE = utils.getUiFileName(__file__)
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
 
     def __init__(self):
@@ -17,6 +16,7 @@ class MainWindow(QMainWindow):
 
     def setup(self):
         from filterpanel import FilterPanel
+        from resultwindow import ResultWindow
 
         self.setWindowTitle(__init__.APP_TITLE)
         self.title.setText(__init__.APP_TITLE)
@@ -26,6 +26,10 @@ class MainWindow(QMainWindow):
 
         self.filter_panel = FilterPanel(self)
         self.filter_scroll.setWidget(self.filter_panel)
+
+        layout = self.runs_groupbox.layout()
+        results = ResultWindow(self)
+        layout.addWidget(results)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         settings.restoreSplitter(self.hsplitter, "mainwindow_horizontal_splitter")

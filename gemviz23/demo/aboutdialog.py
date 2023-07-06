@@ -1,9 +1,8 @@
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QDialog
-
 import __init__
 import textwindow
 import utils
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QDialog
 
 
 class AboutDialog(QDialog):

@@ -5,9 +5,8 @@ Support functions for this demo project.
 import datetime
 import pathlib
 
-import tiled.queries
-
 import __init__
+import tiled.queries
 
 
 def iso2time(isotime):
