@@ -78,9 +78,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         from tiledserverdialog import TiledServerDialog
 
-        server = TiledServerDialog.getServer(self)
-        if server is None:
+        server_uri = TiledServerDialog.getServer(self)
+        if server_uri is None:
             self.status = "No tiled server selected."
         else:
-            self.status = f"tiled {server=!r}"
-            # TODO: do something, such as connect with the server
+            self.status = f"tiled {server_uri=!r}"
+            self.filter_panel.setServer(utils.connect_tiled_server(server_uri))

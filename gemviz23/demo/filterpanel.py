@@ -10,10 +10,26 @@ class FilterPanel(QWidget):
 
     def __init__(self, mainwindow):
         self.mainwindow = mainwindow
+        self._server = None
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
     def setup(self):
-        pass  # TODO: lots more to do
+        self.catalogs.currentTextChanged.connect(self.catalogSelected)
+
+    def setCatalogs(self, catalogs):
+        self.catalogs.clear()
+        self.catalogs.addItems(catalogs)
+
+    def server(self):
+        return self._server
+    
+    def setServer(self, server):
+        self._server = server
+        self.setCatalogs(list(self._server))
+
+    def catalogSelected(self, *args, **kwargs):
+        print(f"catalogSelected: {args = }  {kwargs = }")
+    
