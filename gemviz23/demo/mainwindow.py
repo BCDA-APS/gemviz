@@ -83,7 +83,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.status = "No tiled server selected."
         else:
             self.status = f"tiled {server_uri=!r}"
-            # TODO: do something, such as connect with the server
             self.filter_panel.setServer(utils.connect_tiled_server(server_uri))
             
         print("")
