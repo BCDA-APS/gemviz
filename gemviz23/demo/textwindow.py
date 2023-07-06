@@ -2,9 +2,8 @@
 Show text in a GUI window.
 """
 
-from PyQt5.QtWidgets import QWidget
-
 import utils
+from PyQt5.QtWidgets import QWidget
 
 
 class TextWindow(QWidget):
