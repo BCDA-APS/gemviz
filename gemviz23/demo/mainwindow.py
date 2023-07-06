@@ -84,5 +84,3 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.status = f"tiled {server_uri=!r}"
             self.filter_panel.setServer(utils.connect_tiled_server(server_uri))
-            
-        print("")
