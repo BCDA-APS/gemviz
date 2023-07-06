@@ -106,6 +106,13 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
 
 
+def connect_tiled_server(uri):
+    from tiled.client import from_uri
+    from tiled.client.cache import Cache
+    client = from_uri(uri, cache=Cache.in_memory(2e9))
+    return client
+
+
 def getUiFileName(py_file_name):
     """UI file name matches the Python file, different extension."""
     return f"{pathlib.Path(py_file_name).stem}.ui"

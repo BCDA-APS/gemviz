@@ -156,7 +156,7 @@
         <widget class="QLineEdit" name="status"/>
        </item>
        <item row="1" column="2">
-        <widget class="QComboBox" name="comboBox"/>
+        <widget class="QComboBox" name="catalogs"/>
        </item>
       </layout>
      </widget>
