@@ -62,7 +62,7 @@ class TiledServerDialog(QDialog):
 
         # check the value before accepting it
         url = QUrl(selected)
-        print(f"{url=} {url.isValid()=} {url.isRelative()=}")
+        # print(f"{url=} {url.isValid()=} {url.isRelative()=}")
         if url.isValid() and not url.isRelative():
             settings.setKey(TILED_SERVER_SETTINGS_KEY, selected)
         else:

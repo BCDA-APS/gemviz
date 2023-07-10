@@ -1,25 +1,55 @@
 """
 Support functions for this demo project.
+
+.. autosummary::
+
+    ~connect_tiled_server
+    ~get_tiled_runs
+    ~getUiFileName
+    ~iso2dt
+    ~iso2ts
+    ~myLoadUi
+    ~QueryTimeSince
+    ~QueryTimeUntil
+    ~run_summary_table
+    ~ts2dt
+    ~ts2iso
 """
 
 import datetime
 import pathlib
 
-import __init__
 import tiled.queries
 
 
-def iso2time(isotime):
-    dt = datetime.datetime.fromisoformat(isotime)
-    return datetime.datetime.timestamp(dt)
+def iso2dt(iso_date_time):
+    """Convert ISO8601 time string to datetime object."""
+    return datetime.datetime.fromisoformat(iso_date_time)
+
+
+def iso2ts(iso_date_time):
+    """Convert ISO8601 time string to timestamp."""
+    return iso2dt(iso_date_time).timestamp()
+
+
+def ts2dt(timestamp):
+    """Convert timestamp to datetime object."""
+    return datetime.datetime.fromtimestamp(timestamp)
+
+
+def ts2iso(timestamp):
+    """Convert timestamp to ISO8601 time string."""
+    return ts2dt(timestamp).isoformat(sep=" ")
 
 
 def QueryTimeSince(isotime):
-    return tiled.queries.Key("time") >= iso2time(isotime)
+    """Tiled client query: all runs since given date/time."""
+    return tiled.queries.Key("time") >= iso2ts(isotime)
 
 
 def QueryTimeUntil(isotime):
-    return tiled.queries.Key("time") < iso2time(isotime)
+    """Tiled client query: all runs until given date/time."""
+    return tiled.queries.Key("time") < iso2ts(isotime)
 
 
 def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
@@ -99,16 +129,19 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1
     """
     from PyQt5 import uic
+    import __init__
 
     if isinstance(ui_file, str):
         ui_file = __init__.UI_DIR / ui_file
 
+    # print(f"myLoadUi({ui_file=})")
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
 
 
 def connect_tiled_server(uri):
     from tiled.client import from_uri
     from tiled.client.cache import Cache
+
     client = from_uri(uri, cache=Cache.in_memory(2e9))
     return client
 
