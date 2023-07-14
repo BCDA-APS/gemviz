@@ -26,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.filter_panel = FilterPanel(self)
         self.filter_scroll.setWidget(self.filter_panel)
+        self.resultwindow = ResultWindow
 
         layout = self.runs_groupbox.layout()
         results = ResultWindow(self)
