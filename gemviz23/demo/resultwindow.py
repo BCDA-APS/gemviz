@@ -53,21 +53,21 @@ from PyQt5.uic import loadUi
 
 ###
 
-# # tiled server information
-# tiled_server = "otz.xray.aps.anl.gov"
-# tiled_server_port = 8000
-# catalog = "developer"
-# start_time = "2021-03-17 00:30"
-# end_time = "2021-05-19 15:15"
+# tiled server information
+tiled_server = "otz.xray.aps.anl.gov"
+tiled_server_port = 8000
+catalog = "9idc_usaxs"
+start_time = "2021-03-17 00:30"
+end_time = "2021-05-19 15:15"
 
-# # connect our client with the server
-# uri = f"http://{tiled_server}:{tiled_server_port}"
-# print(f"{uri=}")
-# client = from_uri(uri, cache=Cache.in_memory(2e9))
-# print(f"{client=}")
-# print(f"{catalog=}")
-# cat = client[catalog]
-# print(f"{cat=}")
+# connect our client with the server
+uri = f"http://{tiled_server}:{tiled_server_port}"
+print(f"{uri=}")
+client = from_uri(uri, cache=Cache.in_memory(2e9))
+print(f"{client=}")
+print(f"{catalog=}")
+mycat = client[catalog]
+print(f"{mycat=}")
 
 
 class TableModel(QtCore.QAbstractTableModel):
@@ -75,12 +75,12 @@ class TableModel(QtCore.QAbstractTableModel):
         super().__init__()
         self.columnLabels = ["Scan ID", "Plan Name", "Detectors", "Date", "Status"]
         self._data = data
-        self._uidList = list(reversed(list(self._data)))
-        print("stop")
+        self._uidList = list(reversed(list(self._data)))[:20] # FIXME temporary way to handle large catalog
+
 
     def rowCount(self, parent=None):
         # Want it to return the number of rows to be shown at a given time
-        value = len(self._data)
+        value = len(self._uidList)
         return value
 
     def columnCount(self, parent=None):
@@ -158,10 +158,9 @@ class ResultWindow(QtWidgets.QWidget):
         # self.setLayout(self.layout["main"])
     def setup(self):
         # from filterpanel import FilterPanel
-        self.tableView = QtWidgets.QTableView()
+        # self.tableView = QtWidgets.QTableView()
+        # self.mydisplayTable()
         # self.layout["main"].addWidget(self.table)
-        
-        
         self.mainwindow.filter_panel.catalogs.currentTextChanged.connect(self.displayTable)
         
     def displayTable(self, *args):
@@ -169,6 +168,12 @@ class ResultWindow(QtWidgets.QWidget):
         self.cat = server.get(args[0], {})
         data_model = TableModel(self.cat)
         print(args[0])
+        self.tableView.setModel(data_model)
+
+    def mydisplayTable(self):
+        print("Trying to display")
+        data_model = TableModel(mycat)
+        print("still trying to display")
         self.tableView.setModel(data_model)
 
 
