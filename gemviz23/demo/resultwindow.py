@@ -13,6 +13,7 @@ class TableModel(QtCore.QAbstractTableModel):
         super().__init__()
         
         self.setCatalog(data)
+        self.setUidList(self._get_uidList())
 
     # ------------ methods required by Qt's view
 
@@ -56,7 +57,9 @@ class TableModel(QtCore.QAbstractTableModel):
                 return str(section + 1) #may want to alter at some point
     
     # ------------ local methods
-    
+    def _get_uidList(self):
+        gen = self.catalog()._keys_slice(self.pageOffset(), self.pageOffset() + self.pageSize(), 1 if self.ascending() else -1)
+        return list(gen)
 
     # ------------ get & set methods
     
@@ -67,8 +70,10 @@ class TableModel(QtCore.QAbstractTableModel):
         self._data=catalog
 
     def uidList(self):
-        gen = self.catalog()._keys_slice(self.pageOffset(), self.pageOffset() + self.pageSize(), 1 if self.ascending() else -1)
-        return list(gen)
+        return self._uidList
+
+    def setUidList(self, value):
+        self._uidList=value
     
     def pageOffset(self):
         return self._pageOffset
