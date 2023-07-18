@@ -93,8 +93,12 @@ class TableModel(QtCore.QAbstractTableModel):
     # ------------ local methods
 
     def _get_uidList(self):
-        gen = self.catalog()._keys_slice(self.pageOffset(), self.pageOffset() + self.pageSize(), 1 if self.ascending() else -1)
-        return list(gen)
+        cat = self.catalog()
+        start = self.pageOffset()
+        end = start + self.pageSize()
+        ascending = 1 if self.ascending() else -1
+        gen = cat._keys_slice(start, end, ascending)
+        return list(gen)  # FIXME: fails here with big catalogs
 
     # ------------ get & set methods
     
