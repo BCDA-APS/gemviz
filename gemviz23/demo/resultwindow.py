@@ -98,7 +98,7 @@ class TableModel(QtCore.QAbstractTableModel):
         end = start + self.pageSize()
         ascending = 1 if self.ascending() else -1
         gen = cat._keys_slice(start, end, ascending)
-        return list(gen)  # FIXME: fails here with big catalogs
+        return list(gen)  # FIXME: fails here with big catalogs, see issue #51
 
     # ------------ get & set methods
     
