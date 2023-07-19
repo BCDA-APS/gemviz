@@ -25,12 +25,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionExit.triggered.connect(self.doClose)
 
         self.filter_panel = FilterPanel(self)
-        self.filter_scroll.setWidget(self.filter_panel)
-        self.resultwindow = ResultWindow
-
+        layout = self.filter_groupbox.layout()
+        layout.addWidget(self.filter_panel)
+        
+        self.results = ResultWindow(self)
         layout = self.runs_groupbox.layout()
-        results = ResultWindow(self)
-        layout.addWidget(results)
+        layout.addWidget(self.results)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         settings.restoreSplitter(self.hsplitter, "mainwindow_horizontal_splitter")

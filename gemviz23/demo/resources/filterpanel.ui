@@ -13,80 +13,99 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QTabWidget" name="tabWidget_2">
-     <property name="currentIndex">
-      <number>0</number>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
      </property>
-     <widget class="QWidget" name="TabWidgetPage1">
-      <attribute name="title">
-       <string/>
-      </attribute>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="status_label_2">
-         <property name="text">
-          <string>Catalog</string>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>510</width>
+        <height>255</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QTabWidget" name="tabWidget_2">
+         <property name="currentIndex">
+          <number>0</number>
          </property>
+         <widget class="QWidget" name="TabWidgetPage1">
+          <attribute name="title">
+           <string/>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="status_label_2">
+             <property name="text">
+              <string>Catalog</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="catalogs"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Date &amp; Time</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="plan_label">
+             <property name="text">
+              <string>Plan</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="plan_name"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="scan_id_label">
+             <property name="text">
+              <string>Scan ID</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="scan_id"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="status_label">
+             <property name="text">
+              <string>Status</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="status"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="positioner_label">
+             <property name="text">
+              <string>Positioner</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="positioner"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="TabWidgetPage2">
+          <attribute name="title">
+           <string>Page</string>
+          </attribute>
+         </widget>
         </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="catalogs"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Date &amp; Time</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="plan_label">
-         <property name="text">
-          <string>Plan</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="plan_name"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="scan_id_label">
-         <property name="text">
-          <string>Scan ID</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="scan_id"/>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="status_label">
-         <property name="text">
-          <string>Status</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="status"/>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="positioner_label">
-         <property name="text">
-          <string>Positioner</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="positioner"/>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="TabWidgetPage2">
-      <attribute name="title">
-       <string>Page</string>
-      </attribute>
      </widget>
     </widget>
    </item>
