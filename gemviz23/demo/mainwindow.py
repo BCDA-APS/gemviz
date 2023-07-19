@@ -17,6 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         from filterpanel import FilterPanel
         from resultwindow import ResultWindow
+        from vizpanel import VizPanel
 
         self.setWindowTitle(__init__.APP_TITLE)
         self.title.setText(__init__.APP_TITLE)
@@ -31,6 +32,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.results = ResultWindow(self)
         layout = self.runs_groupbox.layout()
         layout.addWidget(self.results)
+        
+        self.viz = VizPanel(self)
+        layout = self.viz_groupbox.layout()
+        layout.addWidget(self.viz)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         settings.restoreSplitter(self.hsplitter, "mainwindow_horizontal_splitter")
