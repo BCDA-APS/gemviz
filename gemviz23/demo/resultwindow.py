@@ -36,19 +36,26 @@ class TableModel(QtCore.QAbstractTableModel):
             run=self.catalog()[uid]
             column=index.column()
             if column==0:
-                return run.metadata["start"].get("scan_id", "")
+                return self._getKey(run, "start", "scan_id")
             elif column==1:
-                return run.metadata["start"].get("plan_name", "")
+                return self._getKey(run, "start", "plan_name")
             elif column==2:
-                return ", ".join(run.metadata["start"].get("motors", []))
+                return ", ".join(self._getKey(run,"start", "motors", []))
             elif column==3:
-                return ", ".join(run.metadata["start"].get("detectors", []))
+                return ", ".join(self._getKey(run,"start", "detectors", []))
             elif column==4:
-                ts = run.metadata["start"].get("time", "")
+                ts = self._getKey(run, "start", "time")
                 dt = datetime.datetime.fromtimestamp(round(ts))
                 return dt.isoformat(sep=" ")
             elif column==5:
-                return run.metadata.get("stop", {}).get("exit_status", "")
+                return self._getKey(run, "stop", "exit_status")
+            
+    def _getKey(self, run, document_name, key, default=""):
+        md=run.metadata
+        if md is None:
+            return default
+        document=md.get(document_name) or {}
+        return document.get(key, default)
             
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
