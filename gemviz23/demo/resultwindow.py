@@ -165,7 +165,6 @@ class TableModel(QtCore.QAbstractTableModel):
         import yaml
         uid=self.uidList()[index.row()]
         run=self.catalog()[uid]
-        print(f"getMetadata {uid=} {run=}")
         md=run.metadata
         md=yaml.dump(dict(md), indent=4)
         return md
