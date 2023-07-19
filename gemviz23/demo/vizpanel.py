@@ -17,3 +17,13 @@ class VizPanel(QtWidgets.QWidget):
 
     def setup(self):
         pass
+
+    def setMetadata(self, text, *args, **kwargs):
+        # tab=self.metadataPage
+        self.metadata.setText(text)
+
+    def setData(self, *args, **kwargs):
+        pass
+
+    def setPlot(self, *args, **kwargs):
+        pass

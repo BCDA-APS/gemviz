@@ -57,6 +57,11 @@
           <attribute name="title">
            <string>Metadata</string>
           </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QTextBrowser" name="metadata"/>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>

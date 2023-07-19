@@ -161,6 +161,15 @@ class TableModel(QtCore.QAbstractTableModel):
             text = f"{start + 1}-{end} of {total} runs"
         return text
     
+    def getMetadata(self, index):
+        import yaml
+        uid=self.uidList()[index.row()]
+        run=self.catalog()[uid]
+        print(f"getMetadata {uid=} {run=}")
+        md=run.metadata
+        md=yaml.dump(dict(md), indent=4)
+        return md
+    
 
 class ResultWindow(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
@@ -188,6 +197,7 @@ class ResultWindow(QtWidgets.QWidget):
         self.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
+        self.tableView.doubleClicked.connect(self.doRunSelected)
 
     def doPagerButtons(self, action, **kwargs):
         print(f"{action=} {kwargs=}")
@@ -235,29 +245,8 @@ class ResultWindow(QtWidgets.QWidget):
 
         self.status.setText(text)
 
-
-
-# if __name__ == "__main__":
-#     myApp = ResultWindow()
-#     myApp.show()
-
-#     try:
-#         sys.exit(app.exec_())
-#     except SystemExit:
-#         print("Closing Window...")
-    
-
-# # this is not going to change:
-# def gui():
-#     """display the main widget"""
-#     import sys
-
-#     app = QtWidgets.QApplication(sys.argv)
-#     main_window = ResultWindow()
-#     main_window.show()
-#     main_window.load_data()
-#     sys.exit(app.exec_())
-
-
-# if __name__ == "__main__":
-#     gui()
+    def doRunSelected(self, index):
+        model = self.tableView.model()
+        if model is not None:
+            metadata=model.getMetadata(index)
+            self.mainwindow.viz.setMetadata(metadata)
