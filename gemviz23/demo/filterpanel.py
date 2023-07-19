@@ -11,6 +11,7 @@ class FilterPanel(QtWidgets.QWidget):
     def __init__(self, mainwindow):
         self.mainwindow = mainwindow
         self._server = None
+        self._catalogSelected = None
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -40,3 +41,4 @@ class FilterPanel(QtWidgets.QWidget):
 
     def catalogSelected(self, *args, **kwargs):
         print(f"catalogSelected: {args = }  {kwargs = }")
+        self._catalogSelected = args[0]

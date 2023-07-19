@@ -1,57 +1,256 @@
 import utils
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
+import datetime
+import sys
 
-UI_FILE = utils.getUiFileName(__file__)
+class TableModel(QtCore.QAbstractTableModel):
+    def __init__(self, data):
+        self.columnLabels = ["Scan ID", "Plan Name", "Motors", "Detectors", "Date", "Status"]
+        self.setPageOffset(0, init=True)
+        self.setPageSize(20, init=True)
+        self.setAscending(True)
+
+        super().__init__()
+        
+        self.setCatalog(data)
+        self.setUidList(self._get_uidList())
+        
+
+    # ------------ methods required by Qt's view
+
+    def rowCount(self, parent=None):
+        # Want it to return the number of rows to be shown at a given time
+        value = len(self.uidList())
+        return value
+
+    def columnCount(self, parent=None):
+        # Want it to return the number of columns to be shown at a given time
+        value = len(self.columnLabels)
+        return value
+
+    def data(self, index, role=None):
+        # display data
+        if role == QtCore.Qt.DisplayRole:
+            #print("Display role:", index.row(), index.column())
+            uid=self.uidList()[index.row()]
+            run=self.catalog()[uid]
+            column=index.column()
+            if column==0:
+                return run.metadata["start"].get("scan_id", "")
+            elif column==1:
+                return run.metadata["start"].get("plan_name", "")
+            elif column==2:
+                return ", ".join(run.metadata["start"].get("motors", []))
+            elif column==3:
+                return ", ".join(run.metadata["start"].get("detectors", []))
+            elif column==4:
+                ts = run.metadata["start"].get("time", "")
+                dt = datetime.datetime.fromtimestamp(round(ts))
+                return dt.isoformat(sep=" ")
+            elif column==5:
+                return run.metadata.get("stop", {}).get("exit_status", "")
+            
+    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal: 
+                return self.columnLabels[section]
+            else:
+                return str(section + 1) #may want to alter at some point
+
+    # ------------ methods required by the results table 
+
+    def doPager(self, action, value = None):
+        print(f"doPager {action =}, {value =}")
+        if action == "first":
+            self.setPageOffset(0)
+        elif action == "pageSize":
+            self.setPageSize(value)
+        elif action == "back":
+            value = self.pageOffset() - self.pageSize()
+            value = min(value, len(self.catalog()))
+            value = max(value,0)
+            self.setPageOffset(value)
+        elif action == "next":
+            value = self.pageOffset() + self.pageSize()
+            value = min(value, len(self.catalog()) - 1 - self.pageSize())
+            value = max(value,0)
+            self.setPageOffset(value)
+        elif action == "last":
+            value = len(self.catalog()) - 1 - self.pageSize()
+            value = max(value,0)
+            self.setPageOffset(value)
+        
+        self.setUidList(self._get_uidList())
+        print(f"{self.pageOffset() =} {self.pageSize() =}")
 
 
-# this is what we customize:
+    def isPagerAtStart(self):
+        return self.pageOffset()==0
+
+    def isPagerAtEnd(self):
+        return (self.pageOffset() + len(self.uidList())) >= len(self.catalog())
+    
+    # ------------ local methods
+
+    def _get_uidList(self):
+        cat = self.catalog()
+        start = self.pageOffset()
+        end = start + self.pageSize()
+        ascending = 1 if self.ascending() else -1
+        gen = cat._keys_slice(start, end, ascending)
+        return list(gen)  # FIXME: fails here with big catalogs, see issue #51
+
+    # ------------ get & set methods
+    
+    def catalog(self):
+        return self._data
+    
+    def setCatalog(self, catalog):
+        self._data=catalog
+
+    def uidList(self):
+        return self._uidList
+
+    def setUidList(self, value):
+        self._uidList=value
+    
+    def pageOffset(self):
+        return self._pageOffset
+
+    def pageSize(self):
+        return self._pageSize
+
+    def setPageOffset(self, offset, init=False):
+        """Set the pager offset."""
+        offset = int(offset)
+        if init:
+            self._pageOffset = offset
+        elif offset != self._pageOffset:
+            self._pageOffset = offset
+            self.layoutChanged.emit()
+
+    def setPageSize(self, value, init=False):
+        """Set the pager size."""
+        value = int(value)
+        if init:
+            self._pageSize = value
+        elif value != self._pageSize:
+            self._pageSize = value
+            self.layoutChanged.emit()
+
+    def ascending(self):
+        return self._ascending
+    
+    def setAscending(self, value):
+        self._ascending=value
+
+    def pagerStatus(self):
+        total= len(self.catalog())
+        if total==0:
+            text = "No runs"
+        else:
+            start = self.pageOffset()
+            end = start+len(self.uidList())
+            text = f"{start + 1}-{end} of {total} runs"
+        return text
+    
+
 class ResultWindow(QtWidgets.QWidget):
+    ui_file = utils.getUiFileName(__file__)
+
     def __init__(self, mainwindow):
         self.mainwindow = mainwindow
-        self.max_num_of_entries = 100
         super().__init__()
-        utils.myLoadUi(UI_FILE, baseinstance=self)
+        utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
+            
     def setup(self):
-        from resultwindow import ResultWindow
+        from functools import partial
 
-        # TODO widget initilization
+        self.mainwindow.filter_panel.catalogs.currentTextChanged.connect(self.displayTable)
+        # since we cannot set header's ResizeMode in Designer ...
+        header = self.tableView.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        
+        for button_name in "first back next last".split():
+            button = getattr(self, button_name)
+            # custom: pass the button name to the receiver
+            button.released.connect(partial(self.doPagerButtons, button_name))
+        
+        self.pageSize.currentTextChanged.connect(self.doPageSize)
+        self.doButtonPermissions()
+        self.setPagerStatus()
 
-    def load_data(self):
-        cat = [
-            {
-                "Catalog": "1",
-                "Plan": "2",
-                "Scan ID": "333",
-                "Status": "Success",
-                "Positioner": "4",
-            }
-        ]
-        row = 0
-        self.tableWidget.setRowCount(len(cat))
-        for catalog in cat:
-            self.tableWidget.setItem(
-                row, 0, QtWidgets.QTableWidgetItem(catalog["Catalog"])
-            )
-            row = row + 1
+    def doPagerButtons(self, action, **kwargs):
+        print(f"{action=} {kwargs=}")
+        model = self.tableView.model()
 
-    # def horizontal_header():have to make this dynamic so that it takes information from tiled and adapts
+        if model is not None:
+            model.doPager(action)
+        self.doButtonPermissions()
+        self.setPagerStatus()
+    
+    def doPageSize(self, value):
+        print(f"doPageSize {value =}")
+        model = self.tableView.model()
 
-    # def vertical_header():have to make this dynamic so that it takes information from tiled and adapts
+        if model is not None:
+            model.doPager("pageSize", value)
+        self.doButtonPermissions()
+        self.setPagerStatus()
+
+    def doButtonPermissions(self):
+        model = self.tableView.model()
+        atStart = False if model is None else model.isPagerAtStart()
+        atEnd = False if model is None else model.isPagerAtEnd()
+
+        self.first.setEnabled(not atStart)
+        self.back.setEnabled(not atStart)
+        self.next.setEnabled(not atEnd)
+        self.last.setEnabled(not atEnd)
+        
+
+        
+    def displayTable(self, *args):
+        server = self.mainwindow.filter_panel._server
+        self.cat = server[args[0]]
+        data_model = TableModel(self.cat)
+        print(f"Displaying catalog: {args[0]}")
+        self.tableView.setModel(data_model)
+        self.setPagerStatus()
+
+    def setPagerStatus(self, text=None):
+        if text is None:
+            model = self.tableView.model()
+            if model is not None:
+                text=model.pagerStatus()
+
+        self.status.setText(text)
 
 
-# this is not going to change:
-def gui():
-    """display the main widget"""
-    import sys
 
-    app = QtWidgets.QApplication(sys.argv)
-    main_window = ResultWindow()
-    main_window.show()
-    main_window.load_data()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     myApp = ResultWindow()
+#     myApp.show()
+
+#     try:
+#         sys.exit(app.exec_())
+#     except SystemExit:
+#         print("Closing Window...")
+    
+
+# # this is not going to change:
+# def gui():
+#     """display the main widget"""
+#     import sys
+
+#     app = QtWidgets.QApplication(sys.argv)
+#     main_window = ResultWindow()
+#     main_window.show()
+#     main_window.load_data()
+#     sys.exit(app.exec_())
 
 
-if __name__ == "__main__":
-    gui()
+# if __name__ == "__main__":
+#     gui()
