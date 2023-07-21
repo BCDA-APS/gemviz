@@ -49,6 +49,7 @@ class FilterPanel(QtWidgets.QWidget):
         return server[catalog_name]
     
     def filteredCatalog(self):
+        import tiled.queries
         cat=self.catalog()
         
         plan_name=self.plan_name.text().strip()
@@ -62,7 +63,8 @@ class FilterPanel(QtWidgets.QWidget):
         motors=self.positioner.text().strip()
         if len(motors) > 0: 
             for motor in motors.split(" "):
-                cat = utils.get_tiled_runs(cat, motors=motor)
+                cat = cat.search(tiled.queries.Contains("motors", motor))
+            
 
 
         # TODO: status filtering
