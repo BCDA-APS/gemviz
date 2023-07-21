@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>701</width>
-    <height>227</height>
+    <width>892</width>
+    <height>389</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>510</width>
-        <height>255</height>
+        <width>872</width>
+        <height>369</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -51,6 +51,9 @@
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label">
+             <property name="toolTip">
+              <string>Search for runs between these two dates.</string>
+             </property>
              <property name="text">
               <string>Date &amp; Time</string>
              </property>
@@ -58,23 +61,37 @@
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="plan_label">
+             <property name="toolTip">
+              <string>Search for runs that match this Bluesky plan.</string>
+             </property>
              <property name="text">
               <string>Plan</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="plan_name"/>
+            <widget class="QLineEdit" name="plan_name">
+             <property name="toolTip">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="scan_id_label">
+             <property name="toolTip">
+              <string>Search for runs with this scan ID.</string>
+             </property>
              <property name="text">
               <string>Scan ID</string>
              </property>
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLineEdit" name="scan_id"/>
+            <widget class="QLineEdit" name="scan_id">
+             <property name="toolTip">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item row="4" column="0">
             <widget class="QLabel" name="status_label">
@@ -84,17 +101,31 @@
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QLineEdit" name="status"/>
+            <widget class="QLineEdit" name="status">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>It is not possible to filter on the Status at this time. That information comes from the stop document and the current search tools available don't search that document at this time.</string>
+             </property>
+            </widget>
            </item>
            <item row="5" column="0">
             <widget class="QLabel" name="positioner_label">
+             <property name="toolTip">
+              <string>Search for runs with these motor(s). Use blank space to separate more than one motor name. (such as &quot;m1&quot; &quot;m2&quot;)</string>
+             </property>
              <property name="text">
               <string>Positioner</string>
              </property>
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QLineEdit" name="positioner"/>
+            <widget class="QLineEdit" name="positioner">
+             <property name="toolTip">
+              <string/>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

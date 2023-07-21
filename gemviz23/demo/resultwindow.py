@@ -237,7 +237,7 @@ class ResultWindow(QtWidgets.QWidget):
 
         
     def displayTable(self, *args):
-        self.cat = self.mainwindow.filter_panel.catalog()
+        self.cat = self.mainwindow.filter_panel.filteredCatalog()
         data_model = TableModel(self.cat)
         print(f"Displaying catalog: {self.cat.item['id']!r}")
         page_size = self.pageSize.currentText() # remember the current value

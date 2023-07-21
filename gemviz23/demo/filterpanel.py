@@ -47,3 +47,26 @@ class FilterPanel(QtWidgets.QWidget):
         server=self.server()
         catalog_name=self._catalogSelected
         return server[catalog_name]
+    
+    def filteredCatalog(self):
+        cat=self.catalog()
+        
+        plan_name=self.plan_name.text().strip()
+        if len(plan_name) > 0:
+            cat = utils.get_tiled_runs(cat, plan_name=plan_name)
+        
+        scan_id=self.scan_id.text().strip()
+        if len(scan_id) > 0:
+            cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
+
+        motors=self.positioner.text().strip()
+        if len(motors) > 0: 
+            for motor in motors.split(" "):
+                cat = utils.get_tiled_runs(cat, motors=motor)
+
+
+        # TODO: status filtering
+
+        print(f"filteredCatalog: {cat=}")
+        return cat
+        
