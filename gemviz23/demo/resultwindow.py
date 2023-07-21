@@ -170,6 +170,7 @@ class TableModel(QtCore.QAbstractTableModel):
         md=run.metadata
         md=yaml.dump(dict(md), indent=4)
         return md
+
     
 
 class ResultWindow(QtWidgets.QWidget):
@@ -186,6 +187,11 @@ class ResultWindow(QtWidgets.QWidget):
         from functools import partial
 
         self.mainwindow.filter_panel.catalogs.currentTextChanged.connect(self.displayTable)
+        self.mainwindow.filter_panel.plan_name.returnPressed.connect(self.displayTable)
+        self.mainwindow.filter_panel.scan_id.returnPressed.connect(self.displayTable)
+        self.mainwindow.filter_panel.status.returnPressed.connect(self.displayTable)
+        self.mainwindow.filter_panel.positioner.returnPressed.connect(self.displayTable)
+
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -231,10 +237,9 @@ class ResultWindow(QtWidgets.QWidget):
 
         
     def displayTable(self, *args):
-        server = self.mainwindow.filter_panel._server
-        self.cat = server[args[0]]
+        self.cat = self.mainwindow.filter_panel.catalog()
         data_model = TableModel(self.cat)
-        print(f"Displaying catalog: {args[0]}")
+        print(f"Displaying catalog: {self.cat.item['id']!r}")
         page_size = self.pageSize.currentText() # remember the current value
         self.tableView.setModel(data_model) 
         self.doPageSize(page_size) # restore

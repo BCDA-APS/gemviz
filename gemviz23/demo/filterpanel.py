@@ -42,3 +42,8 @@ class FilterPanel(QtWidgets.QWidget):
     def catalogSelected(self, *args, **kwargs):
         print(f"catalogSelected: {args = }  {kwargs = }")
         self._catalogSelected = args[0]
+
+    def catalog(self):
+        server=self.server()
+        catalog_name=self._catalogSelected
+        return server[catalog_name]
