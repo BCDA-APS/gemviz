@@ -2,12 +2,14 @@ import utils
 from PyQt5 import QtCore, QtWidgets
 import datetime
 import sys
+DEFAULT_PAGE_SIZE = 20
+DEFAULT_PAGE_OFFSET = 0
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
         self.columnLabels = ["Scan ID", "Plan Name", "Motors", "Detectors", "Date", "Status"]
-        self.setPageOffset(0, init=True)
-        self.setPageSize(20, init=True)
+        self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
+        self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
 
         super().__init__()
@@ -233,7 +235,9 @@ class ResultWindow(QtWidgets.QWidget):
         self.cat = server[args[0]]
         data_model = TableModel(self.cat)
         print(f"Displaying catalog: {args[0]}")
-        self.tableView.setModel(data_model)
+        page_size = self.pageSize.currentText() # remember the current value
+        self.tableView.setModel(data_model) 
+        self.doPageSize(page_size) # restore
         self.setPagerStatus()
 
     def setPagerStatus(self, text=None):
