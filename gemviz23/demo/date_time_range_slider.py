@@ -20,7 +20,7 @@ WEEK = 7 * DAY
 DEFAULT_MINIMUM = "1995-01-01"
 DEFAULT_LOW = "2023-01-01"
 DEFAULT_HIGH = "2024-05-01"
-DEFAULT_MAXIMUM = "2035-12-31"
+DEFAULT_MAXIMUM = "2100-12-31"
 
 
 class DateTimeRangeSlider(QtWidgets.QWidget):
@@ -84,12 +84,20 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
     def setup(self):
         """Configure the UI widgets."""
         self.slider.setMinimumHeight(30)
-        self.slider.setSingleStep(DAY)
-        self.slider.setPageStep(WEEK)
+        self.slider.setSingleStep(self._slider_units(WEEK))
+        self.slider.setPageStep(self._slider_units(4 * WEEK))
 
         self.slider.sliderMoved.connect(self.adjustDates)
         self.low_date.dateTimeChanged.connect(self.adjustSlider)
         self.high_date.dateTimeChanged.connect(self.adjustSlider)
+
+    def _timestamp_units(self, slider):
+        """Convert slider units (days) to timestamp units (seconds)."""
+        return slider * DAY
+
+    def _slider_units(self, timestamp):
+        """Convert timestamp units (seconds) to slider units (days)."""
+        return int(timestamp / DAY)
 
     def adjustDates(self, low, high):
         """
@@ -99,8 +107,8 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         """
         if not self._locked:
             self._locked = True
-            self.setLow(utils.ts2iso(low))
-            self.setHigh(utils.ts2iso(high))
+            self.setLow(utils.ts2iso(self._timestamp_units(low)))
+            self.setHigh(utils.ts2iso(self._timestamp_units(high)))
             self._locked = False
 
     def adjustSlider(self, *args):
@@ -126,7 +134,7 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         """
         self._high = utils.iso2ts(value) if isinstance(value, str) else value
         self.high_date.setDate(utils.ts2dt(self._high))
-        self.slider.setHigh(int(self._high))
+        self.slider.setHigh(self._slider_units(self._high))
         self.low_date.setMaximumDate(utils.iso2dt(value))
 
     def low(self):
@@ -144,7 +152,7 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         """
         self._low = utils.iso2ts(value) if isinstance(value, str) else value
         self.low_date.setDate(utils.ts2dt(self._low))
-        self.slider.setLow(int(self._low))
+        self.slider.setLow(self._slider_units(self._low))
         self.high_date.setMinimumDate(utils.iso2dt(value))
 
     def maximum(self):
@@ -161,7 +169,7 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
             Date & time in ISO8601 format, such as: "2021-03-04 21:55".
         """
         self._maximum = utils.iso2ts(value) if isinstance(value, str) else value
-        self.slider.setMaximum(int(self._maximum))
+        self.slider.setMaximum(self._slider_units(self._maximum))
         self.high_date.setMaximumDate(utils.iso2dt(value))
 
     def minimum(self):
@@ -178,7 +186,7 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
             Date & time in ISO8601 format, such as: "2021-03-04 21:55".
         """
         self._minimum = utils.iso2ts(value) if isinstance(value, str) else value
-        self.slider.setMinimum(int(self._minimum))
+        self.slider.setMinimum(self._slider_units(self._minimum))
         self.low_date.setMinimumDate(utils.iso2dt(value))
 
 
