@@ -6,8 +6,32 @@ DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
 class TableModel(QtCore.QAbstractTableModel):
+    """Bluesky catalog for QtCore.QAbstractTableModel."""
+
     def __init__(self, data):
-        self.columnLabels = ["Scan ID", "Plan Name", "Motors", "Detectors", "Date", "Status"]
+        self.actions_library = {
+            "#points": ["start", "num_points"],
+            "Date": self.get_run_start_time,
+            "Detectors": self.get_run_detectors,
+            "Plan Name": ["start", "plan_name"],
+            "Positioners": self.get_run_positioners,
+            "Scan ID": ["start", "scan_id"],
+            "Status": ["stop", "exit_status"],
+            "Streams": self.get_run_stream_names,
+            "uid": ["start", "uid"],
+            "uid7": self.get_run_uid7,
+        }
+        self.columnLabels = [
+            "Scan ID",
+            "Plan Name",
+            "Detectors",
+            "Positioners",
+            "#points",
+            "Date",
+            "Status",
+            "Streams",
+        ]
+
         self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
@@ -33,24 +57,17 @@ class TableModel(QtCore.QAbstractTableModel):
     def data(self, index, role=None):
         # display data
         if role == QtCore.Qt.DisplayRole:
-            #print("Display role:", index.row(), index.column())
-            uid=self.uidList()[index.row()]
-            run=self.catalog()[uid]
-            column=index.column()
-            if column==0:
-                return self._getKey(run, "start", "scan_id")
-            elif column==1:
-                return self._getKey(run, "start", "plan_name")
-            elif column==2:
-                return ", ".join(self._getKey(run,"start", "motors", []))
-            elif column==3:
-                return ", ".join(self._getKey(run,"start", "detectors", []))
-            elif column==4:
-                ts = self._getKey(run, "start", "time")
-                dt = datetime.datetime.fromtimestamp(round(ts))
-                return dt.isoformat(sep=" ")
-            elif column==5:
-                return self._getKey(run, "stop", "exit_status")
+            # print("Display role:", index.row(), index.column())
+            uid = self.uidList()[index.row()]
+            run = self.catalog()[uid]
+
+            label = self.columnLabels[index.column()]
+            action = self.actions_library[label]
+
+            if isinstance(action, list):
+                return self.get_md(run, *action)
+            else:
+                return action(run)
             
     def _getKey(self, run, document_name, key, default=""):
         md=run.metadata
@@ -108,6 +125,39 @@ class TableModel(QtCore.QAbstractTableModel):
         ascending = 1 if self.ascending() else -1
         gen = cat._keys_slice(start, end, ascending)
         return list(gen)  # FIXME: fails here with big catalogs, see issue #51
+
+    def get_md(self, run, doc, key, default=""):
+        """Return a key's value from a document in the run."""
+        obj = run.metadata.get(doc)
+        if obj is None:
+            return default
+        return obj.get(key, default)
+
+    def get_run_detectors(self, run):
+        """Return the run's detector names as a list."""
+        items = self.get_md(run, "start", "detectors", [])
+        return ", ".join(items)
+
+    def get_run_positioners(self, run):
+        """Return the run's positioner names as a list."""
+        items = self.get_md(run, "start", "motors", [])
+        return ", ".join(items)
+
+    def get_run_start_time(self, run):
+        """Return the run's start time as ISO8601 string."""
+        ts = self.get_md(run, "start", "time", 0)
+        dt = datetime.datetime.fromtimestamp(round(ts))
+        return dt.isoformat(sep=" ")
+
+    def get_run_stream_names(self, run):
+        """Return the run's stream names as a list."""
+        items = self.get_md(run, "summary", "stream_names", [])
+        return ", ".join(items)
+
+    def get_run_uid7(self, run):
+        """Return the run's uid, truncated to the first 7 characters."""
+        uid = self.get_md(run, "start", "uid")
+        return uid[:7]
 
     # ------------ get & set methods
     
