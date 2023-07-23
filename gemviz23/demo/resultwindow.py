@@ -10,27 +10,18 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def __init__(self, data):
         self.actions_library = {
-            "#points": ["start", "num_points"],
-            "Date": self.get_run_start_time,
-            "Detectors": self.get_run_detectors,
+            "Scan ID": ["start", "scan_id"],
             "Plan Name": ["start", "plan_name"],
             "Positioners": self.get_run_positioners,
-            "Scan ID": ["start", "scan_id"],
+            "Detectors": self.get_run_detectors,
+            "#points": ["start", "num_points"],
+            "Date": self.get_run_start_time,
             "Status": ["stop", "exit_status"],
             "Streams": self.get_run_stream_names,
-            "uid": ["start", "uid"],
-            "uid7": self.get_run_uid7,
+            # "uid": ["start", "uid"],
+            # "uid7": self.get_run_uid7,
         }
-        self.columnLabels = [
-            "Scan ID",
-            "Plan Name",
-            "Detectors",
-            "Positioners",
-            "#points",
-            "Date",
-            "Status",
-            "Streams",
-        ]
+        self.columnLabels = list(self.actions_library.keys())
 
         self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
