@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>892</width>
-    <height>389</height>
+    <width>739</width>
+    <height>331</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>872</width>
-        <height>369</height>
+        <width>719</width>
+        <height>311</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -113,15 +113,32 @@
            <item row="5" column="0">
             <widget class="QLabel" name="positioner_label">
              <property name="toolTip">
-              <string>Search for runs with these motor(s). Use blank space to separate more than one motor name. (such as &quot;m1&quot; &quot;m2&quot;)</string>
+              <string>Search for runs with these motor(s). Use a comma to separate more than one name. (such as &quot;m1, m2&quot;)</string>
              </property>
              <property name="text">
-              <string>Positioner</string>
+              <string>Positioner(s)</string>
              </property>
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QLineEdit" name="positioner">
+            <widget class="QLineEdit" name="positioners">
+             <property name="toolTip">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="detector_label">
+             <property name="toolTip">
+              <string>Search for runs with these detector(s). Use a comma to separate more than one name. (such as &quot;diode, I0&quot;)</string>
+             </property>
+             <property name="text">
+              <string>Detector(s)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="detectors">
              <property name="toolTip">
               <string/>
              </property>

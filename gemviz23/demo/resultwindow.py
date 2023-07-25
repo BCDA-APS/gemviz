@@ -231,7 +231,8 @@ class ResultWindow(QtWidgets.QWidget):
         self.mainwindow.filter_panel.plan_name.returnPressed.connect(self.displayTable)
         self.mainwindow.filter_panel.scan_id.returnPressed.connect(self.displayTable)
         self.mainwindow.filter_panel.status.returnPressed.connect(self.displayTable)
-        self.mainwindow.filter_panel.positioner.returnPressed.connect(self.displayTable)
+        self.mainwindow.filter_panel.positioners.returnPressed.connect(self.displayTable)
+        self.mainwindow.filter_panel.detectors.returnPressed.connect(self.displayTable)
 
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
