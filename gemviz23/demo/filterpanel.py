@@ -89,10 +89,15 @@ class FilterPanel(QtWidgets.QWidget):
         if len(scan_id) > 0:
             cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
 
-        motors=self.positioner.text().strip()
+        motors=self.positioners.text().strip()
         if len(motors) > 0: 
-            for motor in motors.split(" "):
-                cat = cat.search(tiled.queries.Contains("motors", motor))
+            for motor in motors.split(","):
+                cat = cat.search(tiled.queries.Contains("motors", motor.strip()))
+
+        detectors=self.detectors.text().strip()
+        if len(detectors) > 0: 
+            for detector in detectors.split(","):
+                cat = cat.search(tiled.queries.Contains("detectors", detector.strip()))
 
             
 
