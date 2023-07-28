@@ -114,3 +114,7 @@ class FilterPanel(QtWidgets.QWidget):
         print(f"filteredCatalog: {cat=}")
         return cat
         
+
+    
+    def enableDateRange(self, permission):
+        self.date_time_widget.setEnabled(permission)

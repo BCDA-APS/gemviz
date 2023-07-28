@@ -286,6 +286,7 @@ class ResultWindow(QtWidgets.QWidget):
         self.tableView.setModel(data_model) 
         self.doPageSize(page_size) # restore
         self.setPagerStatus()
+        self.mainwindow.filter_panel.enableDateRange(len(self.cat)>0)
 
     def setPagerStatus(self, text=None):
         if text is None:
