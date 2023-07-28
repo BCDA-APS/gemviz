@@ -49,6 +49,8 @@ class FilterPanel(QtWidgets.QWidget):
             return utils.ts2iso(start_time)
         
         cat=self.catalog()
+        if len(cat) == 0:
+            return
         start_times=[
             getStartTime(cat.keys().first()),
             getStartTime(cat.keys().last())
