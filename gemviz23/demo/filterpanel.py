@@ -39,9 +39,13 @@ class FilterPanel(QtWidgets.QWidget):
         self._server = server
         self.setCatalogs(list(self._server))
 
-    def catalogSelected(self, *args, **kwargs):
-        print(f"catalogSelected: {args = }  {kwargs = }")
-        self._catalogSelected = args[0]
+    def catalogSelected(self, catalog_name, *args, **kwargs):
+        print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
+        if len(catalog_name)==0 or catalog_name not in self.server():
+            if len(catalog_name)>0:
+                self.mainwindow.status = f"Catalog {catalog_name!r} is not known."
+            return
+        self._catalogSelected = catalog_name
 
         def getStartTime(uid):    
             run = cat[uid]
@@ -49,6 +53,9 @@ class FilterPanel(QtWidgets.QWidget):
             return utils.ts2iso(start_time)
         
         cat=self.catalog()
+        if len(cat) == 0:
+            self.mainwindow.status = f"Catalog {catalog_name!r} has no runs."
+            return
         start_times=[
             getStartTime(cat.keys().first()),
             getStartTime(cat.keys().last())
@@ -107,3 +114,7 @@ class FilterPanel(QtWidgets.QWidget):
         print(f"filteredCatalog: {cat=}")
         return cat
         
+
+    
+    def enableDateRange(self, permission):
+        self.date_time_widget.setEnabled(permission)
