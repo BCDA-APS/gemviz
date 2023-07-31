@@ -1,7 +1,6 @@
 import utils
 from PyQt5 import QtCore, QtWidgets
 import datetime
-import sys
 import yaml
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
@@ -27,6 +26,7 @@ class TableModel(QtCore.QAbstractTableModel):
         self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
+        self._catalog_length = 0
 
         super().__init__()
         
@@ -78,35 +78,41 @@ class TableModel(QtCore.QAbstractTableModel):
     # ------------ methods required by the results table 
 
     def doPager(self, action, value = None):
-        print(f"doPager {action =}, {value =}")
+        # print(f"doPager {action =}, {value =}")
+
+        catalog_length = self.catalog_length()
+        offset = self.pageOffset()
+        size = self.pageSize()
+        # print(f"{catalog_length=} {offset=}  {size=}")
+
         if action == "first":
             self.setPageOffset(0)
         elif action == "pageSize":
             self.setPageSize(value)
         elif action == "back":
-            value = self.pageOffset() - self.pageSize()
-            value = min(value, len(self.catalog()))
-            value = max(value,0)
+            value = offset - size
+            value = min(value, catalog_length)
+            value = max(value, 0)
             self.setPageOffset(value)
         elif action == "next":
-            value = self.pageOffset() + self.pageSize()
-            value = min(value, len(self.catalog()) - 1 - self.pageSize())
-            value = max(value,0)
+            value = offset + size
+            value = min(value, catalog_length - 1 - size)
+            value = max(value, 0)
             self.setPageOffset(value)
         elif action == "last":
-            value = len(self.catalog()) - 1 - self.pageSize()
-            value = max(value,0)
+            value = catalog_length - 1 - size
+            value = max(value, 0)
             self.setPageOffset(value)
         
         self.setUidList(self._get_uidList())
-        print(f"{self.pageOffset() =} {self.pageSize() =}")
+        # print(f"{self.pageOffset()=} {self.pageSize()=}")
 
 
     def isPagerAtStart(self):
         return self.pageOffset()==0
 
     def isPagerAtEnd(self):
-        return (self.pageOffset() + len(self.uidList())) >= len(self.catalog())
+        return (self.pageOffset() + len(self.uidList())) >= self.catalog_length()
     
     # ------------ local methods
 
@@ -156,8 +162,12 @@ class TableModel(QtCore.QAbstractTableModel):
     def catalog(self):
         return self._data
     
+    def catalog_length(self):
+        return self._catalog_length
+    
     def setCatalog(self, catalog):
         self._data=catalog
+        self._catalog_length = len(catalog)
 
     def uidList(self):
         return self._uidList
@@ -196,7 +206,7 @@ class TableModel(QtCore.QAbstractTableModel):
         self._ascending=value
 
     def pagerStatus(self):
-        total= len(self.catalog())
+        total= self.catalog_length()
         if total==0:
             text = "No runs"
         else:
@@ -265,16 +275,17 @@ class ResultWindow(QtWidgets.QWidget):
         self.tableView.doubleClicked.connect(self.doRunSelected)
 
     def doPagerButtons(self, action, **kwargs):
-        print(f"{action=} {kwargs=}")
+        # print(f"{action=} {kwargs=}")
         model = self.tableView.model()
 
         if model is not None:
+            print(f"{model.pageOffset()=}")
             model.doPager(action)
         self.doButtonPermissions()
         self.setPagerStatus()
     
     def doPageSize(self, value):
-        print(f"doPageSize {value =}")
+        # print(f"doPageSize {value =}")
         model = self.tableView.model()
 
         if model is not None:
@@ -297,7 +308,7 @@ class ResultWindow(QtWidgets.QWidget):
     def displayTable(self, *args):
         self.cat = self.mainwindow.filter_panel.filteredCatalog()
         data_model = TableModel(self.cat)
-        print(f"Displaying catalog: {self.cat.item['id']!r}")
+        # print(f"Displaying catalog: {self.cat.item['id']!r}")
         page_size = self.pageSize.currentText() # remember the current value
         self.tableView.setModel(data_model) 
         self.doPageSize(page_size) # restore
