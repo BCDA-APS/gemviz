@@ -82,11 +82,22 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
+        from app_settings import settings
+        from tiledserverdialog import TILED_SERVER_SETTINGS_KEY
         from tiledserverdialog import TiledServerDialog
 
+        previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         server_uri = TiledServerDialog.getServer(self)
         if server_uri is None:
             self.status = "No tiled server selected."
-        else:
-            self.status = f"tiled {server_uri=!r}"
-            self.filter_panel.setServer(utils.connect_tiled_server(server_uri))
+            return
+        self.status = f"selected tiled {server_uri=!r}"
+
+        try:
+            client = utils.connect_tiled_server(server_uri)
+        except Exception as exc:
+            self.status = f"Error for {server_uri=!r}: {exc}"
+            settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
+            return
+
+        self.filter_panel.setServer(client)
