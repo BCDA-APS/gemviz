@@ -22,8 +22,8 @@ class VizPanel(QtWidgets.QWidget):
         # tab=self.metadataPage
         self.metadata.setText(text)
 
-    def setData(self, *args, **kwargs):
-        pass
+    def setData(self, text, *args, **kwargs):
+        self.data.setText(text)
 
     def setPlot(self, *args, **kwargs):
         pass

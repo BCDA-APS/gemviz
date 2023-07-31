@@ -2,6 +2,7 @@ import utils
 from PyQt5 import QtCore, QtWidgets
 import datetime
 import sys
+import yaml
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
@@ -205,12 +206,27 @@ class TableModel(QtCore.QAbstractTableModel):
         return text
     
     def getMetadata(self, index):
-        import yaml
+        """Provide a text view of the run metadata."""
         uid=self.uidList()[index.row()]
         run=self.catalog()[uid]
         md=run.metadata
         md=yaml.dump(dict(md), indent=4)
         return md
+
+    def getDataDescription(self, index):
+        """Provide text description of the data streams."""
+        uid=self.uidList()[index.row()]
+        run=self.catalog()[uid]
+        rows = []
+        for sname in run:
+            title = f"stream: {sname}"
+            rows.append(title)
+            rows.append("-" * len(title))
+            stream = run[sname]
+            data = stream["data"].read()
+            rows.append(str(data))
+            rows.append("")
+        return "\n".join(rows).strip()
 
     
 
@@ -298,5 +314,5 @@ class ResultWindow(QtWidgets.QWidget):
     def doRunSelected(self, index):
         model = self.tableView.model()
         if model is not None:
-            metadata=model.getMetadata(index)
-            self.mainwindow.viz.setMetadata(metadata)
+            self.mainwindow.viz.setMetadata(model.getMetadata(index))
+            self.mainwindow.viz.setData(model.getDataDescription(index))

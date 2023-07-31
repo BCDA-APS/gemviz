@@ -142,7 +142,7 @@ def connect_tiled_server(uri):
     from tiled.client import from_uri
     from tiled.client.cache import Cache
 
-    client = from_uri(uri, cache=Cache.in_memory(2e9))
+    client = from_uri(uri, "dask", cache=Cache.in_memory(2e9))
     return client
 
 
