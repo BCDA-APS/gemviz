@@ -40,6 +40,8 @@ class FilterPanel(QtWidgets.QWidget):
         self.setCatalogs(list(self._server))
 
     def catalogSelected(self, catalog_name, *args, **kwargs):
+        from date_time_range_slider import DAY
+
         print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
         if len(catalog_name)==0 or catalog_name not in self.server():
             if len(catalog_name)>0:
@@ -62,6 +64,7 @@ class FilterPanel(QtWidgets.QWidget):
         ]
         t_low=min(start_times)
         t_high=max(start_times)
+        t_high=utils.ts2iso(utils.iso2ts(t_high) + DAY)
 
         self.date_time_widget.setMinimum(t_low)
         self.date_time_widget.setLow(t_low)
