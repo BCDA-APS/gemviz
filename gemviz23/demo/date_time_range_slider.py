@@ -14,7 +14,8 @@ import range_slider
 
 SECOND = 1
 MINUTE = 60 * SECOND
-DAY = 60 * MINUTE
+HOUR = 60 * MINUTE
+DAY = 24 * HOUR
 WEEK = 7 * DAY
 
 DEFAULT_MINIMUM = "1995-01-01"
