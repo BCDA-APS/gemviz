@@ -17,10 +17,12 @@ Python Qt5 application to visualize Bluesky data from tiled server.
 
 ## How to run this code?
 
-First said, this code is pre-release and may contain significant unhandled bugs.
-Please [report any you encounter](https://github.com/BCDA-APS/gemviz/issues/new).
+First said, this software application is pre-release and may contain significant unhandled
+bugs.  Please [report any you encounter](https://github.com/BCDA-APS/gemviz/issues/new) or
+feature requests, too.
 
-It is not yet installable as application now but you can run it as a developer would with these instructions:
+It is not yet installable as an application now.  You can run it as a
+developer would by following these instructions:
 
 1. Navigate to a directory where you have similar software projects
 1. `git clone https://github.com/BCDA-APS/gemviz`
