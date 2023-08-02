@@ -24,6 +24,7 @@ It is not yet installable as application now but you can run it as a developer w
 
 1. Navigate to a directory where you have similar software projects
 1. `git clone https://github.com/BCDA-APS/gemviz`
+   - only need to do this once, assumes you have `git` command
 1. `cd gemviz`
 1. `conda env create --force -n gemviz23 -f ./env.yml`
    - only need to do this once, assumes you have `conda` command
