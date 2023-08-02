@@ -21,8 +21,9 @@ First said, this software application is pre-release and may contain significant
 bugs.  Please [report any you encounter](https://github.com/BCDA-APS/gemviz/issues/new) or
 feature requests, too.
 
-It is not yet installable as an application now.  You can run it as a
-developer would by following these instructions:
+It is not yet installable as an application now.  We have such
+[plans](https://github.com/orgs/BCDA-APS/projects/6).  Until then, you
+can run it as a developer would by following these instructions:
 
 1. Navigate to a directory where you have similar software projects
 1. `git clone https://github.com/BCDA-APS/gemviz`
