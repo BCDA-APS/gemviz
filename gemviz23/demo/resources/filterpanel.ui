@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>739</width>
-    <height>331</height>
+    <width>465</width>
+    <height>305</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>719</width>
-        <height>311</height>
+        <width>445</width>
+        <height>285</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -50,36 +50,13 @@
             <widget class="QComboBox" name="catalogs"/>
            </item>
            <item row="1" column="0">
-            <widget class="QWidget" name="widget" native="true">
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QLabel" name="label">
-                <property name="toolTip">
-                 <string>Search for runs between these two dates.</string>
-                </property>
-                <property name="text">
-                 <string>Date &amp; Time</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="refresh">
-                <property name="maximumSize">
-                 <size>
-                  <width>16</width>
-                  <height>16</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>refresh.bmp</normaloff>refresh.bmp</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
+            <widget class="QLabel" name="label">
+             <property name="toolTip">
+              <string>Search for runs between these two dates.</string>
+             </property>
+             <property name="text">
+              <string>Date &amp; Time</string>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
