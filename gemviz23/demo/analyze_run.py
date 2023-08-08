@@ -63,9 +63,9 @@ class SignalAxesFields:
         self.uid = utils.get_md(run, "start", "uid")
 
         if self.status in self.status__with_data:
-            # FIXME: does not identify nx_signal for area detector images (such as plan_name="count")
+            # FIXME: does not identify plot_signal for area detector images (such as plan_name="count")
 
-            # must be first; this method could redefine self.stream_name
+            # must be first because this method could redefine self.stream_name
             self.identify_axes()
 
             self.identify_detectors()
