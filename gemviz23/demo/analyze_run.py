@@ -157,7 +157,9 @@ class SignalAxesFields:
         # for each dimension, choose one field only
         # the plan can supply a list of fields. It's assumed the first
         # of the list is always the one plotted against
-        self.plot_axes = [fields[0] for fields, stream_name in dimensions if len(fields)]
+        self.plot_axes = [
+            fields[0] for fields, stream_name in dimensions if len(fields)
+        ]
         # print(f"{self.dim_fields=}")
 
         # make distinction between flattened fields and plotted fields
