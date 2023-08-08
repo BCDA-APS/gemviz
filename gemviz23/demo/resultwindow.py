@@ -1,7 +1,9 @@
+import analyze_run
 import utils
 from PyQt5 import QtCore, QtWidgets
 import datetime
 import yaml
+import pyRestTable
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
@@ -212,6 +214,25 @@ class TableModel(QtCore.QAbstractTableModel):
         """Provide text description of the data streams."""
         uid=self.uidList()[index.row()]
         run=self.catalog()[uid]
+
+        # Describe what will be plotted.
+        analysis = analyze_run.SignalAxesFields(run).to_dict()
+        table = pyRestTable.Table()
+        table.labels = "item description".split()
+        table.addRow(("scan", analysis['scan_id']))
+        table.addRow(("plan", analysis['plan']))
+        table.addRow(("chart", analysis['chart_type']))
+        if analysis["plot_signal"] is not None:
+            table.addRow(("stream", analysis['stream']))
+            table.addRow(("plot signal", analysis['plot_signal']))
+            table.addRow(("plot axes", ', '.join(analysis['plot_axes'])))
+            table.addRow(("all detectors", ', '.join(analysis['detectors'])))
+            table.addRow(("all positioners", ', '.join(analysis['positioners'])))
+        text = "plot summary"
+        text += ("\n" + "-" * len(text) + "\n" * 2)
+        text += f"{table.reST()}\n"
+
+        # information about each stream
         rows = []
         for sname in run:
             title = f"stream: {sname}"
@@ -221,7 +242,9 @@ class TableModel(QtCore.QAbstractTableModel):
             data = stream["data"].read()
             rows.append(str(data))
             rows.append("")
-        return "\n".join(rows).strip()
+
+        text += "\n".join(rows).strip()
+        return text
 
     
 
