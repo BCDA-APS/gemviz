@@ -54,7 +54,14 @@
           </attribute>
           <layout class="QVBoxLayout" name="vblayout_4">
            <item>
-            <widget class="QTextBrowser" name="data"/>
+            <widget class="QTextBrowser" name="data">
+             <property name="font">
+              <font>
+               <family>Monospace</family>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -64,7 +71,14 @@
           </attribute>
           <layout class="QVBoxLayout" name="vblayout_3">
            <item>
-            <widget class="QTextBrowser" name="metadata"/>
+            <widget class="QTextBrowser" name="metadata">
+             <property name="font">
+              <font>
+               <family>Monospace</family>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
