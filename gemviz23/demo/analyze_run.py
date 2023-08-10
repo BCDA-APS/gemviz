@@ -170,10 +170,15 @@ class SignalAxesFields:
 
     def identify_chart(self) -> None:
         """Identify the type of chart fot this run's data."""
-        # FIXME: does not identify plot_signal for area detector images (such as plan_name="count")
         rank = len(self.plot_axes)
         if rank == 1 and self.plot_signal is not None:
-            self.chart_type = "line_1D"
+            shape = self.descriptors()[0]["data_keys"][self.plot_signal]["shape"]
+            if len(shape) in (0, 1):
+                events = utils.get_md(self.run, "stop", "num_events", {}).get(self.stream_name)
+                if events > 1:
+                    self.chart_type = "line_1D"
+            elif len(shape) in (2, 3):
+                    self.chart_type = f"unknown{len(shape)}D"
         elif rank == 2 and self.plot_signal is not None:
             hints = utils.get_md(self.run, "start", "hints", {})
             gridding = hints.get("gridding")
