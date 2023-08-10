@@ -63,10 +63,7 @@ class SignalAxesFields:
         self.uid = utils.get_md(run, "start", "uid")
 
         if self.status in self.status__with_data:
-            # FIXME: does not identify plot_signal for area detector images (such as plan_name="count")
-
-            # must be first because this method could redefine self.stream_name
-            self.identify_axes()
+            self.identify_axes()  # call first, redefines self.stream_name
 
             self.identify_detectors()
             self.identify_fields()
@@ -173,15 +170,14 @@ class SignalAxesFields:
 
     def identify_chart(self) -> None:
         """Identify the type of chart fot this run's data."""
+        # FIXME: does not identify plot_signal for area detector images (such as plan_name="count")
         rank = len(self.plot_axes)
         if rank == 1 and self.plot_signal is not None:
             self.chart_type = "line_1D"
         elif rank == 2 and self.plot_signal is not None:
-            self.chart_type = (
-                "grid_2D"
-                if self.hints().get("gridding") == "rectilinear"
-                else "scatter_2D"
-            )
+            hints = utils.get_md(self.run, "start", "hints", {})
+            gridding = hints.get("gridding")
+            self.chart_type = "grid_2D" if gridding == "rectilinear" else "scatter_2D"
         else:
             self.chart_type = None
 
@@ -191,10 +187,25 @@ class SignalAxesFields:
 
         Return the fields (the names of the actual data), not the object names.
         """
+        def is_numeric(detector, descriptor):
+            dtype = descriptor["data_keys"][detector]["dtype"]
+            if dtype == "array":
+                ntype = self.run[self.stream_name]["data"][detector].dtype.name
+                if ntype.startswith("int") or ntype.startswith("float"):
+                    dtype = "number"
+            return dtype == "number"
+
         detectors = []
         for det_name in utils.get_md(self.run, "start", "detectors", []):
             detectors.extend(self.object_name_to_fields(det_name))
-        self.detectors = detectors
+
+        # fmt: off
+        self.detectors = [
+            det  # only numeric data
+            for det in detectors
+            for descriptor in self.descriptors(stream=self.stream_name)
+            if is_numeric(det, descriptor)
+        ]
 
     def identify_fields(self) -> None:
         """
