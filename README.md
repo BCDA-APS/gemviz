@@ -32,8 +32,8 @@ can run it as a developer would by following these instructions:
 1. `conda env create --force -n gemviz -f ./env.yml`
    - only need to do this once, assumes you have `conda` command
 1. `conda activate gemviz`
-1. `cd gemviz/demo`
-1. `python app.py &`
+2. `cd gemviz`
+3. `python app.py &`
 
 ## Acknowledgements
 
