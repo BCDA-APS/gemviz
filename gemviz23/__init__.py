@@ -5,13 +5,13 @@ Define constants used throught the code.
 import pathlib
 
 __settings_orgName__ = "BCDA-APS"
-__package_name__ = "gemviz23"
+__package_name__ = "gemviz"
 
 ROOT_DIR = pathlib.Path(__file__).parent
 UI_DIR = ROOT_DIR / "resources"
 
 APP_DESC = "Visualize Bluesky data from tiled server."
-APP_TITLE = "GemViz23"
+APP_TITLE = __package_name__
 AUTHOR_LIST = [
     s.strip()
     for s in """
