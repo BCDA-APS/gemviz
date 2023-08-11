@@ -6,6 +6,7 @@ Support functions for this demo project.
     ~connect_tiled_server
     ~get_tiled_runs
     ~getUiFileName
+    ~get_md
     ~iso2dt
     ~iso2ts
     ~myLoadUi
@@ -49,7 +50,12 @@ def QueryTimeSince(isotime):
 
 def QueryTimeUntil(isotime):
     """Tiled client query: all runs until given date/time."""
-    return tiled.queries.Key("time") < iso2ts(isotime)
+    return tiled.queries.Key("time") <= iso2ts(isotime)
+
+
+def get_md(parent, doc, key, default=None):
+    """Cautiously, get metadata from tiled object by document and key."""
+    return (parent.metadata.get(doc) or {}).get(key) or default
 
 
 def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):

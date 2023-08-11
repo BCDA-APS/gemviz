@@ -1,7 +1,9 @@
+import analyze_run
 import utils
 from PyQt5 import QtCore, QtWidgets
 import datetime
 import yaml
+import pyRestTable
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
@@ -57,16 +59,9 @@ class TableModel(QtCore.QAbstractTableModel):
             action = self.actions_library[label]
 
             if isinstance(action, list):
-                return self.get_md(run, *action)
+                return utils.get_md(run, *action)
             else:
                 return action(run)
-            
-    def _getKey(self, run, document_name, key, default=""):
-        md=run.metadata
-        if md is None:
-            return default
-        document=md.get(document_name) or {}
-        return document.get(key, default)
             
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
@@ -124,37 +119,30 @@ class TableModel(QtCore.QAbstractTableModel):
         gen = cat._keys_slice(start, end, ascending)
         return list(gen)  # FIXME: fails here with big catalogs, see issue #51
 
-    def get_md(self, run, doc, key, default=""):
-        """Return a key's value from a document in the run."""
-        obj = run.metadata.get(doc)
-        if obj is None:
-            return default
-        return obj.get(key, default)
-
     def get_run_detectors(self, run):
         """Return the run's detector names as a list."""
-        items = self.get_md(run, "start", "detectors", [])
+        items = utils.get_md(run, "start", "detectors", [])
         return ", ".join(items)
 
     def get_run_positioners(self, run):
         """Return the run's positioner names as a list."""
-        items = self.get_md(run, "start", "motors", [])
+        items = utils.get_md(run, "start", "motors", [])
         return ", ".join(items)
 
     def get_run_start_time(self, run):
         """Return the run's start time as ISO8601 string."""
-        ts = self.get_md(run, "start", "time", 0)
+        ts = utils.get_md(run, "start", "time", 0)
         dt = datetime.datetime.fromtimestamp(round(ts))
         return dt.isoformat(sep=" ")
 
     def get_run_stream_names(self, run):
         """Return the run's stream names as a list."""
-        items = self.get_md(run, "summary", "stream_names", [])
+        items = utils.get_md(run, "summary", "stream_names", [])
         return ", ".join(items)
 
     def get_run_uid7(self, run):
         """Return the run's uid, truncated to the first 7 characters."""
-        uid = self.get_md(run, "start", "uid")
+        uid = utils.get_md(run, "start", "uid")
         return uid[:7]
 
     # ------------ get & set methods
@@ -219,14 +207,32 @@ class TableModel(QtCore.QAbstractTableModel):
         """Provide a text view of the run metadata."""
         uid=self.uidList()[index.row()]
         run=self.catalog()[uid]
-        md=run.metadata
-        md=yaml.dump(dict(md), indent=4)
+        md=yaml.dump(dict(run.metadata), indent=4)
         return md
 
     def getDataDescription(self, index):
         """Provide text description of the data streams."""
         uid=self.uidList()[index.row()]
         run=self.catalog()[uid]
+
+        # Describe what will be plotted.
+        analysis = analyze_run.SignalAxesFields(run).to_dict()
+        table = pyRestTable.Table()
+        table.labels = "item description".split()
+        table.addRow(("scan", analysis['scan_id']))
+        table.addRow(("plan", analysis['plan']))
+        table.addRow(("chart", analysis['chart_type']))
+        if analysis["plot_signal"] is not None:
+            table.addRow(("stream", analysis['stream']))
+            table.addRow(("plot signal", analysis['plot_signal']))
+            table.addRow(("plot axes", ', '.join(analysis['plot_axes'])))
+            table.addRow(("all detectors", ', '.join(analysis['detectors'])))
+            table.addRow(("all positioners", ', '.join(analysis['positioners'])))
+        text = "plot summary"
+        text += ("\n" + "-" * len(text) + "\n" * 2)
+        text += f"{table.reST()}\n"
+
+        # information about each stream
         rows = []
         for sname in run:
             title = f"stream: {sname}"
@@ -236,7 +242,9 @@ class TableModel(QtCore.QAbstractTableModel):
             data = stream["data"].read()
             rows.append(str(data))
             rows.append("")
-        return "\n".join(rows).strip()
+
+        text += "\n".join(rows).strip()
+        return text
 
     
 

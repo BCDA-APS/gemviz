@@ -1,4 +1,4 @@
-# tiled-viz2023
+# GemViz
 
 Python Qt5 application to visualize Bluesky data from tiled server.
 
@@ -34,3 +34,8 @@ can run it as a developer would by following these instructions:
 1. `conda activate gemviz23`
 1. `cd gemviz23/demo`
 1. `python app.py &`
+
+## Acknowledgements
+
+We'd like to thank the [GEM fellow program](https://www.gemfellowship.org/) for sponsoring
+an intern fellowship for the development of this software at the Advanced Photon Source.
