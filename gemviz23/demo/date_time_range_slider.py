@@ -70,13 +70,8 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
 
-        # replace the placeholder "slider" with the custom one
-        self.verticalLayout.removeWidget(self.slider)
-        self.slider = range_slider.RangeSlider(QtCore.Qt.Horizontal)
-        self.verticalLayout.addWidget(self.slider)
-        self._locked = False
-
         self.setup()
+
         self.setMinimum(minimum or DEFAULT_MINIMUM)
         self.setMaximum(maximum or DEFAULT_MAXIMUM)
         self.setLow(low or DEFAULT_LOW)
@@ -84,6 +79,14 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
 
     def setup(self):
         """Configure the UI widgets."""
+
+        # replace the placeholder "slider" with the custom one
+        layout = self.sliderWidget.layout()
+        layout.removeWidget(self.slider)
+        self.slider = range_slider.RangeSlider(QtCore.Qt.Horizontal)
+        layout.insertWidget(0, self.slider)
+        self._locked = False
+
         self.slider.setMinimumHeight(30)
         self.slider.setSingleStep(self._slider_units(WEEK))
         self.slider.setPageStep(self._slider_units(4 * WEEK))

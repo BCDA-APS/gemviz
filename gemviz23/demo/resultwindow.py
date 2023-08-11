@@ -267,6 +267,7 @@ class ResultWindow(QtWidgets.QWidget):
         self.mainwindow.filter_panel.status.returnPressed.connect(self.displayTable)
         self.mainwindow.filter_panel.positioners.returnPressed.connect(self.displayTable)
         self.mainwindow.filter_panel.detectors.returnPressed.connect(self.displayTable)
+        self.mainwindow.filter_panel.date_time_widget.refresh.released.connect(self.displayTable)
 
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
