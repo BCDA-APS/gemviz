@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-gemviz: Python Qt5 application to demonstrate multiple UI files.
+gemviz: Python Qt5 application to visualize Bluesky data from tiled server.
 """
 
 import sys
