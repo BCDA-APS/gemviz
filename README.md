@@ -1,4 +1,4 @@
-# GemViz
+# gemviz
 
 Python Qt5 application to visualize Bluesky data from tiled server.
 
