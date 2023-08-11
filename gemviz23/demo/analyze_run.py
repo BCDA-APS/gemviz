@@ -105,8 +105,6 @@ class SignalAxesFields:
         # (re)discover the descriptors for this stream and cache them
         run_stream = self.run.get(stream or self.stream_name)
         if run_stream is None:
-            # TODO: What about self._descriptors?
-            # TODO: What if stream != self.stream_name?
             return []  # nothing that is plottable
 
         self._descriptors = run_stream.metadata.get("descriptors") or []
