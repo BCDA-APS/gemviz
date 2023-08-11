@@ -49,10 +49,8 @@ class FilterPanel(QtWidgets.QWidget):
             return
         self._catalogSelected = catalog_name
 
-        def getStartTime(uid):    
-            run = cat[uid]
-            start_time = run.metadata["start"]["time"]
-            return utils.ts2iso(start_time)
+        def getStartTime(uid):
+            return utils.ts2iso(utils.get_md(cat[uid], "start", "time"))
         
         cat=self.catalog()
         if len(cat) == 0:
