@@ -93,11 +93,11 @@ class TableModel(QtCore.QAbstractTableModel):
             self.setPageOffset(value)
         elif action == "next":
             value = offset + size
-            value = min(value, catalog_length - 1 - size)
+            value = min(value, catalog_length - size)
             value = max(value, 0)
             self.setPageOffset(value)
         elif action == "last":
-            value = catalog_length - 1 - size
+            value = catalog_length - size
             value = max(value, 0)
             self.setPageOffset(value)
 
@@ -300,8 +300,8 @@ class ResultWindow(QtWidgets.QWidget):
         model = self.tableView.model()
 
         if model is not None:
-            print(f"{model.pageOffset()=}")
             model.doPager(action)
+            print(f"{model.pageOffset()=}")
         self.doButtonPermissions()
         self.setPagerStatus()
 
