@@ -109,7 +109,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>refresh.bmp</normaloff>refresh.bmp</iconset>
+          <normaloff>apply.png</normaloff>apply.png</iconset>
         </property>
        </widget>
       </item>
