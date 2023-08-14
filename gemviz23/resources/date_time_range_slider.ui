@@ -94,7 +94,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="refresh">
+       <widget class="QPushButton" name="apply">
         <property name="maximumSize">
          <size>
           <width>30</width>
