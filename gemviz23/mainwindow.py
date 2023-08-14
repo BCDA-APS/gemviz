@@ -28,11 +28,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.filter_panel = FilterPanel(self)
         layout = self.filter_groupbox.layout()
         layout.addWidget(self.filter_panel)
-        
+
         self.results = ResultWindow(self)
         layout = self.runs_groupbox.layout()
         layout.addWidget(self.results)
-        
+
         self.viz = VizPanel(self)
         layout = self.viz_groupbox.layout()
         layout.addWidget(self.viz)
@@ -83,8 +83,7 @@ class MainWindow(QtWidgets.QMainWindow):
         User chose to open (connect with) a tiled server.
         """
         from app_settings import settings
-        from tiledserverdialog import TILED_SERVER_SETTINGS_KEY
-        from tiledserverdialog import TiledServerDialog
+        from tiledserverdialog import TILED_SERVER_SETTINGS_KEY, TiledServerDialog
 
         previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         server_uri = TiledServerDialog.getServer(self)
