@@ -36,9 +36,8 @@ This module uses QtCore.QSettings.
 
 import datetime
 
-from PyQt5 import QtCore, QtWidgets
-
 import __init__
+from PyQt5 import QtCore, QtWidgets
 
 GLOBAL_GROUP = "___global___"
 

@@ -1,9 +1,11 @@
-import analyze_run
-import utils
-from PyQt5 import QtCore, QtWidgets
 import datetime
-import yaml
+
+import analyze_run
 import pyRestTable
+import utils
+import yaml
+from PyQt5 import QtCore, QtWidgets
+
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 

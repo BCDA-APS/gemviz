@@ -6,11 +6,9 @@ Custom Qt widget to select range of date/times.
     ~DateTimeRangeSlider
 """
 
-import utils
-
-from PyQt5 import QtCore, QtWidgets
-
 import range_slider
+import utils
+from PyQt5 import QtCore, QtWidgets
 
 SECOND = 1
 MINUTE = 60 * SECOND
