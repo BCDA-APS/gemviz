@@ -1,4 +1,4 @@
-# GemViz
+# gemviz
 
 Python Qt5 application to visualize Bluesky data from tiled server.
 
@@ -29,11 +29,11 @@ can run it as a developer would by following these instructions:
 1. `git clone https://github.com/BCDA-APS/gemviz`
    - only need to do this once, assumes you have `git` command
 1. `cd gemviz`
-1. `conda env create --force -n gemviz23 -f ./env.yml`
+1. `conda env create --force -n gemviz -f ./env.yml`
    - only need to do this once, assumes you have `conda` command
-1. `conda activate gemviz23`
-1. `cd gemviz23/demo`
-1. `python app.py &`
+1. `conda activate gemviz`
+2. `cd gemviz`
+3. `python app.py &`
 
 ## Acknowledgements
 
