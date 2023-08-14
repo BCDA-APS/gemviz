@@ -248,6 +248,13 @@ class TableModel(QtCore.QAbstractTableModel):
         return text
 
 
+class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
+    """ https://stackoverflow.com/a/61722299 """
+    def initStyleOption(self, option, index):
+        super().initStyleOption(option, index)
+        option.displayAlignment = QtCore.Qt.AlignCenter
+
+
 class ResultWindow(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
@@ -262,13 +269,13 @@ class ResultWindow(QtWidgets.QWidget):
 
         # fmt: off
         widgets = [
-            self.mainwindow.filter_panel.catalogs, "currentTextChanged",
-            self.mainwindow.filter_panel.plan_name, "returnPressed",
-            self.mainwindow.filter_panel.scan_id, "returnPressed",
-            self.mainwindow.filter_panel.status, "returnPressed",
-            self.mainwindow.filter_panel.positioners, "returnPressed",
-            self.mainwindow.filter_panel.detectors, "returnPressed",
-            self.mainwindow.filter_panel.date_time_widget.refresh, "released",
+            [self.mainwindow.filter_panel.catalogs, "currentTextChanged",],
+            [self.mainwindow.filter_panel.plan_name, "returnPressed",],
+            [self.mainwindow.filter_panel.scan_id, "returnPressed",],
+            [self.mainwindow.filter_panel.status, "returnPressed",],
+            [self.mainwindow.filter_panel.positioners, "returnPressed",],
+            [self.mainwindow.filter_panel.detectors, "returnPressed",],
+            [self.mainwindow.filter_panel.date_time_widget.apply, "released",],
         ]
         # fmt: on
         for widget, signal in widgets:
@@ -328,6 +335,16 @@ class ResultWindow(QtWidgets.QWidget):
         self.mainwindow.filter_panel.enableDateRange(
             len(self.mainwindow.filter_panel.catalog()) > 0
         )
+        labels = data_model.columnLabels
+
+        def centerColumn(label):
+            if label in labels:
+                column = labels.index(label)
+                delegate = _AlignCenterDelegate(self.tableView)
+                self.tableView.setItemDelegateForColumn(column, delegate)
+
+        centerColumn("Scan ID")
+        centerColumn("#points")
 
     def setPagerStatus(self, text=None):
         if text is None:
