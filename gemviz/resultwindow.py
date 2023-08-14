@@ -268,7 +268,7 @@ class ResultWindow(QtWidgets.QWidget):
             self.mainwindow.filter_panel.status, "returnPressed",
             self.mainwindow.filter_panel.positioners, "returnPressed",
             self.mainwindow.filter_panel.detectors, "returnPressed",
-            self.mainwindow.filter_panel.date_time_widget.refresh, "released",
+            self.mainwindow.filter_panel.date_time_widget.apply, "released",
         ]
         # fmt: on
         for widget, signal in widgets:
