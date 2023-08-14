@@ -9,6 +9,7 @@ from PyQt5 import QtCore, QtWidgets
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
+
 class TableModel(QtCore.QAbstractTableModel):
     """Bluesky catalog for QtCore.QAbstractTableModel."""
 
@@ -33,10 +34,9 @@ class TableModel(QtCore.QAbstractTableModel):
         self._catalog_length = 0
 
         super().__init__()
-        
+
         self.setCatalog(data)
         self.setUidList(self._get_uidList())
-        
 
     # ------------ methods required by Qt's view
 
@@ -64,17 +64,17 @@ class TableModel(QtCore.QAbstractTableModel):
                 return utils.get_md(run, *action)
             else:
                 return action(run)
-            
+
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal: 
+            if orientation == QtCore.Qt.Horizontal:
                 return self.columnLabels[section]
             else:
-                return str(section + 1) #may want to alter at some point
+                return str(section + 1)  # may want to alter at some point
 
-    # ------------ methods required by the results table 
+    # ------------ methods required by the results table
 
-    def doPager(self, action, value = None):
+    def doPager(self, action, value=None):
         # print(f"doPager {action =}, {value =}")
 
         catalog_length = self.catalog_length()
@@ -100,17 +100,16 @@ class TableModel(QtCore.QAbstractTableModel):
             value = catalog_length - 1 - size
             value = max(value, 0)
             self.setPageOffset(value)
-        
+
         self.setUidList(self._get_uidList())
         # print(f"{self.pageOffset()=} {self.pageSize()=}")
 
-
     def isPagerAtStart(self):
-        return self.pageOffset()==0
+        return self.pageOffset() == 0
 
     def isPagerAtEnd(self):
         return (self.pageOffset() + len(self.uidList())) >= self.catalog_length()
-    
+
     # ------------ local methods
 
     def _get_uidList(self):
@@ -148,23 +147,23 @@ class TableModel(QtCore.QAbstractTableModel):
         return uid[:7]
 
     # ------------ get & set methods
-    
+
     def catalog(self):
         return self._data
-    
+
     def catalog_length(self):
         return self._catalog_length
-    
+
     def setCatalog(self, catalog):
-        self._data=catalog
+        self._data = catalog
         self._catalog_length = len(catalog)
 
     def uidList(self):
         return self._uidList
 
     def setUidList(self, value):
-        self._uidList=value
-    
+        self._uidList = value
+
     def pageOffset(self):
         return self._pageOffset
 
@@ -191,47 +190,47 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def ascending(self):
         return self._ascending
-    
+
     def setAscending(self, value):
-        self._ascending=value
+        self._ascending = value
 
     def pagerStatus(self):
-        total= self.catalog_length()
-        if total==0:
+        total = self.catalog_length()
+        if total == 0:
             text = "No runs"
         else:
             start = self.pageOffset()
-            end = start+len(self.uidList())
+            end = start + len(self.uidList())
             text = f"{start + 1}-{end} of {total} runs"
         return text
-    
+
     def getMetadata(self, index):
         """Provide a text view of the run metadata."""
-        uid=self.uidList()[index.row()]
-        run=self.catalog()[uid]
-        md=yaml.dump(dict(run.metadata), indent=4)
+        uid = self.uidList()[index.row()]
+        run = self.catalog()[uid]
+        md = yaml.dump(dict(run.metadata), indent=4)
         return md
 
     def getDataDescription(self, index):
         """Provide text description of the data streams."""
-        uid=self.uidList()[index.row()]
-        run=self.catalog()[uid]
+        uid = self.uidList()[index.row()]
+        run = self.catalog()[uid]
 
         # Describe what will be plotted.
         analysis = analyze_run.SignalAxesFields(run).to_dict()
         table = pyRestTable.Table()
         table.labels = "item description".split()
-        table.addRow(("scan", analysis['scan_id']))
-        table.addRow(("plan", analysis['plan']))
-        table.addRow(("chart", analysis['chart_type']))
+        table.addRow(("scan", analysis["scan_id"]))
+        table.addRow(("plan", analysis["plan"]))
+        table.addRow(("chart", analysis["chart_type"]))
         if analysis["plot_signal"] is not None:
-            table.addRow(("stream", analysis['stream']))
-            table.addRow(("plot signal", analysis['plot_signal']))
-            table.addRow(("plot axes", ', '.join(analysis['plot_axes'])))
-            table.addRow(("all detectors", ', '.join(analysis['detectors'])))
-            table.addRow(("all positioners", ', '.join(analysis['positioners'])))
+            table.addRow(("stream", analysis["stream"]))
+            table.addRow(("plot signal", analysis["plot_signal"]))
+            table.addRow(("plot axes", ", ".join(analysis["plot_axes"])))
+            table.addRow(("all detectors", ", ".join(analysis["detectors"])))
+            table.addRow(("all positioners", ", ".join(analysis["positioners"])))
         text = "plot summary"
-        text += ("\n" + "-" * len(text) + "\n" * 2)
+        text += "\n" + "-" * len(text) + "\n" * 2
         text += f"{table.reST()}\n"
 
         # information about each stream
@@ -248,7 +247,6 @@ class TableModel(QtCore.QAbstractTableModel):
         text += "\n".join(rows).strip()
         return text
 
-    
 
 class ResultWindow(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
@@ -259,27 +257,32 @@ class ResultWindow(QtWidgets.QWidget):
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
-            
     def setup(self):
         from functools import partial
 
-        self.mainwindow.filter_panel.catalogs.currentTextChanged.connect(self.displayTable)
-        self.mainwindow.filter_panel.plan_name.returnPressed.connect(self.displayTable)
-        self.mainwindow.filter_panel.scan_id.returnPressed.connect(self.displayTable)
-        self.mainwindow.filter_panel.status.returnPressed.connect(self.displayTable)
-        self.mainwindow.filter_panel.positioners.returnPressed.connect(self.displayTable)
-        self.mainwindow.filter_panel.detectors.returnPressed.connect(self.displayTable)
-        self.mainwindow.filter_panel.date_time_widget.refresh.released.connect(self.displayTable)
+        # fmt: off
+        widgets = [
+            self.mainwindow.filter_panel.catalogs, "currentTextChanged",
+            self.mainwindow.filter_panel.plan_name, "returnPressed",
+            self.mainwindow.filter_panel.scan_id, "returnPressed",
+            self.mainwindow.filter_panel.status, "returnPressed",
+            self.mainwindow.filter_panel.positioners, "returnPressed",
+            self.mainwindow.filter_panel.detectors, "returnPressed",
+            self.mainwindow.filter_panel.date_time_widget.refresh, "released",
+        ]
+        # fmt: on
+        for widget, signal in widgets:
+            getattr(widget, signal).connect(self.displayTable)
 
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        
+
         for button_name in "first back next last".split():
             button = getattr(self, button_name)
             # custom: pass the button name to the receiver
             button.released.connect(partial(self.doPagerButtons, button_name))
-        
+
         self.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
@@ -294,7 +297,7 @@ class ResultWindow(QtWidgets.QWidget):
             model.doPager(action)
         self.doButtonPermissions()
         self.setPagerStatus()
-    
+
     def doPageSize(self, value):
         # print(f"doPageSize {value =}")
         model = self.tableView.model()
@@ -313,24 +316,24 @@ class ResultWindow(QtWidgets.QWidget):
         self.back.setEnabled(not atStart)
         self.next.setEnabled(not atEnd)
         self.last.setEnabled(not atEnd)
-        
 
-        
     def displayTable(self, *args):
         self.cat = self.mainwindow.filter_panel.filteredCatalog()
         data_model = TableModel(self.cat)
         # print(f"Displaying catalog: {self.cat.item['id']!r}")
-        page_size = self.pageSize.currentText() # remember the current value
-        self.tableView.setModel(data_model) 
-        self.doPageSize(page_size) # restore
+        page_size = self.pageSize.currentText()  # remember the current value
+        self.tableView.setModel(data_model)
+        self.doPageSize(page_size)  # restore
         self.setPagerStatus()
-        self.mainwindow.filter_panel.enableDateRange(len(self.mainwindow.filter_panel.catalog())>0)
+        self.mainwindow.filter_panel.enableDateRange(
+            len(self.mainwindow.filter_panel.catalog()) > 0
+        )
 
     def setPagerStatus(self, text=None):
         if text is None:
             model = self.tableView.model()
             if model is not None:
-                text=model.pagerStatus()
+                text = model.pagerStatus()
 
         self.status.setText(text)
 
