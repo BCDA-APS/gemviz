@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1061</width>
-    <height>967</height>
+    <width>810</width>
+    <height>374</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,8 +47,15 @@
        <property name="toolTip">
         <string>Show the first run.</string>
        </property>
-       <property name="text">
-        <string>| &lt;</string>
+       <property name="icon">
+        <iconset>
+         <normaloff>first.png</normaloff>first.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -70,8 +77,15 @@
        <property name="toolTip">
         <string>Show the previous page of runs.</string>
        </property>
-       <property name="text">
-        <string>&lt;</string>
+       <property name="icon">
+        <iconset>
+         <normaloff>back.png</normaloff>back.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -163,8 +177,15 @@
        <property name="toolTip">
         <string>Show the next page of runs.</string>
        </property>
-       <property name="text">
-        <string>&gt;</string>
+       <property name="icon">
+        <iconset>
+         <normaloff>next.png</normaloff>next.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -186,8 +207,15 @@
        <property name="toolTip">
         <string>Show the last run.</string>
        </property>
-       <property name="text">
-        <string>&gt;|</string>
+       <property name="icon">
+        <iconset>
+         <normaloff>last.png</normaloff>last.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
        </property>
       </widget>
      </item>
