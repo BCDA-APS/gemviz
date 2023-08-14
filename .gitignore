@@ -161,3 +161,7 @@ cython_debug/
 
 #  Microsoft VSCode Editor configuration
 .vscode/
+.DS_Store
+.gitignore
+.DS_Store
+.DS_Store
