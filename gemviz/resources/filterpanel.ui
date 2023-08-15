@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>465</width>
-    <height>305</height>
+    <width>364</width>
+    <height>252</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>445</width>
-        <height>285</height>
+        <width>344</width>
+        <height>232</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -36,20 +36,10 @@
          </property>
          <widget class="QWidget" name="TabWidgetPage1">
           <attribute name="title">
-           <string/>
+           <string>Simple</string>
           </attribute>
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="0">
-            <widget class="QLabel" name="status_label_2">
-             <property name="text">
-              <string>Catalog</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="catalogs"/>
-           </item>
-           <item row="1" column="0">
             <widget class="QLabel" name="label">
              <property name="toolTip">
               <string>Search for runs between these two dates.</string>
@@ -59,7 +49,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="1" column="0">
             <widget class="QLabel" name="plan_label">
              <property name="toolTip">
               <string>Search for runs that match this Bluesky plan.</string>
@@ -69,14 +59,14 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="1" column="1">
             <widget class="QLineEdit" name="plan_name">
              <property name="toolTip">
               <string/>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="scan_id_label">
              <property name="toolTip">
               <string>Search for runs with this scan ID.</string>
@@ -86,21 +76,21 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="1">
             <widget class="QLineEdit" name="scan_id">
              <property name="toolTip">
               <string/>
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="status_label">
              <property name="text">
               <string>Status</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="3" column="1">
             <widget class="QLineEdit" name="status">
              <property name="enabled">
               <bool>false</bool>
@@ -110,7 +100,7 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="positioner_label">
              <property name="toolTip">
               <string>Search for runs with these motor(s). Use a comma to separate more than one name. (such as &quot;m1, m2&quot;)</string>
@@ -120,14 +110,14 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="4" column="1">
             <widget class="QLineEdit" name="positioners">
              <property name="toolTip">
               <string/>
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="detector_label">
              <property name="toolTip">
               <string>Search for runs with these detector(s). Use a comma to separate more than one name. (such as &quot;diode, I0&quot;)</string>
@@ -137,7 +127,7 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
+           <item row="5" column="1">
             <widget class="QLineEdit" name="detectors">
              <property name="toolTip">
               <string/>
@@ -148,8 +138,17 @@
          </widget>
          <widget class="QWidget" name="TabWidgetPage2">
           <attribute name="title">
-           <string>Page</string>
+           <string>TBA</string>
           </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Additional search capabilities are planned.</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
