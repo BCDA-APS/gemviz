@@ -108,6 +108,7 @@ class BRCTableView(QtWidgets.QWidget):
             if model is not None:
                 text = model.pagerStatus()
 
+        self.status.setText(text)
         self.setStatus(text)
 
     def doRunSelected(self, index):
