@@ -154,5 +154,5 @@ class MainWindow(QtWidgets.QMainWindow):
     def setServer(self, uri, server):
         """Define the tiled server URI."""
         self._server = server
-        self.server_uri.setText(f"server: {uri}")
+        self.server_uri.setText(f"tiled server: {uri}")
         self.setCatalogs(list(server))
