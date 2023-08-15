@@ -10,7 +10,7 @@ import utils
 
 
 class BRCSearchPanel(QtWidgets.QWidget):
-    """The panel to name a catalog and search it for runs."""
+    """The panel to search a catalog for runs."""
 
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
