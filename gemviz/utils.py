@@ -13,6 +13,7 @@ Support functions for this demo project.
     ~QueryTimeSince
     ~QueryTimeUntil
     ~removeAllLayoutWidgets
+    ~run_in_thread
     ~run_summary_table
     ~ts2dt
     ~ts2iso
@@ -20,6 +21,7 @@ Support functions for this demo project.
 
 import datetime
 import pathlib
+import threading
 
 import tiled.queries
 
@@ -96,6 +98,31 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     for v in text_case:
         cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
+
+
+def run_in_thread(func):
+    """
+    (decorator) run ``func`` in thread
+
+    USAGE::
+
+       @run_in_thread
+       def progress_reporting():
+           logger.debug("progress_reporting is starting")
+           # ...
+
+       #...
+       progress_reporting()   # runs in separate thread
+       #...
+
+    """
+
+    def wrapper(*args, **kwargs):
+        thread = threading.Thread(target=func, args=args, kwargs=kwargs)
+        thread.start()
+        return thread
+
+    return wrapper
 
 
 def run_summary_table(runs):
