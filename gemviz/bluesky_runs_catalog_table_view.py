@@ -1,7 +1,9 @@
 """
 QTableView of tiled "CatalogOfBlueskyRuns".
 
-Uses :class:`bluesky_runs_catalog_model.TableModel`.
+BRC: BlueskyRunsCatalog
+
+Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
 
 .. autosummary::
 
@@ -23,7 +25,7 @@ class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
         option.displayAlignment = QtCore.Qt.AlignCenter
 
 
-class ResultWindow(QtWidgets.QWidget):
+class BRCTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
@@ -35,12 +37,12 @@ class ResultWindow(QtWidgets.QWidget):
     def setup(self):
         # fmt: off
         widgets = [
-            [self.parent.filter_panel.plan_name, "returnPressed",],
-            [self.parent.filter_panel.scan_id, "returnPressed",],
-            [self.parent.filter_panel.status, "returnPressed",],
-            [self.parent.filter_panel.positioners, "returnPressed",],
-            [self.parent.filter_panel.detectors, "returnPressed",],
-            [self.parent.filter_panel.date_time_widget.apply, "released",],
+            [self.parent.brc_search_panel.plan_name, "returnPressed",],
+            [self.parent.brc_search_panel.scan_id, "returnPressed",],
+            [self.parent.brc_search_panel.status, "returnPressed",],
+            [self.parent.brc_search_panel.positioners, "returnPressed",],
+            [self.parent.brc_search_panel.detectors, "returnPressed",],
+            [self.parent.brc_search_panel.date_time_widget.apply, "released",],
         ]
         # fmt: on
         for widget, signal in widgets:
@@ -90,17 +92,17 @@ class ResultWindow(QtWidgets.QWidget):
         self.last.setEnabled(not atEnd)
 
     def displayTable(self):
-        from bluesky_runs_catalog_model import TableModel
+        from gemviz.bluesky_runs_catalog_table_model import BRCTableModel
 
-        self.cat = self.parent.filter_panel.filteredCatalog()
-        data_model = TableModel(self.cat)
+        self.cat = self.parent.brc_search_panel.filteredCatalog()
+        data_model = BRCTableModel(self.cat)
         # self.setStatus(f"Displaying catalog: {self.cat.item['id']!r}")
         page_size = self.pageSize.currentText()  # remember the current value
         self.tableView.setModel(data_model)
         self.doPageSize(page_size)  # restore
         self.setPagerStatus()
-        self.parent.filter_panel.enableDateRange(
-            len(self.parent.filter_panel.catalog()) > 0
+        self.parent.brc_search_panel.enableDateRange(
+            len(self.parent.brc_search_panel.catalog()) > 0
         )
         labels = data_model.columnLabels
 

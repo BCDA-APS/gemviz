@@ -85,7 +85,6 @@ class MainWindow(QtWidgets.QMainWindow):
             settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
             return
 
-        # self.filter_panel.setServer(client)
         self.setServer(server_uri, client)
 
     def catalog(self):
@@ -121,9 +120,9 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.removeAllLayoutWidgets(layout)
 
         if spec_name == "CatalogOfBlueskyRuns, v1":
-            from bluesky_runs_catalog import BlueskyRunsCatalogMVC
+            from bluesky_runs_catalog import BRC_MVC
 
-            self.mvc_catalog = BlueskyRunsCatalogMVC(self)
+            self.mvc_catalog = BRC_MVC(self)
             layout.addWidget(self.mvc_catalog)
         else:
             self.mvc_catalog = None

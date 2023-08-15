@@ -1,6 +1,8 @@
 """
 MVC implementation of CatalogOfBlueskyRuns.
 
+BRC: BlueskyRunsCatalog
+
 .. autosummary::
 
     ~BlueskyRunsCatalogMVC
@@ -14,7 +16,7 @@ from PyQt5 import QtWidgets
 import utils
 
 
-class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
+class BRC_MVC(QtWidgets.QWidget):
     """MVC class for CatalogOfBlueskyRuns."""
 
     # UI file name matches this module, different extension
@@ -30,19 +32,20 @@ class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
 
     def setup(self):
         from app_settings import settings
-        from filterpanel import FilterPanel
-        from bluesky_runs_catalog_table import ResultWindow
+        from gemviz.bluesky_runs_catalog_search import BRCSearchPanel
+        from gemviz.bluesky_runs_catalog_table_view import BRCTableView
+
         # from vizpanel import VizPanel
 
-        self.filter_panel = FilterPanel(self)
+        self.brc_search_panel = BRCSearchPanel(self)
         layout = self.filter_groupbox.layout()
-        layout.addWidget(self.filter_panel)
-        self.filter_panel.catalogSelected(self.catalog().item["id"])
+        layout.addWidget(self.brc_search_panel)
+        self.brc_search_panel.catalogSelected(self.catalog().item["id"])
 
-        self.results = ResultWindow(self)
+        self.brc_tableview = BRCTableView(self)
         layout = self.runs_groupbox.layout()
-        layout.addWidget(self.results)
-        self.results.displayTable()
+        layout.addWidget(self.brc_tableview)
+        self.brc_tableview.displayTable()
 
         # self.viz = VizPanel(self)
         # layout = self.viz_groupbox.layout()

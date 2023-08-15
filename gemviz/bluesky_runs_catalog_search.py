@@ -1,8 +1,15 @@
-import utils
+"""
+Search criteria for tiled "CatalogOfBlueskyRuns".
+
+BRC: BlueskyRunsCatalog
+"""
+
 from PyQt5 import QtWidgets
 
+import utils
 
-class FilterPanel(QtWidgets.QWidget):
+
+class BRCSearchPanel(QtWidgets.QWidget):
     """The panel to name a catalog and search it for runs."""
 
     # UI file name matches this module, different extension
