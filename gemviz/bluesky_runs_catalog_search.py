@@ -109,16 +109,3 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
-
-    # TODO: discard these methods
-
-    # def setCatalogs(self, catalogs):
-    #     self.catalogs.clear()
-    #     self.catalogs.addItems(catalogs)
-
-    # def server(self):
-    #     return self._server
-
-    # def setServer(self, server):
-    #     self._server = server
-    #     self.setCatalogs(list(self._server))
