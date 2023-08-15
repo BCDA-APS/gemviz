@@ -41,7 +41,7 @@ class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
         if thread is None or not thread.is_alive():
             self.parent.status = f"Start new thread now.  {key=}"
             self.hsplitter_wait_thread = self.splitter_wait_changes(key)
-    
+
     def splitter_settings_name(self, key):
         """Name to use with settings file for 'key' splitter."""
         return f"{self.__class__.__name__.lower()}_{key}"
