@@ -22,6 +22,24 @@ class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
 
     def setup(self):
         from app_settings import settings
+        from filterpanel import FilterPanel
+        # from resultwindow import ResultWindow
+        # from vizpanel import VizPanel
+
+        self.filter_panel = FilterPanel(self)
+        layout = self.filter_groupbox.layout()
+        layout.addWidget(self.filter_panel)
+        self.filter_panel.catalogSelected(self.catalog().item["id"])
+        # TODO: initialize with self.catalog()
+        # print(f"{self.catalog()=}")
+
+        # self.results = ResultWindow(self)
+        # layout = self.runs_groupbox.layout()
+        # layout.addWidget(self.results)
+
+        # self.viz = VizPanel(self)
+        # layout = self.viz_groupbox.layout()
+        # layout.addWidget(self.viz)
 
         # save/restore splitter sizes in application settings
         self.hsplitter_deadline = 0
@@ -34,12 +52,15 @@ class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
+    def catalog(self):
+        return self.parent.catalog()
+
     def splitter_moved(self, key, pos, index):
         setattr(self, f"{key}_deadline", time.time() + self.motion_wait_time)
 
         thread = getattr(self, f"{key}_wait_thread")
         if thread is None or not thread.is_alive():
-            self.parent.status = f"Start new thread now.  {key=}"
+            self.setStatus(f"Start new thread now.  {key=}")
             self.hsplitter_wait_thread = self.splitter_wait_changes(key)
 
     def splitter_settings_name(self, key):
@@ -60,12 +81,15 @@ class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):
-            # self.parent.status = (
+            # self.setStatus(
             #     f"Wait: {time.time()=:.3f}"
             #     f"  {getattr(self, f'{key}_deadline')=:.3f}"
             # )
             time.sleep(self.motion_wait_time * 0.1)
 
         sname = self.splitter_settings_name(key)
-        self.parent.status = f"Update settings: {sname=} {splitter.sizes()=}"
+        self.setStatus(f"Update settings: {sname=} {splitter.sizes()=}")
         settings.saveSplitter(splitter, sname)
+
+    def setStatus(self, text):
+        self.parent.setStatus(text)

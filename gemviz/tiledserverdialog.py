@@ -13,15 +13,15 @@ class TiledServerDialog(QDialog):
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
 
-    def __init__(self, mainwindow):
-        self.mainwindow = mainwindow
+    def __init__(self, parent):
+        self.parent = parent
 
-        super().__init__(mainwindow)
+        super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
-        self.setModal(True)
 
     def setup(self):
+        self.setModal(True)
         self.other_button.toggled.connect(self.enableOther)
 
     def enableOther(self):
@@ -47,7 +47,7 @@ class TiledServerDialog(QDialog):
             dialog.url_button: server,
         }
 
-        parent.status = "Choose which tiled server to use ..."
+        parent.setStatus("Choose which tiled server to use ...")
         ok_selected = dialog.exec()
 
         selected = None

@@ -16,31 +16,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        # from filterpanel import FilterPanel
-        # from resultwindow import ResultWindow
-        # from vizpanel import VizPanel
-
         self._server = None
         self._catalog = None
         self.mvc_catalog = None
 
         self.setWindowTitle(__init__.APP_TITLE)
-        # self.title.setText(__init__.APP_TITLE)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
-
-        # self.filter_panel = FilterPanel(self)
-        # layout = self.filter_groupbox.layout()
-        # layout.addWidget(self.filter_panel)
-
-        # self.results = ResultWindow(self)
-        # layout = self.runs_groupbox.layout()
-        # layout.addWidget(self.results)
-
-        # self.viz = VizPanel(self)
-        # layout = self.viz_groupbox.layout()
-        # layout.addWidget(self.viz)
 
         self.catalogs.currentTextChanged.connect(self.catalogSelected)
 
@@ -50,10 +33,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def status(self):
         return self.statusbar.currentMessage()
 
-    @status.setter
-    def status(self, text, timeout=0):
+    def setStatus(self, text, timeout=0):
         """Write new status to the main window."""
         self.statusbar.showMessage(str(text), msecs=timeout)
+        # TODO: log the text
 
     def doAboutDialog(self, *args, **kw):
         """
@@ -75,11 +58,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose exit (or quit), or closeEvent() was called.
         """
-        self.status = "Application quitting ..."
+        self.setStatus("Application quitting ...")
 
         settings.saveWindowGeometry(self, "mainwindow_geometry")
-        # settings.saveSplitter(self.hsplitter, "mainwindow_horizontal_splitter")
-        # settings.saveSplitter(self.vsplitter, "mainwindow_vertical_splitter")
 
         self.close()
 
@@ -93,14 +74,14 @@ class MainWindow(QtWidgets.QMainWindow):
         previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         server_uri = TiledServerDialog.getServer(self)
         if server_uri is None:
-            self.status = "No tiled server selected."
+            self.setStatus("No tiled server selected.")
             return
-        self.status = f"selected tiled {server_uri=!r}"
+        self.setStatus(f"selected tiled {server_uri=!r}")
 
         try:
             client = utils.connect_tiled_server(server_uri)
         except Exception as exc:
-            self.status = f"Error for {server_uri=!r}: {exc}"
+            self.setStatus(f"Error for {server_uri=!r}: {exc}")
             settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
             return
 
@@ -110,29 +91,33 @@ class MainWindow(QtWidgets.QMainWindow):
     def catalog(self):
         return self._catalog
 
+    def catalogType(self):
+        catalog = self.catalog()
+        specs = catalog.specs
+        # print(f"{specs=}")
+        # print(f'{catalog.item["attributes"]["structure_family"]=}')
+        try:
+            spec = specs[0]
+            spec_name = f"{spec.name}, v{spec.version}"
+        except IndexError:
+            spec_name = "not supported now"
+        return spec_name
+
     def catalogSelected(self, catalog_name):
         """A catalog was selected (from the pop-up menu)."""
         print(f"catalogSelected: {catalog_name=}")
         if len(catalog_name) == 0 or catalog_name not in self.server():
             if len(catalog_name) > 0:
-                self.mainwindow.status = f"Catalog {catalog_name!r} is not known."
+                self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
             return
         self._catalogSelected = catalog_name
         self._catalog = self.server()[catalog_name]
 
-        specs = self._catalog.specs
-        # print(f"{specs=}")
-        # print(f'{self._catalog.item["attributes"]["structure_family"]=}')
-        try:
-            spec = specs[0]
-            spec_name = f"{spec.name}, v{spec.version}"
-        except IndexError:
-            spec_name = "unrecognized"
+        spec_name = self.catalogType()
         self.spec_name.setText(spec_name)
+        self.setStatus(f"catalog {catalog_name!r} is {spec_name!r}")
 
-        self.status = f"catalog {catalog_name!r} is {spec_name!r}"
-
-        layout = self.groupBox.layout()
+        layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
 
         if spec_name == "CatalogOfBlueskyRuns, v1":

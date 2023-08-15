@@ -8,8 +8,8 @@ class FilterPanel(QtWidgets.QWidget):
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
 
-    def __init__(self, mainwindow):
-        self.mainwindow = mainwindow
+    def __init__(self, parent):
+        self.parent = parent
         self._server = None
         self._catalogSelected = None
 
@@ -23,29 +23,14 @@ class FilterPanel(QtWidgets.QWidget):
         # add the date/time slider widget
         self.date_time_widget = DateTimeRangeSlider(self)
         self.TabWidgetPage1.layout().setWidget(
-            1, QtWidgets.QFormLayout.FieldRole, self.date_time_widget
+            0, QtWidgets.QFormLayout.FieldRole, self.date_time_widget
         )
-
-        self.catalogs.currentTextChanged.connect(self.catalogSelected)
-
-    def setCatalogs(self, catalogs):
-        self.catalogs.clear()
-        self.catalogs.addItems(catalogs)
-
-    def server(self):
-        return self._server
-
-    def setServer(self, server):
-        self._server = server
-        self.setCatalogs(list(self._server))
 
     def catalogSelected(self, catalog_name, *args, **kwargs):
         from date_time_range_slider import DAY
 
         print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
-        if len(catalog_name) == 0 or catalog_name not in self.server():
-            if len(catalog_name) > 0:
-                self.mainwindow.status = f"Catalog {catalog_name!r} is not known."
+        if len(catalog_name) == 0:
             return
         self._catalogSelected = catalog_name
 
@@ -54,7 +39,7 @@ class FilterPanel(QtWidgets.QWidget):
 
         cat = self.catalog()
         if len(cat) == 0:
-            self.mainwindow.status = f"Catalog {catalog_name!r} has no runs."
+            self.setStatus(f"Catalog {catalog_name!r} has no runs.")
             return
         start_times = [
             getStartTime(cat.keys().first()),
@@ -72,9 +57,10 @@ class FilterPanel(QtWidgets.QWidget):
         print(f"{t_low=} {t_high=}")
 
     def catalog(self):
-        server = self.server()
-        catalog_name = self._catalogSelected
-        return server[catalog_name]
+        return self.parent.catalog()
+
+    def enableDateRange(self, permission):
+        self.date_time_widget.setEnabled(permission)
 
     def filteredCatalog(self):
         import tiled.queries
@@ -104,10 +90,23 @@ class FilterPanel(QtWidgets.QWidget):
             for detector in detectors.split(","):
                 cat = cat.search(tiled.queries.Contains("detectors", detector.strip()))
 
-        # TODO: status filtering
+        # TODO: exit status filtering
 
         print(f"filteredCatalog: {cat=}")
         return cat
 
-    def enableDateRange(self, permission):
-        self.date_time_widget.setEnabled(permission)
+    def setStatus(self, text):
+        self.parent.setStatus(text)
+
+    # methods to be discarded
+
+    # def setCatalogs(self, catalogs):
+    #     self.catalogs.clear()
+    #     self.catalogs.addItems(catalogs)
+
+    # def server(self):
+    #     return self._server
+
+    # def setServer(self, server):
+    #     self._server = server
+    #     self.setCatalogs(list(self._server))
