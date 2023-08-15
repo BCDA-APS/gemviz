@@ -1,4 +1,5 @@
 import datetime
+from functools import partial
 
 import analyze_run
 import pyRestTable
@@ -17,12 +18,12 @@ class TableModel(QtCore.QAbstractTableModel):
         self.actions_library = {
             "Scan ID": ["start", "scan_id"],
             "Plan Name": ["start", "plan_name"],
-            "Positioners": self.get_run_positioners,
-            "Detectors": self.get_run_detectors,
+            "Positioners": partial(self.get_str_list, "start", "motors"),
+            "Detectors": partial(self.get_str_list, "start", "detectors"),
             "#points": ["start", "num_points"],
             "Date": self.get_run_start_time,
             "Status": ["stop", "exit_status"],
-            "Streams": self.get_run_stream_names,
+            "Streams": partial(self.get_str_list, "summary", "stream_names"),
             # "uid": ["start", "uid"],
             # "uid7": self.get_run_uid7,
         }
@@ -120,31 +121,21 @@ class TableModel(QtCore.QAbstractTableModel):
         gen = cat._keys_slice(start, end, ascending)
         return list(gen)  # FIXME: fails here with big catalogs, see issue #51
 
-    def get_run_detectors(self, run):
-        """Return the run's detector names as a list."""
-        items = utils.get_md(run, "start", "detectors", [])
-        return ", ".join(items)
-
-    def get_run_positioners(self, run):
-        """Return the run's positioner names as a list."""
-        items = utils.get_md(run, "start", "motors", [])
-        return ", ".join(items)
-
     def get_run_start_time(self, run):
         """Return the run's start time as ISO8601 string."""
         ts = utils.get_md(run, "start", "time", 0)
         dt = datetime.datetime.fromtimestamp(round(ts))
         return dt.isoformat(sep=" ")
 
-    def get_run_stream_names(self, run):
-        """Return the run's stream names as a list."""
-        items = utils.get_md(run, "summary", "stream_names", [])
-        return ", ".join(items)
-
     def get_run_uid7(self, run):
         """Return the run's uid, truncated to the first 7 characters."""
         uid = utils.get_md(run, "start", "uid")
         return uid[:7]
+
+    def get_str_list(self, doc, key, run):
+        """Return the document's key values as a list."""
+        items = utils.get_md(run, doc, key, [])
+        return ", ".join(items)
 
     # ------------ get & set methods
 
@@ -265,8 +256,6 @@ class ResultWindow(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from functools import partial
-
         # fmt: off
         widgets = [
             [self.mainwindow.filter_panel.catalogs, "currentTextChanged",],
