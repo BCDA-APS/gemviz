@@ -110,9 +110,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def catalog(self):
         return self._catalog
 
-    def catalogSelected(self, catalog_name, *args, **kwargs):
+    def catalogSelected(self, catalog_name):
         """A catalog was selected (from the pop-up menu)."""
-        print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
+        print(f"catalogSelected: {catalog_name=}")
         if len(catalog_name) == 0 or catalog_name not in self.server():
             if len(catalog_name) > 0:
                 self.mainwindow.status = f"Catalog {catalog_name!r} is not known."
