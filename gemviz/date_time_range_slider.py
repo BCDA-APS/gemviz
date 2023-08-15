@@ -63,8 +63,6 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent, minimum=None, low=None, high=None, maximum=None):
-        from PyQt5 import uic
-
         super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
 
