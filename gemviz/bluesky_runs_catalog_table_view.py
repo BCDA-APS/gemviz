@@ -115,6 +115,7 @@ class BRCTableView(QtWidgets.QWidget):
         if model is not None:
             self.parent.viz.setMetadata(model.getMetadata(index))
             self.parent.viz.setData(model.getDataDescription(index))
+            self.setStatus(model.getSummary(index))
 
     def setStatus(self, text):
         self.parent.setStatus(text)

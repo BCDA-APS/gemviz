@@ -208,17 +208,19 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             text = f"{start + 1}-{end} of {total} runs"
         return text
 
+    def index2run(self, index):
+        uid = self.uidList()[index.row()]
+        return self.catalog()[uid]
+
     def getMetadata(self, index):
         """Provide a text view of the run metadata."""
-        uid = self.uidList()[index.row()]
-        run = self.catalog()[uid]
+        run = self.index2run(index)
         md = yaml.dump(dict(run.metadata), indent=4)
         return md
 
     def getDataDescription(self, index):
         """Provide text description of the data streams."""
-        uid = self.uidList()[index.row()]
-        run = self.catalog()[uid]
+        run = self.index2run(index)
 
         # Describe what will be plotted.
         analysis = analyze_run.SignalAxesFields(run).to_dict()
@@ -250,3 +252,10 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
         text += "\n".join(rows).strip()
         return text
+
+    def getSummary(self, index):
+        run = self.index2run(index)
+        return (
+            f'#{utils.get_md(run, "start", "scan_id", "unknown")}'
+            f'  {utils.get_md(run, "start", "plan_name", "unknown")}'
+        )
