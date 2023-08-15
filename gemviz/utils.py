@@ -12,6 +12,7 @@ Support functions for this demo project.
     ~myLoadUi
     ~QueryTimeSince
     ~QueryTimeUntil
+    ~removeAllLayoutWidgets
     ~run_summary_table
     ~ts2dt
     ~ts2iso
@@ -119,6 +120,12 @@ def run_summary_table(runs):
             )
         )
     return table
+
+
+def removeAllLayoutWidgets(layout):
+    """Remove all existing widgets from QLayout."""
+    for i in reversed(range(layout.count())):
+        layout.itemAt(i).widget().setParent(None)
 
 
 def myLoadUi(ui_file, baseinstance=None, **kw):
