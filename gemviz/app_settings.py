@@ -14,16 +14,16 @@ There is also a menu item to clear this file and reset it to defaults.
 
 This module uses QtCore.QSettings.
 (https://doc.qt.io/qtforpython-5/PySide2/QtCore/QSettings.html#qsettings)
-        
+
 ..  note:: Multi-monitor support : method restoreWindowGeometry()
-    
+
     On multi-monitor systems such as laptops, window may be
     restored to offscreen position.  Here is how it happens:
-    
+
     * geo was saved while window was on 2nd screen while docked
     * now re-opened on laptop display and window is off-screen
-    
-    For now, keep the windows on the main screen 
+
+    For now, keep the windows on the main screen
     or learn how to edit the settings file.
 
 .. see:: https://github.com/prjemian/assign_gup/blob/master/src/Assign_GUP/settings.py
