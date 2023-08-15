@@ -36,7 +36,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
     def catalogSelected(self, catalog_name, *args, **kwargs):
         from date_time_range_slider import DAY
 
-        print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
+        # print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
         if len(catalog_name) == 0:
             return
         self._catalogSelected = catalog_name
@@ -57,11 +57,16 @@ class BRCSearchPanel(QtWidgets.QWidget):
         t_high = utils.ts2iso(utils.iso2ts(t_high) + DAY)
 
         self.date_time_widget.setMinimum(t_low)
+        self.date_time_widget.setMaximum(t_high)
         self.date_time_widget.setLow(t_low)
         self.date_time_widget.setHigh(t_high)
-        self.date_time_widget.setMaximum(t_high)
 
-        print(f"{t_low=} {t_high=}")
+        # print(
+        #     f"{t_low=}"
+        #     f" {t_high=}"
+        #     # f" {self.date_time_widget.low()=}"
+        #     # f" {self.date_time_widget.high()=}"
+        # )
 
     def catalog(self):
         return self.parent.catalog()
@@ -77,7 +82,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         since = self.date_time_widget.low()
         until = self.date_time_widget.high()
         cat = utils.get_tiled_runs(cat, since=since, until=until)
-        print(f"{since=} {until=}")
+        # print(f"{since=} {until=}")
 
         plan_name = self.plan_name.text().strip()
         if len(plan_name) > 0:
@@ -99,7 +104,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
         # TODO: exit status filtering
 
-        print(f"filteredCatalog: {cat=}")
+        # print(f"filteredCatalog: {cat=}")
         return cat
 
     def setStatus(self, text):

@@ -104,7 +104,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def catalogSelected(self, catalog_name):
         """A catalog was selected (from the pop-up menu)."""
-        print(f"catalogSelected: {catalog_name=}")
+        self.setStatus(f"Selected catalog {catalog_name!r}.")
         if len(catalog_name) == 0 or catalog_name not in self.server():
             if len(catalog_name) > 0:
                 self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
