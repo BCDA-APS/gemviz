@@ -26,14 +26,13 @@ It is not yet installable as an application now.  We have such
 can run it as a developer would by following these instructions:
 
 1. Navigate to a directory where you have similar software projects
-1. `git clone https://github.com/BCDA-APS/gemviz`
+2. `git clone https://github.com/BCDA-APS/gemviz`
    - only need to do this once, assumes you have `git` command
-1. `cd gemviz`
-1. `conda env create --force -n gemviz -f ./env.yml`
+3. `cd gemviz`
+4. `conda env create --force -n gemviz -f ./env.yml`
    - only need to do this once, assumes you have `conda` command
-1. `conda activate gemviz`
-2. `cd gemviz`
-3. `python app.py &`
+5. `conda activate gemviz`
+6. `python gemviz/app.py &`
 
 ## Acknowledgements
 
