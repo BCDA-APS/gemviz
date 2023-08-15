@@ -1,8 +1,19 @@
-import utils
+"""
+Visualize content of a Bluesky run.
+
+* BRC: BlueskyRunsCatalog
+
+.. autosummary::
+
+    ~BRCRunVisualization
+"""
+
 from PyQt5 import QtWidgets
 
+import utils
 
-class VizPanel(QtWidgets.QWidget):
+
+class BRCRunVisualization(QtWidgets.QWidget):
     """The panel to show the contents of a run."""
 
     # UI file name matches this module, different extension

@@ -33,10 +33,9 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def setup(self):
         from app_settings import settings
+        from gemviz.bluesky_runs_catalog_run_viz import BRCRunVisualization
         from gemviz.bluesky_runs_catalog_search import BRCSearchPanel
         from gemviz.bluesky_runs_catalog_table_view import BRCTableView
-
-        # from vizpanel import VizPanel
 
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.filter_groupbox.layout()
@@ -48,9 +47,9 @@ class BRC_MVC(QtWidgets.QWidget):
         layout.addWidget(self.brc_tableview)
         self.brc_tableview.displayTable()
 
-        # self.viz = VizPanel(self)
-        # layout = self.viz_groupbox.layout()
-        # layout.addWidget(self.viz)
+        self.viz = BRCRunVisualization(self)
+        layout = self.viz_groupbox.layout()
+        layout.addWidget(self.viz)
 
         # connect search signals with tableview update
         # fmt: off
