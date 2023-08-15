@@ -35,19 +35,6 @@ class BRCTableView(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        # fmt: off
-        widgets = [
-            [self.parent.brc_search_panel.plan_name, "returnPressed",],
-            [self.parent.brc_search_panel.scan_id, "returnPressed",],
-            [self.parent.brc_search_panel.status, "returnPressed",],
-            [self.parent.brc_search_panel.positioners, "returnPressed",],
-            [self.parent.brc_search_panel.detectors, "returnPressed",],
-            [self.parent.brc_search_panel.date_time_widget.apply, "released",],
-        ]
-        # fmt: on
-        for widget, signal in widgets:
-            getattr(widget, signal).connect(self.displayTable)
-
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -121,7 +108,7 @@ class BRCTableView(QtWidgets.QWidget):
             if model is not None:
                 text = model.pagerStatus()
 
-        self.status.setText(text)
+        self.setStatus(text)
 
     def doRunSelected(self, index):
         model = self.tableView.model()

@@ -52,6 +52,20 @@ class BRC_MVC(QtWidgets.QWidget):
         # layout = self.viz_groupbox.layout()
         # layout.addWidget(self.viz)
 
+        # connect search signals with tableview update
+        # fmt: off
+        widgets = [
+            [self.brc_search_panel.plan_name, "returnPressed"],
+            [self.brc_search_panel.scan_id, "returnPressed"],
+            [self.brc_search_panel.status, "returnPressed"],
+            [self.brc_search_panel.positioners, "returnPressed"],
+            [self.brc_search_panel.detectors, "returnPressed"],
+            [self.brc_search_panel.date_time_widget.apply, "released"],
+        ]
+        # fmt: on
+        for widget, signal in widgets:
+            getattr(widget, signal).connect(self.brc_tableview.displayTable)
+
         # save/restore splitter sizes in application settings
         self.hsplitter_deadline = 0
         self.hsplitter_wait_thread = None
