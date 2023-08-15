@@ -122,6 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         specs = self._catalog.specs
         # print(f"{specs=}")
+        # print(f'{self._catalog.item["attributes"]["structure_family"]=}')
         try:
             spec = specs[0]
             spec_name = f"{spec.name}, v{spec.version}"
