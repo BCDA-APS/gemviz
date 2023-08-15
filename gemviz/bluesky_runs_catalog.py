@@ -1,3 +1,11 @@
+"""
+MVC implementation of CatalogOfBlueskyRuns.
+
+.. autosummary::
+
+    ~BlueskyRunsCatalogMVC
+"""
+
 import time
 from functools import partial
 
@@ -23,19 +31,18 @@ class BlueskyRunsCatalogMVC(QtWidgets.QWidget):
     def setup(self):
         from app_settings import settings
         from filterpanel import FilterPanel
-        # from resultwindow import ResultWindow
+        from bluesky_runs_catalog_table import ResultWindow
         # from vizpanel import VizPanel
 
         self.filter_panel = FilterPanel(self)
         layout = self.filter_groupbox.layout()
         layout.addWidget(self.filter_panel)
         self.filter_panel.catalogSelected(self.catalog().item["id"])
-        # TODO: initialize with self.catalog()
-        # print(f"{self.catalog()=}")
 
-        # self.results = ResultWindow(self)
-        # layout = self.runs_groupbox.layout()
-        # layout.addWidget(self.results)
+        self.results = ResultWindow(self)
+        layout = self.runs_groupbox.layout()
+        layout.addWidget(self.results)
+        self.results.displayTable()
 
         # self.viz = VizPanel(self)
         # layout = self.viz_groupbox.layout()
