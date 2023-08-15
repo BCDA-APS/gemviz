@@ -106,7 +106,7 @@
               <bool>false</bool>
              </property>
              <property name="toolTip">
-              <string>It is not possible to filter on the Status at this time. That information comes from the stop document and the current search tools available don't search that document at this time.</string>
+              <string>It is not possible to filter on the run Status at this time. That information comes from the stop document which is currently not searchable.</string>
              </property>
             </widget>
            </item>
