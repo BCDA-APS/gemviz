@@ -7,7 +7,7 @@ Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
 
 .. autosummary::
 
-    ~ResultWindow
+    ~BRCTableView
 """
 
 from functools import partial

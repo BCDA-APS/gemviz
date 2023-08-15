@@ -1,11 +1,12 @@
 """
 MVC implementation of CatalogOfBlueskyRuns.
 
-BRC: BlueskyRunsCatalog
+* BRC: BlueskyRunsCatalog
+* MVC: Model View Controller
 
 .. autosummary::
 
-    ~BlueskyRunsCatalogMVC
+    ~BRC_MVC
 """
 
 import time

@@ -105,7 +105,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
     def setStatus(self, text):
         self.parent.setStatus(text)
 
-    # methods to be discarded
+    # TODO: discard these methods
 
     # def setCatalogs(self, catalogs):
     #     self.catalogs.clear()

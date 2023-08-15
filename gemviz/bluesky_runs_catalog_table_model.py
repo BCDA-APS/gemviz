@@ -5,7 +5,7 @@ BRC: BlueskyRunsCatalog
 
 .. autosummary::
 
-    ~TableModel
+    ~BRCTableModel
 """
 
 import datetime
