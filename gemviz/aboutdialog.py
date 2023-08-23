@@ -32,7 +32,7 @@ class AboutDialog(QDialog):
         self.authors.setText(", ".join(__init__.AUTHOR_LIST))
         self.copyright.setText(__init__.COPYRIGHT_TEXT)
 
-        self.mainwindow.status = f"About {__init__.APP_TITLE}, {pid=}"
+        self.mainwindow.setStatus(f"About {__init__.APP_TITLE}, {pid=}")
 
         # handle the push buttons
         self.docs_pb.setToolTip(__init__.DOCS_URL)
@@ -59,18 +59,18 @@ class AboutDialog(QDialog):
 
     def doDocsUrl(self):
         """opening documentation URL in default browser"""
-        self.mainwindow.status = "opening documentation URL in default browser"
+        self.mainwindow.setStatus("opening documentation URL in default browser")
         self.doUrl(__init__.DOCS_URL)
 
     def doIssuesUrl(self):
         """opening issues URL in default browser"""
-        self.mainwindow.status = "opening issues URL in default browser"
+        self.mainwindow.setStatus("opening issues URL in default browser")
         self.doUrl(__init__.ISSUES_URL)
 
     def doLicense(self):
         """show the license"""
         if self.license_box is None:
-            self.mainwindow.status = "opening License in new window"
+            self.mainwindow.setStatus("opening License in new window")
             license_text = open(__init__.LICENSE_FILE, "r").read()
             # history.addLog('DEBUG: ' + license_text)
             # FIXME: Since "About" is now modal, cannot close this license window!
