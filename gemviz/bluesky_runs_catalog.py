@@ -66,10 +66,6 @@ class BRC_MVC(QtWidgets.QWidget):
             getattr(widget, signal).connect(self.brc_tableview.displayTable)
 
         # save/restore splitter sizes in application settings
-        self.hsplitter_deadline = 0
-        self.hsplitter_wait_thread = None
-        self.vsplitter_deadline = 0
-        self.vsplitter_wait_thread = None
         for key in "hsplitter vsplitter".split():
             splitter = getattr(self, key)
             sname = self.splitter_settings_name(key)
@@ -80,12 +76,12 @@ class BRC_MVC(QtWidgets.QWidget):
         return self.parent.catalog()
 
     def splitter_moved(self, key, pos, index):
-        setattr(self, f"{key}_deadline", time.time() + self.motion_wait_time)
-
-        thread = getattr(self, f"{key}_wait_thread")
+        deadline = getattr(self, f"{key}_deadline",0)
+        thread = getattr(self, f"{key}_wait_thread",None)
+        setattr(self, deadline, time.time() + self.motion_wait_time)
         if thread is None or not thread.is_alive():
             self.setStatus(f"Start new thread now.  {key=}")
-            self.hsplitter_wait_thread = self.splitter_wait_changes(key)
+            setattr(self, thread ,self.splitter_wait_changes(key))
 
     def splitter_settings_name(self, key):
         """Name to use with settings file for 'key' splitter."""
