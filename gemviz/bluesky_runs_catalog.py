@@ -47,9 +47,9 @@ class BRC_MVC(QtWidgets.QWidget):
         layout.addWidget(self.brc_tableview)
         self.brc_tableview.displayTable()
 
-        self.viz = BRCRunVisualization(self)
+        self.brc_run_viz = BRCRunVisualization(self)
         layout = self.viz_groupbox.layout()
-        layout.addWidget(self.viz)
+        layout.addWidget(self.brc_run_viz)
 
         # connect search signals with tableview update
         # fmt: off
