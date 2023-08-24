@@ -18,7 +18,6 @@ class BRCSearchPanel(QtWidgets.QWidget):
     def __init__(self, parent):
         self.parent = parent
         self._server = None
-        self._catalogSelected = None
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -32,14 +31,10 @@ class BRCSearchPanel(QtWidgets.QWidget):
         self.TabWidgetPage1.layout().setWidget(
             0, QtWidgets.QFormLayout.FieldRole, self.date_time_widget
         )
+        
 
-    def catalogSelected(self, catalog_name, *args, **kwargs):
+    def setupCatalog(self, catalog_name, *args, **kwargs):
         from date_time_range_slider import DAY
-
-        # print(f"catalogSelected: {catalog_name=} {args = }  {kwargs = }")
-        if len(catalog_name) == 0:
-            return
-        self._catalogSelected = catalog_name
 
         def getStartTime(uid):
             return utils.ts2iso(utils.get_md(cat[uid], "start", "time"))

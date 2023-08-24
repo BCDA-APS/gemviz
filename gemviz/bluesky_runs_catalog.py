@@ -40,7 +40,7 @@ class BRC_MVC(QtWidgets.QWidget):
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.filter_groupbox.layout()
         layout.addWidget(self.brc_search_panel)
-        self.brc_search_panel.catalogSelected(self.catalog().item["id"])
+        self.brc_search_panel.setupCatalog(self.catalogName())
 
         self.brc_tableview = BRCTableView(self)
         layout = self.runs_groupbox.layout()
@@ -74,6 +74,9 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def catalog(self):
         return self.parent.catalog()
+
+    def catalogName(self):
+        return self.parent.catalogName()
 
     def splitter_moved(self, key, pos, index):
         deadline = getattr(self, f"{key}_deadline",0)
