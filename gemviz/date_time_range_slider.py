@@ -188,6 +188,24 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         self._minimum = utils.iso2ts(value) if isinstance(value, str) else value
         self.slider.setMinimum(self._slider_units(self._minimum))
         self.low_date.setMinimumDate(utils.iso2dt(value))
+        
+        
+    def setTimeBoundaries(self,t_low,t_high):
+        """
+        Set the widget time boundaries: minimum, maximun, low, high.
+
+        PARAMETER:
+
+        t_low *str* :
+            Earliest possible date/time, in ISO8601 format.
+        t_high *str* :
+            Latest possible date/time, in ISO8601 format.            
+            
+        """        
+        self.setMinimum(t_low)
+        self.setMaximum(t_high)
+        self.setLow(t_low)
+        self.setHigh(t_high)        
 
 
 if __name__ == "__main__":

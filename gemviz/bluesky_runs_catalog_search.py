@@ -32,6 +32,8 @@ class BRCSearchPanel(QtWidgets.QWidget):
             0, QtWidgets.QFormLayout.FieldRole, self.date_time_widget
         )
         
+    def catalog(self):
+        return self.parent.catalog()        
 
     def setupCatalog(self, catalog_name, *args, **kwargs):
         from date_time_range_slider import DAY
@@ -50,21 +52,9 @@ class BRCSearchPanel(QtWidgets.QWidget):
         t_low = min(start_times)
         t_high = max(start_times)
         t_high = utils.ts2iso(utils.iso2ts(t_high) + DAY)
+        
+        self.date_time_widget.setTimeBoundaries(t_low,t_high)
 
-        self.date_time_widget.setMinimum(t_low)
-        self.date_time_widget.setMaximum(t_high)
-        self.date_time_widget.setLow(t_low)
-        self.date_time_widget.setHigh(t_high)
-
-        # print(
-        #     f"{t_low=}"
-        #     f" {t_high=}"
-        #     # f" {self.date_time_widget.low()=}"
-        #     # f" {self.date_time_widget.high()=}"
-        # )
-
-    def catalog(self):
-        return self.parent.catalog()
 
     def enableDateRange(self, permission):
         self.date_time_widget.setEnabled(permission)
