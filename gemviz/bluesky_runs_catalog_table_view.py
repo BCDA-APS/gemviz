@@ -114,8 +114,8 @@ class BRCTableView(QtWidgets.QWidget):
     def doRunSelected(self, index):
         model = self.tableView.model()
         if model is not None:
-            self.parent.viz.setMetadata(model.getMetadata(index))
-            self.parent.viz.setData(model.getDataDescription(index))
+            self.parent.brc_run_viz.setMetadata(model.getMetadata(index))
+            self.parent.brc_run_viz.setData(model.getDataDescription(index))
             self.setStatus(model.getSummary(index))
 
     def setStatus(self, text):

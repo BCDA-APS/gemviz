@@ -19,8 +19,8 @@ class BRCRunVisualization(QtWidgets.QWidget):
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
 
-    def __init__(self, mainwindow):
-        self.mainwindow = mainwindow
+    def __init__(self, parent):
+        self.parent = parent
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -38,3 +38,6 @@ class BRCRunVisualization(QtWidgets.QWidget):
 
     def setPlot(self, *args, **kwargs):
         pass
+
+    def setStatus(self, text):
+        self.parent.setStatus(text)

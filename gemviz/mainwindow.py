@@ -25,7 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
 
-        self.catalogs.currentTextChanged.connect(self.catalogSelected)
+        self.catalogs.currentTextChanged.connect(self.setCatalog)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -102,14 +102,17 @@ class MainWindow(QtWidgets.QMainWindow):
             spec_name = "not supported now"
         return spec_name
 
-    def catalogSelected(self, catalog_name):
+    def catalogName(self):
+        return self._catalogName
+
+    def setCatalog(self, catalog_name):
         """A catalog was selected (from the pop-up menu)."""
         self.setStatus(f"Selected catalog {catalog_name!r}.")
         if len(catalog_name) == 0 or catalog_name not in self.server():
             if len(catalog_name) > 0:
                 self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
             return
-        self._catalogSelected = catalog_name
+        self._catalogName = catalog_name
         self._catalog = self.server()[catalog_name]
 
         spec_name = self.catalogType()
