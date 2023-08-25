@@ -53,7 +53,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         t_high = max(start_times)
         t_high = utils.ts2iso(utils.iso2ts(t_high) + DAY)
         
-        self.date_time_widget.setTimeBoundaries(t_low,t_high)
+        self.date_time_widget.setLimits(t_low,t_high)
 
 
     def enableDateRange(self, permission):
