@@ -80,7 +80,7 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         layout = self.sliderWidget.layout()
         layout.removeWidget(self.slider)
         self.slider = range_slider.RangeSlider(QtCore.Qt.Horizontal)
-        layout.insertWidget(0, self.slider)
+        layout.addWidget(self.slider)
         self._locked = False
 
         self.slider.setMinimumHeight(30)
