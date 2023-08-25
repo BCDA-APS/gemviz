@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>388</width>
-    <height>92</height>
+    <height>94</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -84,7 +84,7 @@
     <widget class="QWidget" name="sliderWidget" native="true">
      <layout class="QHBoxLayout" name="sliderLayout">
       <item>
-       <widget class="QSlider" name="slider">
+       <widget class="RangeSlider" name="slider">
         <property name="value">
          <number>50</number>
         </property>
@@ -118,6 +118,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RangeSlider</class>
+   <extends>QSlider</extends>
+   <header>rangeslider.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
