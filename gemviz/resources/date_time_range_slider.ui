@@ -84,10 +84,7 @@
     <widget class="QWidget" name="sliderWidget" native="true">
      <layout class="QHBoxLayout" name="sliderLayout">
       <item>
-       <widget class="RangeSlider" name="slider">
-        <property name="value">
-         <number>50</number>
-        </property>
+       <widget class="RangeSlider" name="horizontalSlider">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>

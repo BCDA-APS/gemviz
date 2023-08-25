@@ -6,7 +6,6 @@ Custom Qt widget to select range of date/times.
     ~DateTimeRangeSlider
 """
 
-import range_slider
 import utils
 from PyQt5 import QtCore, QtWidgets
 
@@ -77,10 +76,6 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
         """Configure the UI widgets."""
 
         # replace the placeholder "slider" with the custom one
-        layout = self.sliderWidget.layout()
-        layout.removeWidget(self.slider)
-        self.slider = range_slider.RangeSlider(QtCore.Qt.Horizontal)
-        layout.addWidget(self.slider)
         self._locked = False
 
         self.slider.setMinimumHeight(30)
