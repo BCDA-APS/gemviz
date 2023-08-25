@@ -1,17 +1,28 @@
+"""
+QAbstractTableModel of tiled "CatalogOfBlueskyRuns".
+
+BRC: BlueskyRunsCatalog
+
+.. autosummary::
+
+    ~BRCTableModel
+"""
+
 import datetime
 from functools import partial
 
-import analyze_run
 import pyRestTable
-import utils
 import yaml
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
+
+import analyze_run
+import utils
 
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
 
-class TableModel(QtCore.QAbstractTableModel):
+class BRCTableModel(QtCore.QAbstractTableModel):
     """Bluesky catalog for QtCore.QAbstractTableModel."""
 
     def __init__(self, data):
@@ -109,7 +120,9 @@ class TableModel(QtCore.QAbstractTableModel):
         return self.pageOffset() == 0
 
     def isPagerAtEnd(self):
-        return (self.pageOffset() + len(self.uidList())) >= self.catalog_length()
+        # number is zero-based
+        last_row_number = self.pageOffset() + len(self.uidList())
+        return last_row_number >= self.catalog_length()
 
     # ------------ local methods
 
@@ -195,17 +208,19 @@ class TableModel(QtCore.QAbstractTableModel):
             text = f"{start + 1}-{end} of {total} runs"
         return text
 
+    def index2run(self, index):
+        uid = self.uidList()[index.row()]
+        return self.catalog()[uid]
+
     def getMetadata(self, index):
         """Provide a text view of the run metadata."""
-        uid = self.uidList()[index.row()]
-        run = self.catalog()[uid]
+        run = self.index2run(index)
         md = yaml.dump(dict(run.metadata), indent=4)
         return md
 
     def getDataDescription(self, index):
         """Provide text description of the data streams."""
-        uid = self.uidList()[index.row()]
-        run = self.catalog()[uid]
+        run = self.index2run(index)
 
         # Describe what will be plotted.
         analysis = analyze_run.SignalAxesFields(run).to_dict()
@@ -238,113 +253,9 @@ class TableModel(QtCore.QAbstractTableModel):
         text += "\n".join(rows).strip()
         return text
 
-
-class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
-    """ https://stackoverflow.com/a/61722299 """
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
-        option.displayAlignment = QtCore.Qt.AlignCenter
-
-
-class ResultWindow(QtWidgets.QWidget):
-    ui_file = utils.getUiFileName(__file__)
-
-    def __init__(self, mainwindow):
-        self.mainwindow = mainwindow
-        super().__init__()
-        utils.myLoadUi(self.ui_file, baseinstance=self)
-        self.setup()
-
-    def setup(self):
-        # fmt: off
-        widgets = [
-            [self.mainwindow.filter_panel.catalogs, "currentTextChanged",],
-            [self.mainwindow.filter_panel.plan_name, "returnPressed",],
-            [self.mainwindow.filter_panel.scan_id, "returnPressed",],
-            [self.mainwindow.filter_panel.status, "returnPressed",],
-            [self.mainwindow.filter_panel.positioners, "returnPressed",],
-            [self.mainwindow.filter_panel.detectors, "returnPressed",],
-            [self.mainwindow.filter_panel.date_time_widget.apply, "released",],
-        ]
-        # fmt: on
-        for widget, signal in widgets:
-            getattr(widget, signal).connect(self.displayTable)
-
-        # since we cannot set header's ResizeMode in Designer ...
-        header = self.tableView.horizontalHeader()
-        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-
-        for button_name in "first back next last".split():
-            button = getattr(self, button_name)
-            # custom: pass the button name to the receiver
-            button.released.connect(partial(self.doPagerButtons, button_name))
-
-        self.pageSize.currentTextChanged.connect(self.doPageSize)
-        self.doButtonPermissions()
-        self.setPagerStatus()
-        self.tableView.doubleClicked.connect(self.doRunSelected)
-
-    def doPagerButtons(self, action, **kwargs):
-        # print(f"{action=} {kwargs=}")
-        model = self.tableView.model()
-
-        if model is not None:
-            model.doPager(action)
-            print(f"{model.pageOffset()=}")
-        self.doButtonPermissions()
-        self.setPagerStatus()
-
-    def doPageSize(self, value):
-        # print(f"doPageSize {value =}")
-        model = self.tableView.model()
-
-        if model is not None:
-            model.doPager("pageSize", value)
-        self.doButtonPermissions()
-        self.setPagerStatus()
-
-    def doButtonPermissions(self):
-        model = self.tableView.model()
-        atStart = False if model is None else model.isPagerAtStart()
-        atEnd = False if model is None else model.isPagerAtEnd()
-
-        self.first.setEnabled(not atStart)
-        self.back.setEnabled(not atStart)
-        self.next.setEnabled(not atEnd)
-        self.last.setEnabled(not atEnd)
-
-    def displayTable(self, *args):
-        self.cat = self.mainwindow.filter_panel.filteredCatalog()
-        data_model = TableModel(self.cat)
-        # print(f"Displaying catalog: {self.cat.item['id']!r}")
-        page_size = self.pageSize.currentText()  # remember the current value
-        self.tableView.setModel(data_model)
-        self.doPageSize(page_size)  # restore
-        self.setPagerStatus()
-        self.mainwindow.filter_panel.enableDateRange(
-            len(self.mainwindow.filter_panel.catalog()) > 0
+    def getSummary(self, index):
+        run = self.index2run(index)
+        return (
+            f'#{utils.get_md(run, "start", "scan_id", "unknown")}'
+            f'  {utils.get_md(run, "start", "plan_name", "unknown")}'
         )
-        labels = data_model.columnLabels
-
-        def centerColumn(label):
-            if label in labels:
-                column = labels.index(label)
-                delegate = _AlignCenterDelegate(self.tableView)
-                self.tableView.setItemDelegateForColumn(column, delegate)
-
-        centerColumn("Scan ID")
-        centerColumn("#points")
-
-    def setPagerStatus(self, text=None):
-        if text is None:
-            model = self.tableView.model()
-            if model is not None:
-                text = model.pagerStatus()
-
-        self.status.setText(text)
-
-    def doRunSelected(self, index):
-        model = self.tableView.model()
-        if model is not None:
-            self.mainwindow.viz.setMetadata(model.getMetadata(index))
-            self.mainwindow.viz.setData(model.getDataDescription(index))
