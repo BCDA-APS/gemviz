@@ -101,10 +101,9 @@ class MainWindow(QtWidgets.QMainWindow):
         except IndexError:
             spec_name = "not supported now"
         return spec_name
-    
+
     def catalogName(self):
         return self._catalogName
-    
 
     def setCatalog(self, catalog_name):
         """A catalog was selected (from the pop-up menu)."""
