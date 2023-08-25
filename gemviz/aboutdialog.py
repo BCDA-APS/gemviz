@@ -10,12 +10,12 @@ class AboutDialog(QDialog):
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
 
-    def __init__(self, mainwindow):
-        self.mainwindow = mainwindow
+    def __init__(self, parent):
+        self.parent = parent
         self.license_box = None
         self.settings = None  # TODO
 
-        super().__init__(mainwindow)
+        super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
@@ -31,7 +31,7 @@ class AboutDialog(QDialog):
         self.authors.setText(", ".join(__init__.AUTHOR_LIST))
         self.copyright.setText(__init__.COPYRIGHT_TEXT)
 
-        self.mainwindow.setStatus(f"About {__init__.APP_TITLE}, {pid=}")
+        self.setStatus(f"About {__init__.APP_TITLE}, {pid=}")
 
         # handle the push buttons
         self.docs_pb.setToolTip(__init__.DOCS_URL)
@@ -58,18 +58,25 @@ class AboutDialog(QDialog):
 
     def doDocsUrl(self):
         """opening documentation URL in default browser"""
-        self.mainwindow.setStatus("opening documentation URL in default browser")
+        self.setStatus("opening documentation URL in default browser")
         self.doUrl(__init__.DOCS_URL)
 
     def doIssuesUrl(self):
         """opening issues URL in default browser"""
-        self.mainwindow.setStatus("opening issues URL in default browser")
+        self.setStatus("opening issues URL in default browser")
         self.doUrl(__init__.ISSUES_URL)
 
     def doLicense(self):
         """show the license"""
         from licensedialog import LicenseDialog
         self.close()
-        self.mainwindow.setStatus("opening License in new window")
+        self.setStatus("opening License in new window")
         license=LicenseDialog(self)
-        license.open()
+        license.finished.connect(self.clearStatus)
+        license.open()   
+    
+    def clearStatus(self):
+        self.setStatus("")
+        
+    def setStatus(self, text):
+        self.parent.setStatus(text)
