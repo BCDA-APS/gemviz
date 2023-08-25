@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QMainWindow):
         from aboutdialog import AboutDialog
 
         about = AboutDialog(self)
-        about.exec()
+        about.open()
 
     def closeEvent(self, event):
         """
