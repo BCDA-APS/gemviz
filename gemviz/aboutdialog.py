@@ -1,5 +1,4 @@
 import __init__
-import textwindow
 import utils
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog
@@ -69,13 +68,8 @@ class AboutDialog(QDialog):
 
     def doLicense(self):
         """show the license"""
-        if self.license_box is None:
-            self.mainwindow.setStatus("opening License in new window")
-            license_text = open(__init__.LICENSE_FILE, "r").read()
-            # history.addLog('DEBUG: ' + license_text)
-            # FIXME: Since "About" is now modal, cannot close this license window!
-            # Only closes when About closes.
-            ui = textwindow.TextWindow(None, "LICENSE", license_text)
-            ui.setMinimumSize(700, 500)
-            self.license_box = ui
-        self.license_box.show()
+        from licensedialog import LicenseDialog
+        self.close()
+        self.mainwindow.setStatus("opening License in new window")
+        license=LicenseDialog(self)
+        license.open()
