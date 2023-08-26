@@ -69,7 +69,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY, TiledServerDialog
+        from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
+        from .tiledserverdialog import TiledServerDialog
 
         previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         server_uri = TiledServerDialog.getServer(self)

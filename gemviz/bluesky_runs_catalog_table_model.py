@@ -15,7 +15,8 @@ import pyRestTable
 import yaml
 from PyQt5 import QtCore
 
-from . import analyze_run, utils
+from . import analyze_run
+from . import utils
 
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0

@@ -12,7 +12,8 @@ Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
 
 from functools import partial
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 
 from . import utils
 
