@@ -38,3 +38,6 @@ can run it as a developer would by following these instructions:
 
 We'd like to thank the [GEM fellow program](https://www.gemfellowship.org/) for sponsoring
 an intern fellowship for the development of this software at the Advanced Photon Source.
+
+This product includes software produced by UChicago Argonne, LLC 
+under Contract No. DE-AC02-06CH11357 with the Department of Energy.
