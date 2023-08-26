@@ -79,7 +79,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
             except ValueError:
                 self.setStatus('Invalid entry: scan_id must be an integer.')
                 pass
-                # TODO: Issue #145 https://github.com/BCDA-APS/gemviz/pull/145
+                # TODO: PR #145 https://github.com/BCDA-APS/gemviz/pull/145
                 # after updating tiled is updated (issue #53), we should try this:
                 # import tiled.catalogs
                 # empty_catalog = tiled.catalogs.Catalog.from_dict({})
