@@ -1,18 +1,18 @@
-from . import APP_TITLE
-from . import __version__
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
+
 from . import APP_DESC
+from . import APP_TITLE
 from . import AUTHOR_LIST
 from . import COPYRIGHT_TEXT
 from . import DOCS_URL
 from . import ISSUES_URL
-
-
+from . import __version__
 from . import utils
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QDialog
 
 
-class AboutDialog(QDialog):
+class AboutDialog(QtWidgets.QDialog):
     """Load a generic About... Dialog as a .ui file."""
 
     # UI file name matches this module, different extension

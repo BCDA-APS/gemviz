@@ -1,8 +1,9 @@
+from PyQt5 import QtWidgets
+
 from . import utils
-from PyQt5.QtWidgets import QDialog
 
 
-class LicenseDialog(QDialog):
+class LicenseDialog(QtWidgets.QDialog):
     """ Show license text in a GUI window."""
 
     # UI file name matches this module, different extension

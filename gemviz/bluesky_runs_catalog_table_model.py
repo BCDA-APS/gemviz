@@ -9,7 +9,6 @@ BRC: BlueskyRunsCatalog
 """
 
 import datetime
-from functools import partial
 
 import pyRestTable
 import yaml

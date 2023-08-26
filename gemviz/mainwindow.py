@@ -1,11 +1,12 @@
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 
 from . import APP_TITLE
 from . import utils
 from .app_settings import settings
-from PyQt5.QtCore import QUrl
+from .tiledserverdialog import LOCALHOST_URL
+from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
-from .tiledserverdialog import LOCALHOST_URL, TESTING_URL
 
 # TODO: remove testing URLs before production
 
@@ -176,7 +177,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.doOpen()
         else:
             # check the value
-            url = QUrl(server_uri)
+            url = QtCore.QUrl(server_uri)
             # print(f"{url=} {url.isValid()=} {url.isRelative()=}")
             if url.isValid() and not url.isRelative():
                 settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
