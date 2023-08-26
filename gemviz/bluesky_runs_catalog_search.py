@@ -77,8 +77,10 @@ class BRCSearchPanel(QtWidgets.QWidget):
             try:
                 cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
             except ValueError:
+                self.setStatus('Invalid entry: scan_id must be an integer.')
                 pass
-                # TODO: after updating tiled is updated, we should try this:
+                # TODO: Issue #145 https://github.com/BCDA-APS/gemviz/pull/145
+                # after updating tiled is updated (issue #53), we should try this:
                 # import tiled.catalogs
                 # empty_catalog = tiled.catalogs.Catalog.from_dict({})
                 # return empty_catalog
