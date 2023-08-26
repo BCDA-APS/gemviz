@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,1,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,0,0,1,0,0,0">
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
