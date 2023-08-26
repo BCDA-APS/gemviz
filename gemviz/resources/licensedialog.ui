@@ -13,21 +13,11 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>530</width>
-     <height>560</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-    <item>
-     <widget class="QTextBrowser" name="license"/>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTextBrowser" name="license"/>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
