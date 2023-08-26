@@ -3,7 +3,10 @@ from PyQt5 import QtWidgets
 import __init__
 import utils
 from app_settings import settings
+from PyQt5.QtCore import QUrl
 
+LOCALHOST_URL = "http://localhost:8000"
+TILED_SERVER_SETTINGS_KEY = "tiled_server"
 UI_FILE = utils.getUiFileName(__file__)
 
 
@@ -18,13 +21,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self._server = None
         self._catalog = None
+        self._serverList = None
         self.mvc_catalog = None
-
+    
         self.setWindowTitle(__init__.APP_TITLE)
+        self.setServers()
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
 
+        self.server_uri.currentTextChanged.connect(self.connectServer)
         self.catalogs.currentTextChanged.connect(self.setCatalog)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
@@ -68,25 +74,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from app_settings import settings
-        from tiledserverdialog import TILED_SERVER_SETTINGS_KEY, TiledServerDialog
+        from tiledserverdialog import TiledServerDialog
 
-        previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         server_uri = TiledServerDialog.getServer(self)
-        if server_uri is None:
-            self.setStatus("No tiled server selected.")
+        if not server_uri:
             return
-        self.setStatus(f"selected tiled {server_uri=!r}")
-
-        try:
-            client = utils.connect_tiled_server(server_uri)
-        except Exception as exc:
-            self.setStatus(f"Error for {server_uri=!r}: {exc}")
-            settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
-            return
-
-        self.setServer(server_uri, client)
-
+        uri_list=self.serverList()
+        if uri_list[0] == "": uri_list[0]= server_uri
+        else: uri_list.insert(0,server_uri)
+        duplicates=uri_list[1:].index(server_uri) + 1 if server_uri in uri_list[1:] else None
+        if duplicates: del uri_list[duplicates]
+        print(f"{uri_list=}")
+        self.setServers(uri_list)
+        
     def catalog(self):
         return self._catalog
 
@@ -135,12 +135,70 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the names (of server's catalogs) in the pop-up list."""
         self.catalogs.clear()
         self.catalogs.addItems(catalogs)
+        
+    def serverList(self):
+        return self._serverList
+    
+    def setServerList(self,uri_list=None):
+        if not uri_list:
+            previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY)
+            self._serverList = ["",previous_uri,LOCALHOST_URL,"Other..."]
+        else:
+            self._serverList=uri_list
+
+    def setServers(self,uri_list=None):
+        """Set the names of the server uri in the pop-up list"""
+        self.setServerList(uri_list)
+        if not uri_list:
+            uri_list = self.serverList()
+        self.server_uri.clear()
+        self.server_uri.addItems(uri_list)
+
+
+    # def doServer(self,server_choice):
+    #     if server_choice == "Other...":
+    #         self.doOpen()
+    #     else:  
+    #         self.connectServer()
+            
+            
+    def connectServer(self,server_uri):
+        """Connect to the server URI and return URI and client"""
+        if server_uri == "Other...":
+            self.doOpen()
+        else:    
+            # check the value
+            url = QUrl(server_uri)
+            # print(f"{url=} {url.isValid()=} {url.isRelative()=}")
+            if url.isValid() and not url.isRelative():
+                settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
+            else:
+                return       
+            previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
+            if server_uri is None:
+                self.setStatus("No tiled server selected.")
+                return
+            self.setStatus(f"selected tiled {server_uri=!r}")
+            try:
+                client = utils.connect_tiled_server(server_uri)
+            except Exception as exc:
+                self.setStatus(f"Error for {server_uri=!r}: {exc}")
+                settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
+                return
+            self.setServer(server_uri, client)
 
     def server(self):
         return self._server
-
-    def setServer(self, uri, server):
+    
+    def setServer(self, uri,server):
         """Define the tiled server URI."""
         self._server = server
-        self.server_uri.setText(f"tiled server: {uri}")
+        #TODO: self.server_uri.setText(f"tiled server: {uri}")
         self.setCatalogs(list(server))
+        
+
+    # def setServer(self, uri, server):
+    #     """Define the tiled server URI."""
+    #     self._server = server
+    #     self.server_uri.setText(f"tiled server: {uri}")
+    #     self.setCatalogs(list(server))
