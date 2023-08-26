@@ -42,6 +42,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="server_uri"/>
+       <property name="toolTip">
+         <string>Select a tiled server.</string>
+        </property>
       </item>
       <item>
        <spacer name="horizontalSpacer_3">
@@ -58,9 +61,6 @@
       </item>
       <item>
        <widget class="QLabel" name="catalogs_label">
-        <property name="toolTip">
-         <string>URL of the selected tiled server.</string>
-        </property>
         <property name="text">
          <string>Catalogs:   </string>
         </property>
