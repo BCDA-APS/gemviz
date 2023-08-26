@@ -14,7 +14,7 @@ from functools import partial
 
 from PyQt5 import QtWidgets
 
-import utils
+from . import utils
 
 
 class BRC_MVC(QtWidgets.QWidget):
@@ -32,10 +32,10 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from app_settings import settings
-        from gemviz.bluesky_runs_catalog_run_viz import BRCRunVisualization
-        from gemviz.bluesky_runs_catalog_search import BRCSearchPanel
-        from gemviz.bluesky_runs_catalog_table_view import BRCTableView
+        from .app_settings import settings
+        from .bluesky_runs_catalog_run_viz import BRCRunVisualization
+        from .bluesky_runs_catalog_search import BRCSearchPanel
+        from .bluesky_runs_catalog_table_view import BRCTableView
 
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.filter_groupbox.layout()
@@ -99,7 +99,7 @@ class BRC_MVC(QtWidgets.QWidget):
         key *str*:
             Name of splitter (either 'hsplitter' or 'vsplitter')
         """
-        from app_settings import settings
+        from .app_settings import settings
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):

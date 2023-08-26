@@ -1,11 +1,11 @@
 from PyQt5 import QtWidgets
 
-import __init__
-import utils
-from app_settings import settings
+from . import APP_TITLE
+from . import utils
+from .app_settings import settings
 from PyQt5.QtCore import QUrl
-from tiledserverdialog import TILED_SERVER_SETTINGS_KEY
-from tiledserverdialog import LOCALHOST_URL, TESTING_URL
+from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
+from .tiledserverdialog import LOCALHOST_URL, TESTING_URL
 
 # TODO: remove testing URLs before production
 
@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._serverList = None
         self.mvc_catalog = None
 
-        self.setWindowTitle(__init__.APP_TITLE)
+        self.setWindowTitle(APP_TITLE)
         self.setServers(None)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
@@ -50,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Show the "About ..." dialog
         """
-        from aboutdialog import AboutDialog
+        from .aboutdialog import AboutDialog
 
         about = AboutDialog(self)
         about.open()
@@ -76,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from tiledserverdialog import TiledServerDialog
+        from .tiledserverdialog import TiledServerDialog
 
         server_uri = TiledServerDialog.getServer(self)
         if not server_uri:
@@ -124,7 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clearContent(clear_cat=False)
 
         if spec_name == "CatalogOfBlueskyRuns, v1":
-            from bluesky_runs_catalog import BRC_MVC
+            from .bluesky_runs_catalog import BRC_MVC
 
             self.mvc_catalog = BRC_MVC(self)
             layout.addWidget(self.mvc_catalog)

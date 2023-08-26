@@ -9,7 +9,7 @@ import sys
 
 def gui():
     """Display the main window"""
-    from mainwindow import MainWindow
+    from .mainwindow import MainWindow
     from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
@@ -18,6 +18,9 @@ def gui():
     main_window.show()
     sys.exit(app.exec())
 
+def main():  # for future command-line options
+    gui()
+
 
 if __name__ == "__main__":
-    gui()
+    main()

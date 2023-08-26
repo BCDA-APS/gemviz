@@ -8,7 +8,7 @@ Analyze a tiled run for its plottable data.
 
 import warnings
 
-import utils
+from . import utils
 
 DEFAULT_STREAM = "primary"
 

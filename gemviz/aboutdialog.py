@@ -1,5 +1,13 @@
-import __init__
-import utils
+from . import APP_TITLE
+from . import __version__
+from . import APP_DESC
+from . import AUTHOR_LIST
+from . import COPYRIGHT_TEXT
+from . import DOCS_URL
+from . import ISSUES_URL
+
+
+from . import utils
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog
 
@@ -24,18 +32,18 @@ class AboutDialog(QDialog):
 
         pid = os.getpid()
 
-        self.setWindowTitle(f"About ... {__init__.APP_TITLE}")
-        self.title.setText(__init__.APP_TITLE)
-        self.version.setText(f"version {__init__.VERSION}")
-        self.description.setText(__init__.APP_DESC)
-        self.authors.setText(", ".join(__init__.AUTHOR_LIST))
-        self.copyright.setText(__init__.COPYRIGHT_TEXT)
+        self.setWindowTitle(f"About ... {APP_TITLE}")
+        self.title.setText(APP_TITLE)
+        self.version.setText(f"version {__version__}")
+        self.description.setText(APP_DESC)
+        self.authors.setText(", ".join(AUTHOR_LIST))
+        self.copyright.setText(COPYRIGHT_TEXT)
 
-        self.setStatus(f"About {__init__.APP_TITLE}, {pid=}")
+        self.setStatus(f"About {APP_TITLE}, {pid=}")
 
         # handle the push buttons
-        self.docs_pb.setToolTip(__init__.DOCS_URL)
-        self.issues_pb.setToolTip(__init__.ISSUES_URL)
+        self.docs_pb.setToolTip(DOCS_URL)
+        self.issues_pb.setToolTip(ISSUES_URL)
         self.docs_pb.clicked.connect(self.doDocsUrl)
         self.issues_pb.clicked.connect(self.doIssuesUrl)
         self.license_pb.clicked.connect(self.doLicense)
@@ -59,24 +67,25 @@ class AboutDialog(QDialog):
     def doDocsUrl(self):
         """opening documentation URL in default browser"""
         self.setStatus("opening documentation URL in default browser")
-        self.doUrl(__init__.DOCS_URL)
+        self.doUrl(DOCS_URL)
 
     def doIssuesUrl(self):
         """opening issues URL in default browser"""
         self.setStatus("opening issues URL in default browser")
-        self.doUrl(__init__.ISSUES_URL)
+        self.doUrl(ISSUES_URL)
 
     def doLicense(self):
         """show the license"""
-        from licensedialog import LicenseDialog
-        self.close()
+        from .licensedialog import LicenseDialog
+
         self.setStatus("opening License in new window")
-        license=LicenseDialog(self)
+
+        license = LicenseDialog(self)
         license.finished.connect(self.clearStatus)
-        license.open()   
-    
+        license.open()  # modal: must close licensedialog BEFORE aboutdialog
+
     def clearStatus(self):
         self.setStatus("")
-        
+
     def setStatus(self, text):
         self.parent.setStatus(text)

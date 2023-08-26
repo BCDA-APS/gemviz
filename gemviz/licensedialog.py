@@ -1,5 +1,4 @@
-import __init__
-import utils
+from . import utils
 from PyQt5.QtWidgets import QDialog
 
 
@@ -17,6 +16,8 @@ class LicenseDialog(QDialog):
         self.setup()
 
     def setup(self):
+        from . import LICENSE_FILE
+
         self.setModal(True)
-        license_text = open(__init__.LICENSE_FILE, "r").read()
+        license_text = open(LICENSE_FILE, "r").read()
         self.license.setText(license_text)

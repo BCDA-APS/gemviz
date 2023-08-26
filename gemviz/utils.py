@@ -168,11 +168,11 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     inspired by:
     http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1
     """
-    import __init__
+    from . import UI_DIR
     from PyQt5 import uic
 
     if isinstance(ui_file, str):
-        ui_file = __init__.UI_DIR / ui_file
+        ui_file = UI_DIR / ui_file
 
     # print(f"myLoadUi({ui_file=})")
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
