@@ -19,6 +19,7 @@ def gui():
     main_window.show()
     sys.exit(app.exec())
 
+
 def main():  # for future command-line options
     gui()
 

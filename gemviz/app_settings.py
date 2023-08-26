@@ -245,6 +245,7 @@ class ApplicationQSettings(QtCore.QSettings):
         if sizes is not None:
             splitter.setSizes(map(int, str(sizes).split()))
 
+
 # create _the_ singleton object
 settings = ApplicationQSettings(__settings_orgName__, __package_name__)
 

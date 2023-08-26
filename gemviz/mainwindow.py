@@ -1,5 +1,5 @@
-from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 
 from . import APP_TITLE
 from . import utils
