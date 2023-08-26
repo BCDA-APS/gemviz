@@ -78,7 +78,7 @@ class BRC_MVC(QtWidgets.QWidget):
     def catalogName(self):
         return self.parent.catalogName()
 
-    def splitter_moved(self, key):
+    def splitter_moved(self, key,*arg,**kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
         setattr(self,  f"{key}_deadline", time.time() + self.motion_wait_time)
         if thread is None or not thread.is_alive():
