@@ -1,0 +1,76 @@
+[build-system]
+# qt ==5
+# pyqt ==5
+requires = [
+  "pyRestTable",
+  "setuptools>=61.0",
+  "setuptools_scm[toml]>=6.2",
+  "tiled"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gemviz"
+description = "Visualize Bluesky data from tiled server."
+authors = [
+  { name="Ollivier Gassant" },
+  { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
+  { name="Pete Jemian", email="prjemian@gmail.com" },
+]
+maintainers = [
+  { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
+  { name="Pete Jemian", email="prjemian@gmail.com" },
+]
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["bluesky", "databroker", "tiled", "catalog"]
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
+license = {file = "gemviz/LICENSE"}
+# https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: Freely Distributable",
+    "License :: Public Domain",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Biology",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Geology",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Utilities",
+]
+
+[tool.setuptools_scm]
+
+[project.urls]
+"Homepage" = "https://github.com/BCDA-APS/gemviz"
+"Bug Tracker" = "https://github.com/BCDA-APS/gemviz/issues"
+
+[project.scripts]
+gemviz = "gemviz.app:main"
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E501"]
+
+[tool.isort]
+ force_single_line = true
+# multi_line_output = 1
+line_length = 88
+include_trailing_comma = true
+
+[tool.black]
+line_length = 88
