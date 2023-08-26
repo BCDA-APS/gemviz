@@ -21,16 +21,6 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
-        self.setup()
-
-    def setup(self):
-        from date_time_range_slider import DateTimeRangeSlider
-
-        # add the date/time slider widget
-        self.date_time_widget = DateTimeRangeSlider(self)
-        self.TabWidgetPage1.layout().setWidget(
-            0, QtWidgets.QFormLayout.FieldRole, self.date_time_widget
-        )
 
     def catalog(self):
         return self.parent.catalog()

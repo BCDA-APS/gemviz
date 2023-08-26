@@ -1,5 +1,4 @@
 import __init__
-import textwindow
 import utils
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog
@@ -11,12 +10,12 @@ class AboutDialog(QDialog):
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
 
-    def __init__(self, mainwindow):
-        self.mainwindow = mainwindow
+    def __init__(self, parent):
+        self.parent = parent
         self.license_box = None
         self.settings = None  # TODO
 
-        super().__init__(mainwindow)
+        super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
@@ -32,7 +31,7 @@ class AboutDialog(QDialog):
         self.authors.setText(", ".join(__init__.AUTHOR_LIST))
         self.copyright.setText(__init__.COPYRIGHT_TEXT)
 
-        self.mainwindow.setStatus(f"About {__init__.APP_TITLE}, {pid=}")
+        self.setStatus(f"About {__init__.APP_TITLE}, {pid=}")
 
         # handle the push buttons
         self.docs_pb.setToolTip(__init__.DOCS_URL)
@@ -59,23 +58,25 @@ class AboutDialog(QDialog):
 
     def doDocsUrl(self):
         """opening documentation URL in default browser"""
-        self.mainwindow.setStatus("opening documentation URL in default browser")
+        self.setStatus("opening documentation URL in default browser")
         self.doUrl(__init__.DOCS_URL)
 
     def doIssuesUrl(self):
         """opening issues URL in default browser"""
-        self.mainwindow.setStatus("opening issues URL in default browser")
+        self.setStatus("opening issues URL in default browser")
         self.doUrl(__init__.ISSUES_URL)
 
     def doLicense(self):
         """show the license"""
-        if self.license_box is None:
-            self.mainwindow.setStatus("opening License in new window")
-            license_text = open(__init__.LICENSE_FILE, "r").read()
-            # history.addLog('DEBUG: ' + license_text)
-            # FIXME: Since "About" is now modal, cannot close this license window!
-            # Only closes when About closes.
-            ui = textwindow.TextWindow(None, "LICENSE", license_text)
-            ui.setMinimumSize(700, 500)
-            self.license_box = ui
-        self.license_box.show()
+        from licensedialog import LicenseDialog
+        self.close()
+        self.setStatus("opening License in new window")
+        license=LicenseDialog(self)
+        license.finished.connect(self.clearStatus)
+        license.open()   
+    
+    def clearStatus(self):
+        self.setStatus("")
+        
+    def setStatus(self, text):
+        self.parent.setStatus(text)

@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>344</width>
-        <height>232</height>
+        <width>330</width>
+        <height>241</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -134,6 +134,9 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="1">
+            <widget class="DateTimeRangeSlider" name="date_time_widget" native="true"/>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="TabWidgetPage2">
@@ -158,6 +161,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DateTimeRangeSlider</class>
+   <extends>QWidget</extends>
+   <header>date_time_range_slider.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
