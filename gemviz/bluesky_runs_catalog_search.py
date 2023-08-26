@@ -50,7 +50,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
     def filteredCatalog(self):
         import tiled.queries
-
+        
         cat = self.catalog()
 
         since = self.date_time_widget.low()
@@ -64,7 +64,16 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
         scan_id = self.scan_id.text().strip()
         if len(scan_id) > 0:
-            cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
+            try:
+                cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
+            except ValueError:
+                self.setStatus('Invalid entry: scan_id must be an integer.')
+                pass
+                # TODO: PR #145 https://github.com/BCDA-APS/gemviz/pull/145
+                # after updating tiled is updated (issue #53), we should try this:
+                # import tiled.catalogs
+                # empty_catalog = tiled.catalogs.Catalog.from_dict({})
+                # return empty_catalog
 
         motors = self.positioners.text().strip()
         if len(motors) > 0:
