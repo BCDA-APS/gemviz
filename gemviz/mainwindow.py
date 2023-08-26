@@ -78,7 +78,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         server_uri = TiledServerDialog.getServer(self)
         if not server_uri:
-            return
+            self.clearLayout()
         uri_list=self.serverList()
         if uri_list[0] == "": uri_list[0]= server_uri
         else: uri_list.insert(0,server_uri)
@@ -120,8 +120,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatus(f"catalog {catalog_name!r} is {spec_name!r}")
 
         layout = self.groupbox.layout()
-        utils.removeAllLayoutWidgets(layout)
-
+        self.clearLayout()
+        
         if spec_name == "CatalogOfBlueskyRuns, v1":
             from bluesky_runs_catalog import BRC_MVC
 
@@ -135,7 +135,11 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the names (of server's catalogs) in the pop-up list."""
         self.catalogs.clear()
         self.catalogs.addItems(catalogs)
-        
+    
+    def clearLayout(self):
+        layout = self.groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+      
     def serverList(self):
         return self._serverList
     
@@ -153,17 +157,10 @@ class MainWindow(QtWidgets.QMainWindow):
             uri_list = self.serverList()
         self.server_uri.clear()
         self.server_uri.addItems(uri_list)
-
-
-    # def doServer(self,server_choice):
-    #     if server_choice == "Other...":
-    #         self.doOpen()
-    #     else:  
-    #         self.connectServer()
-            
             
     def connectServer(self,server_uri):
         """Connect to the server URI and return URI and client"""
+        self.clearLayout()
         if server_uri == "Other...":
             self.doOpen()
         else:    
@@ -193,12 +190,4 @@ class MainWindow(QtWidgets.QMainWindow):
     def setServer(self, uri,server):
         """Define the tiled server URI."""
         self._server = server
-        #TODO: self.server_uri.setText(f"tiled server: {uri}")
         self.setCatalogs(list(server))
-        
-
-    # def setServer(self, uri, server):
-    #     """Define the tiled server URI."""
-    #     self._server = server
-    #     self.server_uri.setText(f"tiled server: {uri}")
-    #     self.setCatalogs(list(server))
