@@ -119,7 +119,7 @@
   <customwidget>
    <class>RangeSlider</class>
    <extends>QSlider</extends>
-   <header>range_slider.h</header>
+   <header>gemviz.range_slider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
