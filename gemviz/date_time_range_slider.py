@@ -6,8 +6,8 @@ Custom Qt widget to select range of date/times.
     ~DateTimeRangeSlider
 """
 
-import range_slider
-import utils
+from . import range_slider
+from . import utils
 from PyQt5 import QtCore, QtWidgets
 
 SECOND = 1

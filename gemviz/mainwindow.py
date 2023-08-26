@@ -1,8 +1,7 @@
 from PyQt5 import QtWidgets
 
-import __init__
-import utils
-from app_settings import settings
+from . import utils
+from .app_settings import settings
 
 UI_FILE = utils.getUiFileName(__file__)
 
@@ -16,11 +15,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
+        from . import APP_TITLE
         self._server = None
         self._catalog = None
         self.mvc_catalog = None
 
-        self.setWindowTitle(__init__.APP_TITLE)
+        self.setWindowTitle(APP_TITLE)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
@@ -42,7 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Show the "About ..." dialog
         """
-        from aboutdialog import AboutDialog
+        from .aboutdialog import AboutDialog
 
         about = AboutDialog(self)
         about.open()
@@ -68,8 +68,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from app_settings import settings
-        from tiledserverdialog import TILED_SERVER_SETTINGS_KEY, TiledServerDialog
+        from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY, TiledServerDialog
 
         previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
         server_uri = TiledServerDialog.getServer(self)
@@ -123,7 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.removeAllLayoutWidgets(layout)
 
         if spec_name == "CatalogOfBlueskyRuns, v1":
-            from bluesky_runs_catalog import BRC_MVC
+            from .bluesky_runs_catalog import BRC_MVC
 
             self.mvc_catalog = BRC_MVC(self)
             layout.addWidget(self.mvc_catalog)

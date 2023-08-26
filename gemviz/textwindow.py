@@ -2,7 +2,7 @@
 Show text in a GUI window.
 """
 
-import utils
+from . import utils
 from PyQt5.QtWidgets import QWidget
 
 

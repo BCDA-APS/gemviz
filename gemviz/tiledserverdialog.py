@@ -1,5 +1,5 @@
-import utils
-from app_settings import settings
+from . import utils
+from .app_settings import settings
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QDialog
 

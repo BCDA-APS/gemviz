@@ -6,7 +6,7 @@ BRC: BlueskyRunsCatalog
 
 from PyQt5 import QtWidgets
 
-import utils
+from . import utils
 
 
 class BRCSearchPanel(QtWidgets.QWidget):
@@ -24,7 +24,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from date_time_range_slider import DateTimeRangeSlider
+        from .date_time_range_slider import DateTimeRangeSlider
 
         # add the date/time slider widget
         self.date_time_widget = DateTimeRangeSlider(self)
@@ -36,7 +36,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         return self.parent.catalog()
 
     def setupCatalog(self, catalog_name, *args, **kwargs):
-        from date_time_range_slider import DAY
+        from .date_time_range_slider import DAY
 
         def getStartTime(uid):
             return utils.ts2iso(utils.get_md(cat[uid], "start", "time"))
