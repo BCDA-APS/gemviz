@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>485</width>
-    <height>365</height>
+    <width>719</width>
+    <height>364</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,1,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,0,0,1,0,0,0">
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -31,12 +31,19 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="server_uri">
+       <widget class="QLabel" name="server_label">
         <property name="toolTip">
          <string>URL of the selected tiled server.</string>
         </property>
         <property name="text">
-         <string>tiled server URI</string>
+         <string>Tiled server:   </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="server_uri">
+        <property name="toolTip">
+         <string>Select tiled server URI</string>
         </property>
        </widget>
       </item>
@@ -52,6 +59,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="catalogs_label">
+        <property name="text">
+         <string>Catalogs:   </string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QComboBox" name="catalogs">
@@ -105,7 +119,11 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QWidget" name="widget" native="true"/>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="toolTip">
+          <string extracomment="Select"/>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -117,8 +135,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>485</width>
-     <height>20</height>
+     <width>719</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

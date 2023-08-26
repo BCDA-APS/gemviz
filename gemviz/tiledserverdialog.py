@@ -1,10 +1,11 @@
 import utils
 from app_settings import settings
-from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QDialog
 
-LOCALHOST_URL = "http://localhost:5000"
 TILED_SERVER_SETTINGS_KEY = "tiled_server"
+# TODO: remove testing URLs before production:
+LOCALHOST_URL = "http://localhost:8000"
+TESTING_URL = "http://otz.xray.aps.anl.gov:8000"
 
 
 class TiledServerDialog(QDialog):
@@ -59,13 +60,5 @@ class TiledServerDialog(QDialog):
                 break
         if selected is None and dialog.other_button.isChecked():
             selected = dialog.other_url.text()
-
-        # check the value before accepting it
-        url = QUrl(selected)
-        # print(f"{url=} {url.isValid()=} {url.isRelative()=}")
-        if url.isValid() and not url.isRelative():
-            settings.setKey(TILED_SERVER_SETTINGS_KEY, selected)
-        else:
-            return
 
         return selected
