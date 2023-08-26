@@ -16,6 +16,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setup(self):
         from . import APP_TITLE
+
         self._server = None
         self._catalog = None
         self.mvc_catalog = None

@@ -1,7 +1,8 @@
-from . import utils
-from .app_settings import settings
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QDialog
+
+from . import utils
+from .app_settings import settings
 
 LOCALHOST_URL = "http://localhost:5000"
 TILED_SERVER_SETTINGS_KEY = "tiled_server"
