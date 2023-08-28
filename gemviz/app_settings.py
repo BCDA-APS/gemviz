@@ -36,8 +36,11 @@ This module uses QtCore.QSettings.
 
 import datetime
 
-import __init__
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+
+from . import __package_name__
+from . import __settings_orgName__
 
 GLOBAL_GROUP = "___global___"
 
@@ -244,9 +247,7 @@ class ApplicationQSettings(QtCore.QSettings):
 
 
 # create _the_ singleton object
-settings = ApplicationQSettings(
-    __init__.__settings_orgName__, __init__.__package_name__
-)
+settings = ApplicationQSettings(__settings_orgName__, __package_name__)
 
 
 def main():

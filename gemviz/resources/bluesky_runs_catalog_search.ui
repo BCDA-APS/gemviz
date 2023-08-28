@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>330</width>
-        <height>241</height>
+        <width>344</width>
+        <height>232</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -165,7 +165,7 @@
   <customwidget>
    <class>DateTimeRangeSlider</class>
    <extends>QWidget</extends>
-   <header>date_time_range_slider.h</header>
+   <header>gemviz.date_time_range_slider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

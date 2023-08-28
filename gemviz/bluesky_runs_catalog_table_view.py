@@ -12,9 +12,10 @@ Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
 
 from functools import partial
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 
-import utils
+from . import utils
 
 
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
@@ -79,7 +80,7 @@ class BRCTableView(QtWidgets.QWidget):
         self.last.setEnabled(not atEnd)
 
     def displayTable(self):
-        from gemviz.bluesky_runs_catalog_table_model import BRCTableModel
+        from .bluesky_runs_catalog_table_model import BRCTableModel
 
         self.cat = self.parent.brc_search_panel.filteredCatalog()
         data_model = BRCTableModel(self.cat)

@@ -10,7 +10,7 @@ Visualize content of a Bluesky run.
 
 from PyQt5 import QtWidgets
 
-import utils
+from . import utils
 
 
 class BRCRunVisualization(QtWidgets.QWidget):

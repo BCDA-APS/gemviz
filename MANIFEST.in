@@ -1,0 +1,3 @@
+global-exclude *.pptx
+global-exclude *.vsd
+global-exclude */archive/*

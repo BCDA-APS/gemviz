@@ -164,3 +164,9 @@ cython_debug/
 
 # Macintosh
 .DS_Store
+
+# local developer code
+dev_*.py
+
+# Qt (on Windows)
+gemviz/resources/*.py

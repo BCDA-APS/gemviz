@@ -6,7 +6,7 @@ BRC: BlueskyRunsCatalog
 
 from PyQt5 import QtWidgets
 
-import utils
+from . import utils
 
 
 class BRCSearchPanel(QtWidgets.QWidget):
@@ -26,7 +26,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         return self.parent.catalog()
 
     def setupCatalog(self, catalog_name, *args, **kwargs):
-        from date_time_range_slider import DAY
+        from .date_time_range_slider import DAY
 
         def getStartTime(uid):
             return utils.ts2iso(utils.get_md(cat[uid], "start", "time"))
@@ -50,7 +50,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
     def filteredCatalog(self):
         import tiled.queries
-        
+
         cat = self.catalog()
 
         since = self.date_time_widget.low()
@@ -67,7 +67,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
             try:
                 cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
             except ValueError:
-                self.setStatus('Invalid entry: scan_id must be an integer.')
+                self.setStatus("Invalid entry: scan_id must be an integer.")
                 pass
                 # TODO: PR #145 https://github.com/BCDA-APS/gemviz/pull/145
                 # after updating tiled is updated (issue #53), we should try this:
