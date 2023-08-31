@@ -12,7 +12,7 @@ try:
 except (LookupError, ModuleNotFoundError):
     from importlib.metadata import version
 
-    __version__ = version("pkgdemo")
+    __version__ = version("gemviz")
     del version
 
 __settings_orgName__ = "BCDA-APS"

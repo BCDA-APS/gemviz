@@ -181,9 +181,9 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 
 def connect_tiled_server(uri):
     from tiled.client import from_uri
-    from tiled.client.cache import Cache
 
-    client = from_uri(uri, "dask", cache=Cache.in_memory(2e9))
+    # leave out "dask" and get numpy by default
+    client = from_uri(uri, "dask")
     return client
 
 
