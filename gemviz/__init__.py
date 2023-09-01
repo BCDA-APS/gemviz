@@ -4,6 +4,9 @@ Define constants used throught the code.
 
 import pathlib
 
+__settings_orgName__ = "BCDA-APS"
+__package_name__ = "gemviz"
+
 try:
     from setuptools_scm import get_version
 
@@ -12,11 +15,8 @@ try:
 except (LookupError, ModuleNotFoundError):
     from importlib.metadata import version
 
-    __version__ = version("pkgdemo")
+    __version__ = version(__package_name__)
     del version
-
-__settings_orgName__ = "BCDA-APS"
-__package_name__ = "gemviz"
 
 ROOT_DIR = pathlib.Path(__file__).parent
 UI_DIR = ROOT_DIR / "resources"
