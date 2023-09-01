@@ -5,8 +5,8 @@ from .app_settings import settings
 
 TILED_SERVER_SETTINGS_KEY = "tiled_server"
 # TODO: remove testing URLs before production:
-LOCALHOST_URL = "http://localhost:8000"
-TESTING_URL = "http://otz.xray.aps.anl.gov:8000"
+LOCALHOST_URL = "http://localhost:8020"
+TESTING_URL = "http://otz.xray.aps.anl.gov:8020"
 
 
 class TiledServerDialog(QtWidgets.QDialog):
