@@ -20,7 +20,23 @@ def gui():
     sys.exit(app.exec())
 
 
+def command_line_interface():
+    import argparse
+    from . import __version__
+
+    doc = __doc__.strip().splitlines()[0]
+    parser = argparse.ArgumentParser(description=doc)
+
+    parser.add_argument(
+        "-v", "--version", action="version", version=__version__
+    )
+
+    return parser.parse_args()
+
+
 def main():  # for future command-line options
+    options = command_line_interface()
+    # print(f"{options=}")
     gui()
 
 
