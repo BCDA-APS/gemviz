@@ -7,7 +7,7 @@ gemviz: Python Qt5 application to visualize Bluesky data from tiled server.
 import sys
 
 
-def gui(*args, **kwargs):
+def gui():
     """Display the main window"""
     from PyQt5 import QtWidgets
 
