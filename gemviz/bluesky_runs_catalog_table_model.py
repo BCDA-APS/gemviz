@@ -13,12 +13,21 @@ import datetime
 import pyRestTable
 import yaml
 from PyQt5 import QtCore
+from PyQt5 import QtGui
 
 from . import analyze_run
 from . import utils
 
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
+BGCLUT ={  # BackGround Color Lookup Table
+    "success": None,
+    # mark background color of unsuccessful runs
+    "abort": QtGui.QColorConstants.Svg.lightyellow,  # ffffe0
+    "fail": QtGui.QColorConstants.Svg.mistyrose,  # ffe4e1
+    # other, such as None (when no stop document)
+    "other": QtGui.QColorConstants.Svg.lightslategrey,  # 778899
+}
 
 
 class BRCTableModel(QtCore.QAbstractTableModel):
@@ -62,14 +71,17 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         return value
 
     def data(self, index, role=None):
-        # display data
-        if role == QtCore.Qt.DisplayRole:
+        if role == QtCore.Qt.DisplayRole:  # display data
             # print("Display role:", index.row(), index.column())
-            uid = self.uidList()[index.row()]
-            run = self.catalog()[uid]
+            run = self.indexToRun(index)
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
             return action(run)
+
+        elif role == QtCore.Qt.BackgroundRole:
+            bgcolor = self.backgroundColor(self.indexToRun(index))
+            if bgcolor is not None:
+                return QtGui.QBrush(bgcolor)
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
@@ -120,13 +132,18 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
     # ------------ local methods
 
+    def backgroundColor(self, run):
+        exit_status = utils.get_md(run, "stop", "exit_status", "unknown")
+        bgcolor = BGCLUT.get(exit_status, BGCLUT["other"])
+        return bgcolor
+
     def _get_uidList(self):
         cat = self.catalog()
         start = self.pageOffset()
         end = start + self.pageSize()
         ascending = 1 if self.ascending() else -1
         gen = cat._keys_slice(start, end, ascending)
-        return list(gen)  # FIXME: fails here with big catalogs, see issue #51
+        return list(gen)  # FIXME: #51: fails here with big catalogs, see issue #51
 
     def get_run_start_time(self, run):
         """Return the run's start time as ISO8601 string."""
@@ -154,7 +171,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
     def setCatalog(self, catalog):
         self._data = catalog
-        self._catalog_length = len(catalog)
+        self._catalog_length = len(catalog)  # TODO: for #51 catalog.item["attributes"]["structure"]["count"]
 
     def uidList(self):
         return self._uidList
@@ -202,19 +219,19 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             text = f"{start + 1}-{end} of {total} runs"
         return text
 
-    def index2run(self, index):
+    def indexToRun(self, index):
         uid = self.uidList()[index.row()]
         return self.catalog()[uid]
 
     def getMetadata(self, index):
         """Provide a text view of the run metadata."""
-        run = self.index2run(index)
+        run = self.indexToRun(index)
         md = yaml.dump(dict(run.metadata), indent=4)
         return md
 
     def getDataDescription(self, index):
         """Provide text description of the data streams."""
-        run = self.index2run(index)
+        run = self.indexToRun(index)
 
         # Describe what will be plotted.
         analysis = analyze_run.SignalAxesFields(run).to_dict()
@@ -248,7 +265,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         return text
 
     def getSummary(self, index):
-        run = self.index2run(index)
+        run = self.indexToRun(index)
         return (
             f'#{utils.get_md(run, "start", "scan_id", "unknown")}'
             f'  {utils.get_md(run, "start", "plan_name", "unknown")}'
