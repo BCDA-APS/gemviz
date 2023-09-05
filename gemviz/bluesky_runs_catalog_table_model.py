@@ -26,7 +26,7 @@ BGCLUT ={  # BackGround Color Lookup Table
     "abort": QtGui.QColorConstants.Svg.lightyellow,  # ffffe0
     "fail": QtGui.QColorConstants.Svg.mistyrose,  # ffe4e1
     # other, such as None (when no stop document)
-    "other": QtGui.QColorConstants.Svg.lightslategrey,  # 778899
+    "other": QtGui.QColor(0xe2, 0xe2, 0xec),  # light blue/grey
 }
 
 
