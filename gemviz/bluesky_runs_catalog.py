@@ -32,7 +32,7 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from .app_settings import settings
+        from .user_settings import settings
         from .bluesky_runs_catalog_run_viz import BRCRunVisualization
         from .bluesky_runs_catalog_search import BRCSearchPanel
         from .bluesky_runs_catalog_table_view import BRCTableView
@@ -99,7 +99,7 @@ class BRC_MVC(QtWidgets.QWidget):
         key *str*:
             Name of splitter (either 'hsplitter' or 'vsplitter')
         """
-        from .app_settings import settings
+        from .user_settings import settings
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):

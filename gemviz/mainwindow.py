@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets
 
 from . import APP_TITLE
 from . import utils
-from .app_settings import settings
+from .user_settings import settings
 from .tiledserverdialog import LOCALHOST_URL
 from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY

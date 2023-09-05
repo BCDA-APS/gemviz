@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 
 from . import utils
-from .app_settings import settings
+from .user_settings import settings
 
 TILED_SERVER_SETTINGS_KEY = "tiled_server"
 # TODO: remove testing URLs before production:
