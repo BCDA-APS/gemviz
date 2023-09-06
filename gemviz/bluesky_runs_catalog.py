@@ -32,10 +32,10 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from .user_settings import settings
         from .bluesky_runs_catalog_run_viz import BRCRunVisualization
         from .bluesky_runs_catalog_search import BRCSearchPanel
         from .bluesky_runs_catalog_table_view import BRCTableView
+        from .user_settings import settings
 
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.filter_groupbox.layout()

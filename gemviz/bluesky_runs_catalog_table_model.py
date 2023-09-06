@@ -9,6 +9,7 @@ BRC: BlueskyRunsCatalog
 """
 
 import datetime
+import logging
 
 import pyRestTable
 import yaml
@@ -18,15 +19,16 @@ from PyQt5 import QtGui
 from . import analyze_run
 from . import utils
 
+logger = logging.getLogger(__name__)
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
-BGCLUT ={  # BackGround Color Lookup Table
+BGCLUT = {  # BackGround Color Lookup Table
     "success": None,
     # mark background color of unsuccessful runs
     "abort": QtGui.QColorConstants.Svg.lightyellow,  # ffffe0
     "fail": QtGui.QColorConstants.Svg.mistyrose,  # ffe4e1
     # other, such as None (when no stop document)
-    "other": QtGui.QColor(0xe2e2ec),  # light blue/grey
+    "other": QtGui.QColor(0xE2E2EC),  # light blue/grey
 }
 
 
@@ -72,7 +74,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role=None):
         if role == QtCore.Qt.DisplayRole:  # display data
-            # print("Display role:", index.row(), index.column())
+            logger.debug("Display role: %d, %d", index.row(), index.column())
             run = self.indexToRun(index)
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
@@ -93,12 +95,14 @@ class BRCTableModel(QtCore.QAbstractTableModel):
     # ------------ methods required by the results table
 
     def doPager(self, action, value=None):
-        # print(f"doPager {action =}, {value =}")
+        logger.debug("action=%s, value=%s", action, value)
 
         catalog_length = self.catalog_length()
         offset = self.pageOffset()
         size = self.pageSize()
-        # print(f"{catalog_length=} {offset=}  {size=}")
+        logger.debug(
+            "catalog_length=%s, offset=%s, size=%s", catalog_length, offset, size
+        )
 
         if action == "first":
             self.setPageOffset(0)
@@ -120,7 +124,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             self.setPageOffset(value)
 
         self.setUidList(self._get_uidList())
-        # print(f"{self.pageOffset()=} {self.pageSize()=}")
+        logger.debug("pageOffset=%s, pageSize=%s", self.pageOffset(), self.pageSize())
 
     def isPagerAtStart(self):
         return self.pageOffset() == 0
@@ -171,7 +175,9 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
     def setCatalog(self, catalog):
         self._data = catalog
-        self._catalog_length = len(catalog)  # TODO: for #51 catalog.item["attributes"]["structure"]["count"]
+        self._catalog_length = len(
+            catalog
+        )  # TODO: for #51 catalog.item["attributes"]["structure"]["count"]
 
     def uidList(self):
         return self._uidList
