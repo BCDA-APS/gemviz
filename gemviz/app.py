@@ -55,6 +55,8 @@ def main():  # for future command-line options
     logging.basicConfig(level=options.log.upper())
     logger = logging.getLogger(__name__)
     logger.info("Logging level: %s", options.log)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("PyQt5").setLevel(logging.WARNING)
 
     gui()
 
