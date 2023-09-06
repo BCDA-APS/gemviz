@@ -102,7 +102,7 @@ class RangeSlider(QtWidgets.QSlider):
         max_pos = max(low_pos, high_pos)
 
         c = QtCore.QRect(low_rect.center(), high_rect.center()).center()
-        logger.debug("min_pos=%s, max_pos=%s, c", min_pos, max_pos, c)
+        logger.debug("min_pos=%s, max_pos=%s, c=%s", min_pos, max_pos, c)
         if opt.orientation == QtCore.Qt.Horizontal:
             span_rect = QtCore.QRect(
                 QtCore.QPoint(min_pos, c.y() - 2), QtCore.QPoint(max_pos, c.y() + 1)
