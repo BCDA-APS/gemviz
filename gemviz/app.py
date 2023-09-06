@@ -48,15 +48,19 @@ def command_line_interface():
     return parser.parse_args()
 
 
-def main():  # for future command-line options
+def main():
+    """Command-line entry point."""
     global logger
 
     options = command_line_interface()
+
     logging.basicConfig(level=options.log.upper())
     logger = logging.getLogger(__name__)
     logger.info("Logging level: %s", options.log)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("PyQt5").setLevel(logging.WARNING)
+
+    # set warning log level for (noisy) support packages
+    for package in "httpcore httpx PyQt5 tiled".split():
+        logging.getLogger(package).setLevel(logging.WARNING)
 
     gui()
 
