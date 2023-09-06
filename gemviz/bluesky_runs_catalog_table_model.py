@@ -20,7 +20,7 @@ from . import analyze_run
 from . import utils
 
 logger = logging.getLogger(__name__)
-DEFAULT_PAGE_SIZE = 20
+DEFAULT_PAGE_SIZE = 5
 DEFAULT_PAGE_OFFSET = 0
 BGCLUT = {  # BackGround Color Lookup Table
     "success": None,
@@ -145,9 +145,12 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         cat = self.catalog()
         start = self.pageOffset()
         end = start + self.pageSize()
-        ascending = 1 if self.ascending() else -1
-        gen = cat._keys_slice(start, end, ascending)
-        return list(gen)  # FIXME: #51: fails here with big catalogs, see issue #51
+        # ascending = 1 if self.ascending() else -1
+        # gen = cat._keys_slice(start, end, ascending)
+        # return list(gen)  # FIXME: #51: fails here with big catalogs, see issue #51
+        key_gen = cat.keys()
+        key_list = key_gen[start:end]
+        return key_list
 
     def get_run_start_time(self, run):
         """Return the run's start time as ISO8601 string."""
