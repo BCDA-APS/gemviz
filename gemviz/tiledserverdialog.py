@@ -36,7 +36,9 @@ class TiledServerDialog(QtWidgets.QDialog):
     @staticmethod
     def getServer(parent):
         dialog = TiledServerDialog(parent)
-        server = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
+        recent_servers_str = settings.getKey(TILED_SERVER_SETTINGS_KEY)
+        recent_servers = recent_servers_str.split(",") if recent_servers_str else []
+        server = recent_servers[0] if recent_servers else ""
         if server != "":
             dialog.url_button.setText(server)
             dialog.url_button.setChecked(True)
