@@ -38,7 +38,7 @@ def command_line_interface():
         help=(
             "Provide logging level. "
             "Example '--log debug'. "
-            "default level: 'warning'"),
+            "Default level: 'warning'"),
         choices=[k.lower() for k in logging.getLevelNamesMapping()],
     )
     # fmt: on
