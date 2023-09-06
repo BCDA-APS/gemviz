@@ -21,7 +21,6 @@ class AboutDialog(QtWidgets.QDialog):
     def __init__(self, parent):
         self.parent = parent
         self.license_box = None
-        self.settings = None  # TODO
 
         super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
