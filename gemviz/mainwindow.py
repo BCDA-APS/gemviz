@@ -1,15 +1,18 @@
+import logging
+
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import APP_TITLE
 from . import utils
-from .user_settings import settings
 from .tiledserverdialog import LOCALHOST_URL
 from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
+from .user_settings import settings
 
 # TODO: remove testing URLs before production
 
+logger = logging.getLogger(__name__)
 UI_FILE = utils.getUiFileName(__file__)
 
 
@@ -45,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setStatus(self, text, timeout=0):
         """Write new status to the main window."""
         self.statusbar.showMessage(str(text), msecs=timeout)
-        # TODO: log the text
+        logger.info("Status: %s", text)
 
     def doAboutDialog(self, *args, **kw):
         """
@@ -95,8 +98,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def catalogType(self):
         catalog = self.catalog()
         specs = catalog.specs
-        # print(f"{specs=}")
-        # print(f'{catalog.item["attributes"]["structure_family"]=}')
+        logger.debug("specs=%s", specs)
+        logger.debug(
+            "structure_family=%s", catalog.item["attributes"]["structure_family"]
+        )
         try:
             spec = specs[0]
             spec_name = f"{spec.name}, v{spec.version}"
@@ -178,7 +183,9 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             # check the value
             url = QtCore.QUrl(server_uri)
-            # print(f"{url=} {url.isValid()=} {url.isRelative()=}")
+            logger.debug(
+                "url=%s, valid=%s, relative=%s", url, url.isValid(), url.isRelative()
+            )
             if url.isValid() and not url.isRelative():
                 settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
             else:

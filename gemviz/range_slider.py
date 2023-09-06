@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
@@ -9,6 +11,8 @@ from PyQt5 import QtWidgets
 # https://www.mail-archive.com/pyqt@riverbankcomputing.com/msg22889.html
 # Modification refered from
 # https://gist.github.com/Riateche/27e36977f7d5ea72cf4f
+
+logger = logging.getLogger(__name__)
 
 
 class RangeSlider(QtWidgets.QSlider):
@@ -80,7 +84,7 @@ class RangeSlider(QtWidgets.QSlider):
         # if self.tickPosition() != self.NoTicks:
         #    opt.subControls |= QtWidgets.QStyle.SC_SliderTickmarks
         opt.siderValue = 0
-        # print(self._low)
+        logger.debug("low=%s", self._low)
         opt.sliderPosition = self._low
         low_rect = style.subControlRect(
             QtWidgets.QStyle.CC_Slider, opt, QtWidgets.QStyle.SC_SliderHandle, self
@@ -90,7 +94,7 @@ class RangeSlider(QtWidgets.QSlider):
             QtWidgets.QStyle.CC_Slider, opt, QtWidgets.QStyle.SC_SliderHandle, self
         )
 
-        # print(low_rect, high_rect)
+        logger.debug("low_rect=%s, high_rect=%s", low_rect, high_rect)
         low_pos = self.__pick(low_rect.center())
         high_pos = self.__pick(high_rect.center())
 
@@ -98,7 +102,7 @@ class RangeSlider(QtWidgets.QSlider):
         max_pos = max(low_pos, high_pos)
 
         c = QtCore.QRect(low_rect.center(), high_rect.center()).center()
-        # print(min_pos, max_pos, c)
+        logger.debug("min_pos=%s, max_pos=%s, c", min_pos, max_pos, c)
         if opt.orientation == QtCore.Qt.Horizontal:
             span_rect = QtCore.QRect(
                 QtCore.QPoint(min_pos, c.y() - 2), QtCore.QPoint(max_pos, c.y() + 1)
@@ -109,7 +113,13 @@ class RangeSlider(QtWidgets.QSlider):
             )
 
         # self.initStyleOption(opt)
-        # print(groove.x(), groove.y(), groove.width(), groove.height())
+        logger.debug(
+            "groove: x=%s y=%s w=%s h=%s",
+            groove.x(),
+            groove.y(),
+            groove.width(),
+            groove.height(),
+        )
         if opt.orientation == QtCore.Qt.Horizontal:
             groove.adjust(0, 0, -1, 0)
         else:

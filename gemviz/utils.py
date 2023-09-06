@@ -20,10 +20,13 @@ Support functions for this demo project.
 """
 
 import datetime
+import logging
 import pathlib
 import threading
 
 import tiled.queries
+
+logger = logging.getLogger(__name__)
 
 
 def iso2dt(iso_date_time):
@@ -175,7 +178,7 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     if isinstance(ui_file, str):
         ui_file = UI_DIR / ui_file
 
-    # print(f"myLoadUi({ui_file=})")
+    logger.debug("ui_file=%s", ui_file)
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
 
 
