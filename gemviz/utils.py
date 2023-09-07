@@ -1,10 +1,12 @@
 """
-Support functions for this demo project.
+Support for GemViz.
 
 .. autosummary::
 
+    ~TiledServerError
     ~connect_tiled_server
     ~get_tiled_runs
+    ~get_tiled_slice
     ~getUiFileName
     ~get_md
     ~iso2dt
@@ -24,9 +26,14 @@ import logging
 import pathlib
 import threading
 
+from httpx import HTTPStatusError
 import tiled.queries
 
 logger = logging.getLogger(__name__)
+
+
+class TiledServerError(RuntimeError):
+    """An error from the tiled server."""
 
 
 def iso2dt(iso_date_time):
@@ -101,6 +108,23 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     for v in text_case:
         cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
+
+
+def get_tiled_slice(cat, offset, size, ascending=True):
+    end = offset + size
+    key_gen = cat.keys()
+
+    try:
+        return key_gen[offset:end]
+    except HTTPStatusError as exc:
+        # fmt: off
+        # logger.error("HTTPStatusError: %s", exc)
+        raise TiledServerError(
+            f"{exc.response.reason_phrase}"
+            f" ({exc.response.status_code})"
+            "  Adjust filters to reduce the catalog size."
+        )
+        # fmt: on
 
 
 def run_in_thread(func):
