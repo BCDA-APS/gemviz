@@ -64,6 +64,7 @@ class BRCTableView(QtWidgets.QWidget):
                 self.setStatus(str(exc))
                 dialog = QtWidgets.QMessageBox(self)
                 dialog.setWindowTitle("Notice")
+                dialog.setIcon(dialog.Warning)
                 dialog.setText(f"Error when paging.\n{exc}")
                 dialog.exec()
 
