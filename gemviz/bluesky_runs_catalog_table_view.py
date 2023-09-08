@@ -62,6 +62,10 @@ class BRCTableView(QtWidgets.QWidget):
                 self.setPagerStatus()
             except utils.TiledServerError as exc:
                 self.setStatus(str(exc))
+                dialog = QtWidgets.QMessageBox(self)
+                dialog.setWindowTitle("Notice")
+                dialog.setText(f"Error when paging.\n{exc}")
+                dialog.exec()
 
     def doPageSize(self, value):
         # self.setStatus(f"doPageSize {value =}")
