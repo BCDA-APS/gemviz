@@ -30,8 +30,19 @@ class SelectXYMonTableView(QtWidgets.QWidget):
     def displayTable(self):
         from .select_fields_xymon_tablemodel import SelectXYMonTableModel
 
-        run = None  # TODO:
-        data_model = SelectXYMonTableModel(run)
+        stream = None  # TODO: Pass as arg?
+        # TODO: get actual field names from run stream
+        fields = {
+            k: {} for k in "time motor I I0 I00 I000 diode scint".split()
+        }
+        fields["motor"]["select"] = "X"  # example pre-assignments
+        fields["I"]["select"] = "Y"
+        fields["I0"]["select"] = "Mon"
+        fields["I00"]["select"] = "Y"
+        fields["motor"]["Description"] = "some motor"  # example
+        fields["I0"]["Description"] = "use as monitor"
+
+        data_model = SelectXYMonTableModel(fields)
         self.tableView.setModel(data_model)
 
     def setStatus(self, text):
