@@ -114,7 +114,7 @@ class SelectXYMonTableModel(QtCore.QAbstractTableModel):
             )
 
         self.logCheckboxSelections()
-        logger.debug(self.plotFields())  # plotter would get the fields here
+        logger.debug(self.plotFields())  # plotter should call plotFields()
 
     def logCheckboxSelections(self):
         logger.debug("checkbox selections:")
@@ -128,6 +128,9 @@ class SelectXYMonTableModel(QtCore.QAbstractTableModel):
             logger.debug(text)
 
     def plotFields(self):
+        """
+        Return dictionary, key=column_name, value=field_name(s)
+        """
         choices = dict(Y=[])
         for row, column_name in self.selections.items():
             field = self.fields()[row]
