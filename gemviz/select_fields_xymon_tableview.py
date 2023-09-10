@@ -1,22 +1,19 @@
 """
-QTableView of tiled "BlueskyStream" signals.
+Select X, Y, and Mon data fields for 1-D plotting: QTableView.
 
-BSS: BlueskyStreamSignals
-
-Uses :class:`bluesky_stream_signals_table_model.BSSTableModel`.
+Uses :class:`select_fields_xymon_tablemodel.SelectXYMonTableModel`.
 
 .. autosummary::
 
-    ~BSSTableView
+    ~SelectXYMonTableView
 """
 
-# from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import utils
 
 
-class BSSTableView(QtWidgets.QWidget):
+class SelectXYMonTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
@@ -31,10 +28,10 @@ class BSSTableView(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
     def displayTable(self):
-        from .bluesky_stream_signals_table_model import BSSTableModel
+        from .select_fields_xymon_tablemodel import SelectXYMonTableModel
 
         run = None  # TODO:
-        data_model = BSSTableModel(run)
+        data_model = SelectXYMonTableModel(run)
         self.tableView.setModel(data_model)
 
     def setStatus(self, text):

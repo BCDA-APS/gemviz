@@ -32,7 +32,7 @@
      <item>
       <widget class="QPushButton" name="addButton">
        <property name="toolTip">
-        <string>Add signal(s) to the plot.</string>
+        <string>Add field(s) to the plot.</string>
        </property>
        <property name="text">
         <string>Add</string>
@@ -42,7 +42,7 @@
      <item>
       <widget class="QPushButton" name="removeButton">
        <property name="toolTip">
-        <string>Remove signal(s) from the plot.</string>
+        <string>Remove field(s) from the plot.</string>
        </property>
        <property name="text">
         <string>Remove</string>
@@ -52,7 +52,7 @@
      <item>
       <widget class="QPushButton" name="replaceButton">
        <property name="toolTip">
-        <string>Make a new plot with just these signal(s).</string>
+        <string>Make a new plot with just these field(s).</string>
        </property>
        <property name="text">
         <string>New Plot</string>

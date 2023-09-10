@@ -1,11 +1,9 @@
 """
-QAbstractTableModel of tiled "BlueskyStream".
-
-BSS: BlueskyStreamSignals
+Select X, Y, and Mon data fields for 1-D plotting: QAbstractTableModel.
 
 .. autosummary::
 
-    ~BSSTableModel
+    ~SelectXYMonTableModel
 """
 
 import logging
@@ -15,20 +13,20 @@ from PyQt5 import QtCore
 logger = logging.getLogger(__name__)
 
 
-class BSSTableModel(QtCore.QAbstractTableModel):
+class SelectXYMonTableModel(QtCore.QAbstractTableModel):
     """
     Bluesky catalog for QtCore.QAbstractTableModel.
 
     https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html
     """
 
-    _columns = "Signal X Y Mon".split()  # a constant list
+    _columns = "Field X Y Mon".split()  # a constant list
     checkboxColumns = (1, 2, 3)
 
     def __init__(self, run):
-        # TODO: get signals from run
+        # TODO: get fields from run
         # This is an example.
-        self.setSignals("time motor I I0 I00 I000 diode scint".split())
+        self.setFields("time motor I I0 I00 I000 diode scint".split())
         self.selections = {}  # key=row, value=column number
 
         super().__init__()
@@ -36,8 +34,8 @@ class BSSTableModel(QtCore.QAbstractTableModel):
     # ------------ methods required by Qt's view
 
     def rowCount(self, parent=None):
-        """Number of signals."""
-        value = len(self.signals())
+        """Number of fields."""
+        value = len(self.fields())
         return value
 
     def columnCount(self, parent=None):
@@ -51,8 +49,8 @@ class BSSTableModel(QtCore.QAbstractTableModel):
                 return self.checkbox(index)
 
         if role == QtCore.Qt.DisplayRole and index.column() == 0:
-            # signal name
-            return self.signals()[index.row()]
+            # Field name
+            return self.fields()[index.row()]
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
@@ -87,7 +85,7 @@ class BSSTableModel(QtCore.QAbstractTableModel):
         """Set the checkbox state."""
         row, column = index.row(), index.column()
         column_name = self.columns()[column]
-        checked = (state == QtCore.Qt.Checked)
+        checked = state == QtCore.Qt.Checked
         prior = self.selections.get(row)
         self.selections[row] = column_name if checked else None
         changes = self.selections[row] != prior
@@ -112,10 +110,11 @@ class BSSTableModel(QtCore.QAbstractTableModel):
             self.dataChanged.emit(
                 self.index(top, left),
                 self.index(bottom, right),
-                [QtCore.Qt.CheckStateRole]
+                [QtCore.Qt.CheckStateRole],
             )
 
         self.logCheckboxSelections()
+        logger.debug(self.plotFields())  # plotter would get the fields here
 
     def logCheckboxSelections(self):
         logger.debug("checkbox selections:")
@@ -125,16 +124,26 @@ class BSSTableModel(QtCore.QAbstractTableModel):
                 state = self.checkbox(self.index(r, c))
                 choices = {QtCore.Qt.Checked: "*", QtCore.Qt.Unchecked: "-"}
                 text += choices[state]
-            text += f" {self.signals()[r]}"
+            text += f" {self.fields()[r]}"
             logger.debug(text)
+
+    def plotFields(self):
+        choices = dict(Y=[])
+        for row, column_name in self.selections.items():
+            field = self.fields()[row]
+            if column_name in ("X", "Mon"):
+                choices[column_name] = field  # only one choice
+            elif column_name == "Y":
+                choices[column_name].append(field)  # one or more
+        return choices
 
     # ------------ local methods
 
     def columns(self):
         return self._columns
 
-    def signals(self):
-        return self._signals
+    def fields(self):
+        return self._fields
 
-    def setSignals(self, signals):
-        self._signals = signals
+    def setFields(self, fields):
+        self._fields = fields
