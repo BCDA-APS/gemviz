@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QSplitter" name="hsplitter">
      <property name="orientation">
@@ -34,6 +34,12 @@
         <string>Matching Run(s)</string>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+      </widget>
+      <widget class="QGroupBox" name="stream_groupbox">
+       <property name="title">
+        <string>Run(s) Signal(s)</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
       </widget>
      </widget>
      <widget class="QGroupBox" name="viz_groupbox">

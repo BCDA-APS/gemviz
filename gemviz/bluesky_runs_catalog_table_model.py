@@ -92,7 +92,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             else:
                 return str(section + 1)  # may want to alter at some point
 
-    # ------------ methods required by the results table
+    # ------------ methods required by the view
 
     def doPager(self, action, value=None):
         logger.debug("action=%s, value=%s", action, value)
