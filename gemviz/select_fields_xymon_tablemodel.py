@@ -1,6 +1,15 @@
 """
 Select X, Y, and Mon data fields for 1-D plotting: QAbstractTableModel.
 
+General plot model is: Y/Mon vs X.  If X is not selected, use index number. If
+Mon is not selected, use 1.0 (trivial case, do not divide by Mon).
+
+When Model/View is created, the view should call 'model.setFields(field_name_list)'
+with the list of field names for selection.
+
+TODO: How to pre-select fields?
+TODO: Generalize for addition columns, such as in mdaviz.
+
 .. autosummary::
 
     ~SelectXYMonTableModel
@@ -129,7 +138,9 @@ class SelectXYMonTableModel(QtCore.QAbstractTableModel):
 
     def plotFields(self):
         """
-        Return dictionary, key=column_name, value=field_name(s)
+        Return dictionary with the selected fields to be plotted.
+        
+        key=column_name, value=field_name(s)
         """
         choices = dict(Y=[])
         for row, column_name in self.selections.items():
