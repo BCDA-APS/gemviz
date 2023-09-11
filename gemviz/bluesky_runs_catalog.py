@@ -50,6 +50,7 @@ class BRC_MVC(QtWidgets.QWidget):
         layout.addWidget(self.brc_tableview)
         self.brc_tableview.displayTable()
 
+        # TODO: use a QDialog, not a panel in this window..
         self.bss_tableview = SelectFieldsTableView(self)
         layout = self.stream_groupbox.layout()
         layout.addWidget(self.bss_tableview)
