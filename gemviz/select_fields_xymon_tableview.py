@@ -28,21 +28,28 @@ class SelectXYMonTableView(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
     def displayTable(self):
-        from .select_fields_xymon_tablemodel import SelectXYMonTableModel
+        from .select_fields_xymon_tablemodel import TableField
+        from .select_fields_xymon_tablemodel import Select1DTableModel
+        from .select_fields_xymon_tablemodel import XY_COLUMNS
+        from .select_fields_xymon_tablemodel import STANDARD_COLUMNS
 
         stream = None  # TODO: Pass as arg?
-        # TODO: get actual field names from run stream
-        fields = {
-            k: {} for k in "time motor I I0 I00 I000 diode scint".split()
-        }
-        fields["motor"]["select"] = "X"  # example pre-assignments
-        fields["I"]["select"] = "Y"
-        fields["I0"]["select"] = "Mon"
-        fields["I00"]["select"] = "Y"
-        fields["motor"]["Description"] = "some motor"  # example
-        fields["I0"]["Description"] = "use as monitor"
+        # TODO: use data from stream
+        fields = [
+            TableField("time", description="epoch"),
+            TableField("motor", "X", description="some motor"),
+            TableField("I", "Y"),
+            TableField("I0", "Mon", description="use as monitor", pv="ioc:I0"),
+            TableField("I00", "Y"),
+            TableField("I000"),
+            TableField("scint"),
+            TableField("diode"),
+            TableField("ROI1"),
+            TableField("ROI2"),
+            TableField("ROI3"),
+        ]
 
-        data_model = SelectXYMonTableModel(fields)
+        data_model = Select1DTableModel(STANDARD_COLUMNS, fields)
         self.tableView.setModel(data_model)
 
     def setStatus(self, text):
