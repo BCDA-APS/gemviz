@@ -23,7 +23,7 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
 
 .. autosummary::
 
-    ~SelectXYMonTableModel
+    ~SelectFieldsTableModel
     ~ColumnDataType
     ~FieldSelectionRuleType
     ~TableColumn
@@ -83,7 +83,7 @@ XY_COLUMNS = [
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
 ]
-STANDARD_COLUMNS = XY_COLUMNS + [
+MDAVIZ_COLUMNS = XY_COLUMNS + [
     TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Description", ColumnDataType.text),
     TableColumn("PV", ColumnDataType.text),
@@ -91,9 +91,9 @@ STANDARD_COLUMNS = XY_COLUMNS + [
 # fmt: on
 
 
-class Select1DTableModel(QtCore.QAbstractTableModel):
+class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     """
-    Select fields for 1-D plots.
+    Select fields for plots.
 
     .. autosummary::
 

@@ -1,11 +1,11 @@
 """
 Select X, Y, and Mon data fields for 1-D plotting: QTableView.
 
-Uses :class:`select_fields_xymon_tablemodel.SelectXYMonTableModel`.
+Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
 
 .. autosummary::
 
-    ~SelectXYMonTableView
+    ~SelectFieldsTableView
 """
 
 from PyQt5 import QtWidgets
@@ -13,7 +13,7 @@ from PyQt5 import QtWidgets
 from . import utils
 
 
-class SelectXYMonTableView(QtWidgets.QWidget):
+class SelectFieldsTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
@@ -28,12 +28,12 @@ class SelectXYMonTableView(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
     def displayTable(self):
-        from .select_fields_xymon_tablemodel import TableField
-        from .select_fields_xymon_tablemodel import Select1DTableModel
-        from .select_fields_xymon_tablemodel import XY_COLUMNS
-        from .select_fields_xymon_tablemodel import STANDARD_COLUMNS
+        from .select_fields_tablemodel import TableField
+        from .select_fields_tablemodel import SelectFieldsTableModel
+        # from .select_fields_tablemodel import XY_COLUMNS
+        from .select_fields_tablemodel import MDAVIZ_COLUMNS
 
-        stream = None  # TODO: Pass as arg?
+        # stream = None  # TODO: Pass as arg?
         # TODO: use data from stream
         fields = [
             TableField("time", description="epoch"),
@@ -49,7 +49,7 @@ class SelectXYMonTableView(QtWidgets.QWidget):
             TableField("ROI3"),
         ]
 
-        data_model = Select1DTableModel(STANDARD_COLUMNS, fields)
+        data_model = SelectFieldsTableModel(MDAVIZ_COLUMNS, fields)
         self.tableView.setModel(data_model)
 
     def setStatus(self, text):

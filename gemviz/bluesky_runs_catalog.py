@@ -35,7 +35,7 @@ class BRC_MVC(QtWidgets.QWidget):
         from .bluesky_runs_catalog_run_viz import BRCRunVisualization
         from .bluesky_runs_catalog_search import BRCSearchPanel
         from .bluesky_runs_catalog_table_view import BRCTableView
-        from .select_fields_xymon_tableview import SelectXYMonTableView
+        from .select_fields_tableview import SelectFieldsTableView
         from .user_settings import settings
 
         self.brc_search_panel = BRCSearchPanel(self)
@@ -48,7 +48,7 @@ class BRC_MVC(QtWidgets.QWidget):
         layout.addWidget(self.brc_tableview)
         self.brc_tableview.displayTable()
 
-        self.bss_tableview = SelectXYMonTableView(self)
+        self.bss_tableview = SelectFieldsTableView(self)
         layout = self.stream_groupbox.layout()
         layout.addWidget(self.bss_tableview)
         self.bss_tableview.displayTable()
