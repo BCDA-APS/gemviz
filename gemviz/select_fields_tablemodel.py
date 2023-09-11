@@ -226,10 +226,11 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         row = index.row()
         column_name = self.columnName(index.column())
         for r, v in sorted(self.selections.items()):
-            if self.columnNumber(v) in self.uniqueSelectionColumns:
-                if r != row and column_name == v:
-                    self.selections[r] = None
-                    changes = True
+            if v is not None:
+                if self.columnNumber(v) in self.uniqueSelectionColumns:
+                    if r != row and column_name == v:
+                        self.selections[r] = None
+                        changes = True
         return changes
 
     def updateCheckboxes(self):
