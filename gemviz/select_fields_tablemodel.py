@@ -68,7 +68,12 @@ class TableColumn:
 
 @dataclass(frozen=True)
 class TableField:
-    """One data field candidate for user-selection."""
+    """One data field candidate for user-selection.
+
+    NOTE: Data for the "Description" and "PV" TableColumns is
+    provided by the "description" and "pv" attributes here
+    using `cname.lower()`.  (FIXME: This could break.  Easily.)
+    """
 
     name: str
     selection: (str, None) = None  # either of these, selection rule 1.
@@ -98,7 +103,7 @@ XY_FIELDS = [
 ]
 MDAVIZ_FIELDS = [
     TableField("time", description="epoch"),
-    TableField("motor", "X", description="some motor"),
+    TableField("motor", "X", pv="ioc:m1"),
     TableField("I", "Y"),
     TableField("I0", "Mon", description="use as monitor", pv="ioc:I0"),
     TableField("I00", "Y"),
@@ -317,7 +322,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             return fname  # special case
 
         cname = self.columnName(column)
-        text = getattr(self._fields[fname], cname, "")
+        text = getattr(self._fields[fname], cname.lower(), "")
         assert isinstance(text, str), f"Not text: {fname}.{cname} {text!r}"
         return text
 
