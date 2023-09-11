@@ -1,5 +1,5 @@
 """
-Select X, Y, and Mon data fields for 1-D plotting: QTableView.
+Select data fields for plotting: QTableView.
 
 Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
 
@@ -27,30 +27,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
-    def displayTable(self):
-        from .select_fields_tablemodel import TableField
+    def displayTable(self, columns, fields):
         from .select_fields_tablemodel import SelectFieldsTableModel
-        # from .select_fields_tablemodel import XY_COLUMNS
-        from .select_fields_tablemodel import MDAVIZ_COLUMNS
 
-        # stream = None  # TODO: Pass as arg?
-        # TODO: use data from stream
-        fields = [
-            TableField("time", description="epoch"),
-            TableField("motor", "X", description="some motor"),
-            TableField("I", "Y"),
-            TableField("I0", "Mon", description="use as monitor", pv="ioc:I0"),
-            TableField("I00", "Y"),
-            TableField("I000"),
-            TableField("scint"),
-            TableField("diode"),
-            TableField("ROI1"),
-            TableField("ROI2"),
-            TableField("ROI3"),
-        ]
-
-        data_model = SelectFieldsTableModel(MDAVIZ_COLUMNS, fields)
+        data_model = SelectFieldsTableModel(columns, fields)
         self.tableView.setModel(data_model)
-
-    def setStatus(self, text):
-        self.parent.setStatus(text)

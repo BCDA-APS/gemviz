@@ -78,6 +78,7 @@ class TableField:
 
 
 # fmt: off
+# Example lists of columns & fields.
 XY_COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
@@ -87,6 +88,26 @@ MDAVIZ_COLUMNS = XY_COLUMNS + [
     TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Description", ColumnDataType.text),
     TableColumn("PV", ColumnDataType.text),
+]
+XY_FIELDS = [
+    TableField("motor", "X", description="some motor"),
+    TableField("I", "Y"),
+    TableField("I00", "Y"),
+    TableField("scint"),
+    TableField("diode"),
+]
+MDAVIZ_FIELDS = [
+    TableField("time", description="epoch"),
+    TableField("motor", "X", description="some motor"),
+    TableField("I", "Y"),
+    TableField("I0", "Mon", description="use as monitor", pv="ioc:I0"),
+    TableField("I00", "Y"),
+    TableField("I000"),
+    TableField("scint"),
+    TableField("diode"),
+    TableField("ROI1"),
+    TableField("ROI2"),
+    TableField("ROI3"),
 ]
 # fmt: on
 
