@@ -27,8 +27,27 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
+        self.addButton.clicked.connect(self.addPlotFields)
+        self.removeButton.clicked.connect(self.removePlotFields)
+        self.replaceButton.clicked.connect(self.replacePlotFields)
+
     def displayTable(self, columns, fields):
         from .select_fields_tablemodel import SelectFieldsTableModel
 
         data_model = SelectFieldsTableModel(columns, fields)
         self.tableView.setModel(data_model)
+
+    def addPlotFields(self):
+        """Add selected fields to current plot."""
+        print(f"Add: {self.tableView.model().plotFields()=}")
+        # TODO:
+
+    def removePlotFields(self):
+        """Remove selected fields from current plot."""
+        print(f"Remove: {self.tableView.model().plotFields()=}")
+        # TODO:
+
+    def replacePlotFields(self):
+        """Replace current plot with selected fields."""
+        print(f"Replace: {self.tableView.model().plotFields()=}")
+        # TODO:

@@ -240,10 +240,11 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     def updateCheckboxes(self):
         """Update checkboxes to agree with self.selections."""
-        top = min(self.selections)
-        left = min(self.checkboxColumns)
-        bottom = max(self.selections)
-        right = max(self.checkboxColumns)
+        if len(self.selections) > 0:
+            top, bottom = min(self.selections), max(self.selections)
+        else:
+            top, bottom = 0, self.rowCount() - 1
+        left, right = min(self.checkboxColumns), max(self.checkboxColumns)
         logger.debug("corners: (%d,%d)  (%d,%d)", top, left, bottom, right)
 
         # Re-evaluate the checkboxes bounded by the two corners (inclusive).
@@ -322,8 +323,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             return fname  # special case
 
         cname = self.columnName(column)
-        text = getattr(self._fields[fname], cname.lower(), "")
-        assert isinstance(text, str), f"Not text: {fname}.{cname} {text!r}"
+        text = str(getattr(self._fields[fname], cname.lower(), ""))
         return text
 
     def fields(self):
@@ -353,10 +353,10 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         """
         choices = dict(Y=[])
         for row, column_name in self.selections.items():
-            field = self.fieldName(row)
+            field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
-                choices[column_name] = field
-            elif column_name in self.multipleSelectionColumns:
-                choices[column_name].append(field)
+                choices[column_name] = field_name
+            elif column_number in self.multipleSelectionColumns:
+                choices[column_name].append(field_name)
         return choices

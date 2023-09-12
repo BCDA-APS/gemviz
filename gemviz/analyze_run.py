@@ -62,6 +62,7 @@ class SignalAxesFields:
         self.scan_id = utils.get_md(run, "start", "scan_id")
         self.status = utils.get_md(run, "stop", "exit_status")
         self.time = utils.get_md(run, "start", "time")
+        self.title = utils.get_md(run, "start", "title")
         self.uid = utils.get_md(run, "start", "uid")
 
         if self.status in self.status__with_data:
@@ -77,6 +78,7 @@ class SignalAxesFields:
             f" ScanID:{self.scan_id}"
             f" plan:{self.plan_name}"
             f" status:{self.status}"
+            f" title:{self.title!r}"
         )
         if self.plot_signal is not None:
             s += (
