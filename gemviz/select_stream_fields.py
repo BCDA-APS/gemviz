@@ -79,6 +79,8 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         stream = self.run[stream_name]
         logger.debug("stream_name=%s, stream=%s", stream_name, stream)
 
+        # Any fields to pre-select?
+        # TODO: This is for 1-D.  Generalize for multi-dimensional.
         x_name = None
         y_name = None
         if stream_name == self.analysis.stream_name:
@@ -86,6 +88,7 @@ class SelectStreamsDialog(QtWidgets.QDialog):
                 x_name = self.analysis.plot_axes[0]
             y_name = self.analysis.plot_signal
 
+        # describe the data fields for the dialog.
         fields = []
         for field_name in support.stream_data_fields(stream):
             selection = None
@@ -94,11 +97,14 @@ class SelectStreamsDialog(QtWidgets.QDialog):
             elif y_name is not None and field_name == y_name:
                 selection = "Y"
             shape = support.stream_data_field_shape(stream, field_name)
-            fields.append(MyTableField(field_name, selection=selection, shape=shape))
+            field = MyTableField(field_name, selection=selection, shape=shape)
+            fields.append(field)
         logger.debug("fields=%s", fields)
 
+        # build the view of this stream
         view = SelectFieldsTableView(self)
         view.displayTable(STREAM_COLUMNS, fields)
+
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(view)
