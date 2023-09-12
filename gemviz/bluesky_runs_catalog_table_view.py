@@ -10,8 +10,8 @@ Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
     ~BRCTableView
 """
 
-from functools import partial
 import logging
+from functools import partial
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
