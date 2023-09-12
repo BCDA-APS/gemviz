@@ -24,13 +24,27 @@ def run_summary(run):
 
 
 def stream_data_fields(stream):
-    """Data field (names) of this BlueskyEventStream."""
+    """
+    Data field (names) of this BlueskyEventStream.
+
+    Sort the list by relevance.
+    
+    First "time" (epoch timestamp for each event document), then "config" (the
+    caller provided these names as parameters for this stream), then "data"
+    (other signals in this stream, usually added from a Device hint).
+    """
     # List any stream["config"] names first.
     fields = sorted(stream.get("config", []))
+
     # Other names from "data" are sorted alphabetically.
     for nm in sorted(stream.get("data", [])):
         if nm not in fields:
             fields.append(nm)
+
+    # Promote "time" field to first place.
+    if "time" in fields:
+        fields.remove("time")
+        fields.insert(0, "time")
     return fields
 
 
