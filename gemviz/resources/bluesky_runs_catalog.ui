@@ -35,12 +35,6 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </widget>
-      <widget class="QGroupBox" name="stream_groupbox">
-       <property name="title">
-        <string>Select Field(s) to Plot</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
-      </widget>
      </widget>
      <widget class="QGroupBox" name="viz_groupbox">
       <property name="title">

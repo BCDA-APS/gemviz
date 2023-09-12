@@ -75,11 +75,12 @@ class TableField:
     using `cname.lower()`.  (FIXME: This could break.  Easily.)
     """
 
-    name: str
+    name: str  # the "Field" column
     selection: (str, None) = None  # either of these, selection rule 1.
-    _: KW_ONLY
-    description: str = ""
-    pv: str = ""
+    _: KW_ONLY  # all parameters below are specified by keyword
+    description: str = ""  # the "Description" column
+    pv: str = ""  # the "PV" column
+    shape: tuple = ()  # the "Shape" column
 
 
 # fmt: off

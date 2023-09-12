@@ -11,11 +11,14 @@ Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
 """
 
 from functools import partial
+import logging
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import utils
+
+logger = logging.getLogger(__name__)
 
 
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
@@ -48,7 +51,7 @@ class BRCTableView(QtWidgets.QWidget):
         self.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
-        self.tableView.doubleClicked.connect(self.doRunSelected)
+        self.tableView.clicked.connect(self.doPopup)
 
     def doPagerButtons(self, action, **kwargs):
         # self.setStatus(f"{action=} {kwargs=}")
@@ -112,12 +115,54 @@ class BRCTableView(QtWidgets.QWidget):
         self.status.setText(text)
         self.setStatus(text)
 
-    def doRunSelected(self, index):
+    def doDescribeRun(self, index):
         model = self.tableView.model()
         if model is not None:
             self.parent.brc_run_viz.setMetadata(model.getMetadata(index))
             self.parent.brc_run_viz.setData(model.getDataDescription(index))
             self.setStatus(model.getSummary(index))
+
+    def doPopup(self, index):
+        from functools import partial
+
+        logger.debug("index=%s", index)
+        r, c = index.row(), index.column()
+        logger.debug("row=%s  column=%s", r, c)
+        pos_local = QtCore.QPoint(
+            self.tableView.rowViewportPosition(r),
+            self.tableView.columnViewportPosition(c),
+        )
+        logger.debug("pos_local=%s", pos_local)
+        pos_global = self.tableView.mapToGlobal(pos_local)
+        logger.debug("pos_global=%s", pos_global)
+        popup = QtWidgets.QMenu(self.tableView)
+        popup.addAction("Select")
+        popup.addAction("Describe")
+        popup.addAction("Plot")
+        popup.triggered.connect(partial(self.doPopupResponse, index=index))
+        popup.popup(pos_global, popup.actions()[0])
+
+    def doPopupResponse(self, action, index=None):
+        handlers = {
+            "Describe": self.doDescribeRun,
+            "Plot": self.doPlotRun,
+            "Select": None,  # nothing special here
+        }
+        handler = handlers.get(action.text())
+        if handler is not None:
+            handler(index)
+
+    def doPlotRun(self, index):
+        from .select_stream_fields import SelectStreamsDialog
+
+        model = self.tableView.model()
+        if model is not None:
+            dialog = SelectStreamsDialog(self, model.indexToRun(index))
+            dialog.selected.connect(self.doPlotResponse)
+            dialog.exec()
+
+    def doPlotResponse(self, action, selections):
+        print(f"doPlotResponse({action=}, {selections=})")
 
     def setStatus(self, text):
         self.parent.setStatus(text)

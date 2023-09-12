@@ -9,9 +9,10 @@ Modal QDialog to select stream data fields for plotting.
 import logging
 from dataclasses import dataclass
 
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-from . import tiled_support as support
+from . import tapi
 from . import utils
 from .analyze_run import SignalAxesFields
 from .select_fields_tablemodel import ColumnDataType
@@ -19,12 +20,6 @@ from .select_fields_tablemodel import FieldRuleType
 from .select_fields_tablemodel import TableColumn
 from .select_fields_tablemodel import TableField
 from .select_fields_tableview import SelectFieldsTableView
-
-
-@dataclass(frozen=True)
-class MyTableField(TableField):
-    shape: tuple = ()  # the "Shape" column
-
 
 logger = logging.getLogger(__name__)
 DEFAULT_STREAM = "primary"
@@ -39,6 +34,7 @@ STREAM_COLUMNS = [
 
 class SelectStreamsDialog(QtWidgets.QDialog):
     ui_file = utils.getUiFileName(__file__)
+    selected = QtCore.pyqtSignal(str, dict)
 
     def __init__(self, parent, run, default_stream=DEFAULT_STREAM):
         self.parent = parent
@@ -51,7 +47,7 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         self.setup()
 
     def setup(self):
-        summary = support.run_summary(self.run)
+        summary = tapi.run_summary(self.run)
         summary_elide = 40
         if len(summary) > summary_elide:  # elide right
             summary = summary[: summary_elide - 4] + " ..."
@@ -90,21 +86,25 @@ class SelectStreamsDialog(QtWidgets.QDialog):
 
         # describe the data fields for the dialog.
         fields = []
-        for field_name in support.stream_data_fields(stream):
+        for field_name in tapi.stream_data_fields(stream):
             selection = None
             if x_name is not None and field_name == x_name:
                 selection = "X"
             elif y_name is not None and field_name == y_name:
                 selection = "Y"
-            shape = support.stream_data_field_shape(stream, field_name)
-            field = MyTableField(field_name, selection=selection, shape=shape)
+            shape = tapi.stream_data_field_shape(stream, field_name)
+            field = TableField(field_name, selection=selection, shape=shape)
             fields.append(field)
         logger.debug("fields=%s", fields)
 
         # build the view of this stream
         view = SelectFieldsTableView(self)
         view.displayTable(STREAM_COLUMNS, fields)
+        view.selected.connect(self.relayPlotSelections)
 
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(view)
+
+    def relayPlotSelections(self, action, selections):
+        self.selected.emit(action, selections)

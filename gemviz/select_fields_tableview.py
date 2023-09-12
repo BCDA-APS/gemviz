@@ -8,6 +8,7 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     ~SelectFieldsTableView
 """
 
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import utils
@@ -15,6 +16,7 @@ from . import utils
 
 class SelectFieldsTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
+    selected = QtCore.pyqtSignal(str, dict)
 
     def __init__(self, parent):
         self.parent = parent
@@ -38,16 +40,13 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.tableView.setModel(data_model)
 
     def addPlotFields(self):
-        """Add selected fields to current plot."""
-        print(f"Add: {self.tableView.model().plotFields()=}")
-        # TODO:
+        """Signals that selected fields should be added to current plot."""
+        self.selected.emit("add", self.tableView.model().plotFields())
 
     def removePlotFields(self):
-        """Remove selected fields from current plot."""
-        print(f"Remove: {self.tableView.model().plotFields()=}")
-        # TODO:
+        """Signals that selected fields should be removed from current plot."""
+        self.selected.emit("remove", self.tableView.model().plotFields())
 
     def replacePlotFields(self):
-        """Replace current plot with selected fields."""
-        print(f"Replace: {self.tableView.model().plotFields()=}")
-        # TODO:
+        """Signals to replace current plot with selected fields."""
+        self.selected.emit("replace", self.tableView.model().plotFields())
