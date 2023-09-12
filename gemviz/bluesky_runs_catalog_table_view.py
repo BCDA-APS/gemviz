@@ -153,16 +153,19 @@ class BRCTableView(QtWidgets.QWidget):
             handler(index)
 
     def doPlotRun(self, index):
+        from functools import partial
         from .select_stream_fields import SelectStreamsDialog
 
         model = self.tableView.model()
         if model is not None:
-            dialog = SelectStreamsDialog(self, model.indexToRun(index))
-            dialog.selected.connect(self.doPlotResponse)
+            run = model.indexToRun(index)
+            dialog = SelectStreamsDialog(self, run)
+            dialog.selected.connect(partial(self.doPlotResponse, run))
             dialog.exec()
 
-    def doPlotResponse(self, action, selections):
-        print(f"doPlotResponse({action=}, {selections=})")
+    def doPlotResponse(self, run, action, selections):
+        # FIXME: need to know which stream!
+        print(f"doPlotResponse({run=}, {action=}, {selections=})")
 
     def setStatus(self, text):
         self.parent.setStatus(text)

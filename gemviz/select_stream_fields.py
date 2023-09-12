@@ -75,7 +75,6 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         stream = self.run[stream_name]
         logger.debug("stream_name=%s, stream=%s", stream_name, stream)
 
-        # Any fields to pre-select?
         # TODO: This is for 1-D.  Generalize for multi-dimensional.
         x_name = None
         y_name = None
@@ -107,4 +106,5 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         layout.addWidget(view)
 
     def relayPlotSelections(self, action, selections):
+        # FIXME: add stream name
         self.selected.emit(action, selections)
