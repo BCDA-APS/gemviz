@@ -44,6 +44,19 @@ def get_md(parent, doc, key, default=None):
     return (parent.metadata.get(doc) or {}).get(key) or default
 
 
+def get_run(uri=None, catalog="training", reference=None):
+    """Get referenced run from tiled server catalog."""
+    from gemviz.tapi import connect_tiled_server, get_tiled_runs
+
+    uri = uri or "http://localhost:8020"
+    client = connect_tiled_server(uri)
+    cat = get_tiled_runs(client[catalog], plan_name="scan")
+    reference = reference or -1
+    uid = reference if isinstance(reference, str) else cat.keys()[reference]
+    run = cat[uid]
+    return run
+
+
 def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     """
     Return a new catalog, filtered by search terms.
