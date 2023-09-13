@@ -167,6 +167,8 @@ class BRCTableView(QtWidgets.QWidget):
 
     def doPlotResponse(self, run, stream_name, action, selections):
         print(f"doPlotResponse({run=}, {stream_name=}, {action=}, {selections=})")
+        # TODO: try to plot
+        # TODO: check all fields are 1-D and have same shape
 
     def setStatus(self, text):
         self.parent.setStatus(text)
