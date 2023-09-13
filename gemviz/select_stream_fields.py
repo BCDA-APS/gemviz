@@ -34,7 +34,7 @@ STREAM_COLUMNS = [
 
 class SelectStreamsDialog(QtWidgets.QDialog):
     ui_file = utils.getUiFileName(__file__)
-    selected = QtCore.pyqtSignal(str, dict)
+    selected = QtCore.pyqtSignal(str, str, dict)
 
     def __init__(self, parent, run, default_stream=DEFAULT_STREAM):
         self.parent = parent
@@ -72,6 +72,8 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         self.close()
 
     def setStream(self, stream_name):
+        from functools import partial
+
         self.stream_name = stream_name
         stream = self.run[stream_name]
         logger.debug("stream_name=%s, stream=%s", stream_name, stream)
@@ -101,13 +103,13 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         # build the view of this stream
         view = SelectFieldsTableView(self)
         view.displayTable(STREAM_COLUMNS, fields)
-        view.selected.connect(self.relayPlotSelections)
+        view.selected.connect(partial(self.relayPlotSelections, stream_name))
 
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(view)
 
-    def relayPlotSelections(self, action, selections):
+    def relayPlotSelections(self, stream_name, action, selections):
         """Receive selections from the dialog and relay to the caller."""
-        selections["stream_name"] = self.stream_name
-        self.selected.emit(action, selections)
+        # selections["stream_name"] = self.stream_name
+        self.selected.emit(stream_name, action, selections)

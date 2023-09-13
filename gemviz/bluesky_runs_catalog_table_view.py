@@ -165,9 +165,8 @@ class BRCTableView(QtWidgets.QWidget):
             dialog.selected.connect(partial(self.doPlotResponse, run))
             dialog.exec()
 
-    def doPlotResponse(self, run, action, selections):
-        # FIXME: need to know which stream!
-        print(f"doPlotResponse({run=}, {action=}, {selections=})")
+    def doPlotResponse(self, run, stream_name, action, selections):
+        print(f"doPlotResponse({run=}, {stream_name=}, {action=}, {selections=})")
 
     def setStatus(self, text):
         self.parent.setStatus(text)
