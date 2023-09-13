@@ -7,6 +7,8 @@ TAPI: Local support for the tiled API & data structures.
     ~get_md
     ~get_tiled_runs
     ~QueryTimeSince
+    ~QueryTimeUntil
+    ~run_description_table
     ~run_summary
     ~run_summary_table
     ~stream_data_field_shape
@@ -19,16 +21,6 @@ import tiled
 import tiled.queries
 
 from . import utils
-
-
-def QueryTimeSince(isotime):
-    """Tiled client query: all runs since given date/time."""
-    return tiled.queries.Key("time") >= utils.iso2ts(isotime)
-
-
-def QueryTimeUntil(isotime):
-    """Tiled client query: all runs until given date/time."""
-    return tiled.queries.Key("time") <= utils.iso2ts(isotime)
 
 
 def connect_tiled_server(uri):
@@ -46,9 +38,20 @@ def get_md(parent, doc, key, default=None):
     return (parent.metadata.get(doc) or {}).get(key) or default
 
 
+def QueryTimeSince(isotime):
+    """Tiled client query: all runs since given date/time."""
+    return tiled.queries.Key("time") >= utils.iso2ts(isotime)
+
+
+def QueryTimeUntil(isotime):
+    """Tiled client query: all runs until given date/time."""
+    return tiled.queries.Key("time") <= utils.iso2ts(isotime)
+
+
 def get_run(uri=None, catalog="training", reference=None):
     """Get referenced run from tiled server catalog."""
-    from gemviz.tapi import connect_tiled_server, get_tiled_runs
+    from gemviz.tapi import connect_tiled_server
+    from gemviz.tapi import get_tiled_runs
 
     uri = uri or "http://localhost:8020"
     client = connect_tiled_server(uri)
@@ -96,6 +99,44 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     for v in text_case:
         cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
+
+
+def run_description_table(run):
+    """Provide text description of the data streams."""
+    import pyRestTable
+
+    from . import analyze_run
+
+    # Describe what will be plotted.
+    analysis = analyze_run.SignalAxesFields(run).to_dict()
+    table = pyRestTable.Table()
+    table.labels = "item description".split()
+    table.addRow(("scan", analysis["scan_id"]))
+    table.addRow(("plan", analysis["plan"]))
+    table.addRow(("chart", analysis["chart_type"]))
+    if analysis["plot_signal"] is not None:
+        table.addRow(("stream", analysis["stream"]))
+        table.addRow(("plot signal", analysis["plot_signal"]))
+        table.addRow(("plot axes", ", ".join(analysis["plot_axes"])))
+        table.addRow(("all detectors", ", ".join(analysis["detectors"])))
+        table.addRow(("all positioners", ", ".join(analysis["positioners"])))
+    text = "plot summary"
+    text += "\n" + "-" * len(text) + "\n" * 2
+    text += f"{table.reST()}\n"
+
+    # information about each stream
+    rows = []
+    for sname in run:
+        title = f"stream: {sname}"
+        rows.append(title)
+        rows.append("-" * len(title))
+        stream = run[sname]
+        data = stream["data"].read()
+        rows.append(str(data))
+        rows.append("")
+
+    text += "\n".join(rows).strip()
+    return text
 
 
 def run_summary(run):

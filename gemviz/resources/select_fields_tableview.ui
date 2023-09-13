@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>316</width>
+    <width>199</width>
     <height>241</height>
    </rect>
   </property>
@@ -18,6 +18,9 @@
     <widget class="QTableView" name="tableView">
      <property name="alternatingRowColors">
       <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="gridStyle">
       <enum>Qt::DotLine</enum>
@@ -48,9 +51,26 @@
         <string>Make a new plot with just these field(s).</string>
        </property>
        <property name="text">
-        <string>New Plot</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>refresh.png</normaloff>refresh.png</iconset>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="addButton">
@@ -58,9 +78,26 @@
         <string>Add field(s) to the plot.</string>
        </property>
        <property name="text">
-        <string>Add</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>plus.png</normaloff>plus.png</iconset>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="removeButton">
@@ -68,7 +105,11 @@
         <string>Remove field(s) from the plot.</string>
        </property>
        <property name="text">
-        <string>Remove</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>delete.png</normaloff>delete.png</iconset>
        </property>
       </widget>
      </item>

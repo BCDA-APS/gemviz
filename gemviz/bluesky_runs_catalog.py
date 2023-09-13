@@ -12,8 +12,10 @@ MVC implementation of CatalogOfBlueskyRuns.
 import time
 from functools import partial
 
+import yaml
 from PyQt5 import QtWidgets
 
+from . import tapi
 from . import utils
 
 
@@ -35,9 +37,6 @@ class BRC_MVC(QtWidgets.QWidget):
         from .bluesky_runs_catalog_run_viz import BRCRunVisualization
         from .bluesky_runs_catalog_search import BRCSearchPanel
         from .bluesky_runs_catalog_table_view import BRCTableView
-        from .select_fields_tablemodel import XY_COLUMNS  # example
-        from .select_fields_tablemodel import XY_FIELDS  # example
-        from .select_fields_tableview import SelectFieldsTableView
         from .user_settings import settings
 
         self.brc_search_panel = BRCSearchPanel(self)
@@ -68,6 +67,8 @@ class BRC_MVC(QtWidgets.QWidget):
         for widget, signal in widgets:
             getattr(widget, signal).connect(self.brc_tableview.displayTable)
 
+        self.brc_tableview.run_selected.connect(self.doRunSelectedSlot)
+
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
             splitter = getattr(self, key)
@@ -80,6 +81,44 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def catalogName(self):
         return self.parent.catalogName()
+
+    def doPlotSlot(self, run, stream_name, action, selections):
+        """Slot: data field selected (for plotting) button is clicked."""
+        from .chartview import ChartView
+        from .select_stream_fields import to_datasets
+
+        # TODO: make the plots prettier (and configurable)
+
+        if action not in ("replace", "add"):  # TODO: implement "remove"
+            raise ValueError(f"Unsupported action: {action=}")
+        if action == "add":  # TODO: implement
+            print("Replacing {action=!r} with 'replace' for now.")
+            action = "replace"
+
+        # setup datasets
+        datasets = to_datasets(run[stream_name], selections)
+        # TODO: (add, remove): get self.brc_run_viz.plot.plot_widget
+        if action in ("replace", "add"):
+            widget = ChartView(self)  # blank chart
+            for ds in datasets:
+                widget.plot(*ds)
+            self.brc_run_viz.setPlot(widget)
+
+    def doRunSelectedSlot(self, run):
+        """Slot: run is clicked in the table view."""
+        from functools import partial
+
+        from .select_stream_fields import SelectStreamsWidget
+
+        self.brc_run_viz.setMetadata(yaml.dump(dict(run.metadata), indent=4))
+        self.brc_run_viz.setData(tapi.run_description_table(run))
+        self.setStatus(tapi.run_summary(run))
+
+        widget = SelectStreamsWidget(self, run)
+        widget.selected.connect(partial(self.doPlotSlot, run))
+        layout = self.fields_groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+        layout.addWidget(widget)
 
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)

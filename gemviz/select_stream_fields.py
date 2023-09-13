@@ -1,9 +1,9 @@
 """
-Modal QDialog to select stream data fields for plotting.
+QWidget to select stream data fields for plotting.
 
 .. autosummary::
 
-    ~SelectStreamsDialog
+    ~SelectStreamsWidget
 """
 
 import logging
@@ -32,7 +32,7 @@ STREAM_COLUMNS = [
 ]
 
 
-class SelectStreamsDialog(QtWidgets.QDialog):
+class SelectStreamsWidget(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, str, dict)
 
@@ -47,12 +47,7 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         self.setup()
 
     def setup(self):
-        summary = tapi.run_summary(self.run)
-        summary_elide = 40
-        if len(summary) > summary_elide:  # elide right
-            summary = summary[: summary_elide - 4] + " ..."
-        self.run_summary.setText(summary)
-        self.buttonbox.clicked.connect(self.dismiss)
+        self.run_summary.setText(tapi.run_summary(self.run))
 
         stream_list = list(self.run)
         if self.stream_name in stream_list:
@@ -66,10 +61,6 @@ class SelectStreamsDialog(QtWidgets.QDialog):
             self.streams.clear()
             self.streams.addItems(stream_list)
             self.streams.currentTextChanged.connect(self.setStream)
-
-    def dismiss(self, button):
-        """Close the dialog."""
-        self.close()
 
     def setStream(self, stream_name):
         from functools import partial
@@ -113,3 +104,46 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         """Receive selections from the dialog and relay to the caller."""
         # selections["stream_name"] = self.stream_name
         self.selected.emit(stream_name, action, selections)
+
+
+def to_datasets(stream, selections):
+    x_axis = selections.get("X")
+    if x_axis is None:
+        x_data = None
+    else:
+        x_data = stream["data"][x_axis].compute()
+        x_shape = x_data.shape
+        if len(x_shape) != 1:
+            # fmt: off
+            raise ValueError(
+                "Can only plot 1-D data now."
+                f" {x_axis} shape is {x_shape}"
+            )
+            # fmt: on
+        # if x_axis == "time":  # pyqtgraph does not plot datetime objects
+        #     x_data = list(map(datetime.datetime.fromtimestamp, x_data))
+        # https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/graphicsItems/DateAxisItem.html#
+
+    datasets = []
+    for y_axis in selections.get("Y", []):
+        y_data = stream["data"][y_axis].compute()
+        if len(y_data.shape) != 1:
+            # fmt: off
+            raise ValueError(
+                "Can only plot 1-D data now."
+                f" {y_axis} shape is {y_data.shape}"
+            )
+
+        if x_axis is None:
+            ds = [y_data]  # , title=f"{y_axis} v index"
+        else:
+            if x_shape != y_data.shape:
+                raise ValueError(
+                    "Cannot plot.  Different shapes for"
+                    f" X ({x_shape!r})"
+                    f" and Y ({y_data.shape!r}) data."
+                )
+            ds = [x_data, y_data]
+        datasets.append(ds)
+
+    return datasets

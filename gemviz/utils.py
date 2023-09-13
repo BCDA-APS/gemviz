@@ -9,7 +9,6 @@ Support functions for this demo project.
     ~myLoadUi
     ~removeAllLayoutWidgets
     ~run_in_thread
-    ~run_summary_table
     ~ts2dt
     ~ts2iso
 """

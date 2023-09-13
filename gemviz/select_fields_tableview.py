@@ -25,13 +25,15 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
+        from functools import partial
+
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
-        self.addButton.clicked.connect(self.addPlotFields)
-        self.removeButton.clicked.connect(self.removePlotFields)
-        self.replaceButton.clicked.connect(self.replacePlotFields)
+        self.addButton.clicked.connect(partial(self.responder, "add"))
+        self.removeButton.clicked.connect(partial(self.responder, "remove"))
+        self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
     def displayTable(self, columns, fields):
         from .select_fields_tablemodel import SelectFieldsTableModel
@@ -39,14 +41,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         data_model = SelectFieldsTableModel(columns, fields)
         self.tableView.setModel(data_model)
 
-    def addPlotFields(self):
-        """Signals that selected fields should be added to current plot."""
-        self.selected.emit("add", self.tableView.model().plotFields())
-
-    def removePlotFields(self):
-        """Signals that selected fields should be removed from current plot."""
-        self.selected.emit("remove", self.tableView.model().plotFields())
-
-    def replacePlotFields(self):
-        """Signals to replace current plot with selected fields."""
-        self.selected.emit("replace", self.tableView.model().plotFields())
+    def responder(self, action):
+        """Modify the plot with the described action."""
+        self.selected.emit(action, self.tableView.model().plotFields())
