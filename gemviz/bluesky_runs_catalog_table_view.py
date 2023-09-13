@@ -16,6 +16,7 @@ from functools import partial
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
+from . import tapi
 from . import utils
 
 logger = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ class BRCTableView(QtWidgets.QWidget):
                 self.setStatus(f"{model.pageOffset()=}")
                 self.doButtonPermissions()
                 self.setPagerStatus()
-            except utils.TiledServerError as exc:
+            except tapi.TiledServerError as exc:
                 self.setStatus(str(exc))
                 dialog = QtWidgets.QMessageBox(self)
                 dialog.setWindowTitle("Notice")

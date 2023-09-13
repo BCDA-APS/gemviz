@@ -3,6 +3,7 @@ TAPI: Local support for the tiled API & data structures.
 
 .. autosummary:
 
+    ~TiledServerError
     ~connect_tiled_server
     ~get_md
     ~get_tiled_runs
@@ -21,6 +22,10 @@ import tiled
 import tiled.queries
 
 from . import utils
+
+
+class TiledServerError(RuntimeError):
+    """An error from the tiled server."""
 
 
 def connect_tiled_server(uri):

@@ -127,7 +127,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
         try:
             self.setUidList()
-        except utils.TiledServerError as exc:
+        except tapi.TiledServerError as exc:
             # reset to previous values
             self.setPageOffset(offset)
             self.setPageSize(size)

@@ -21,10 +21,6 @@ import threading
 logger = logging.getLogger(__name__)
 
 
-class TiledServerError(RuntimeError):
-    """An error from the tiled server."""
-
-
 def iso2dt(iso_date_time):
     """Convert ISO8601 time string to datetime object."""
     return datetime.datetime.fromisoformat(iso_date_time)
