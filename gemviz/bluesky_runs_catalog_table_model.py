@@ -20,7 +20,7 @@ from . import analyze_run
 from . import tapi
 
 logger = logging.getLogger(__name__)
-DEFAULT_PAGE_SIZE = 20
+DEFAULT_PAGE_SIZE = 5
 DEFAULT_PAGE_OFFSET = 0
 BGCLUT = {  # BackGround Color Lookup Table
     "success": None,
@@ -53,12 +53,12 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
-        self._catalog_length = 0
-
-        super().__init__()
+        self._catalog_count = 0
 
         self.setCatalog(data)
-        self.setUidList(self._get_uidList())
+        self.setUidList()
+
+        super().__init__()
 
     # ------------ methods required by Qt's view
 
@@ -81,7 +81,9 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             return action(run)
 
         elif role == QtCore.Qt.BackgroundRole:
-            bgcolor = self.backgroundColor(self.indexToRun(index))
+            run = self.indexToRun(index)
+            exit_status = utils.get_md(run, "stop", "exit_status", "unknown")
+            bgcolor = BGCLUT.get(exit_status, BGCLUT["other"])
             if bgcolor is not None:
                 return QtGui.QBrush(bgcolor)
 
@@ -97,11 +99,11 @@ class BRCTableModel(QtCore.QAbstractTableModel):
     def doPager(self, action, value=None):
         logger.debug("action=%s, value=%s", action, value)
 
-        catalog_length = self.catalog_length()
+        catalog_count = self.catalogCount()
         offset = self.pageOffset()
         size = self.pageSize()
         logger.debug(
-            "catalog_length=%s, offset=%s, size=%s", catalog_length, offset, size
+            "catalog_count=%s, offset=%s, size=%s", catalog_count, offset, size
         )
 
         if action == "first":
@@ -110,20 +112,28 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             self.setPageSize(value)
         elif action == "back":
             value = offset - size
-            value = min(value, catalog_length)
+            value = min(value, catalog_count)
             value = max(value, 0)
             self.setPageOffset(value)
         elif action == "next":
             value = offset + size
-            value = min(value, catalog_length - size)
+            value = min(value, catalog_count - size)
             value = max(value, 0)
             self.setPageOffset(value)
         elif action == "last":
-            value = catalog_length - size
+            value = catalog_count - size
             value = max(value, 0)
             self.setPageOffset(value)
 
-        self.setUidList(self._get_uidList())
+        try:
+            self.setUidList()
+        except utils.TiledServerError as exc:
+            # reset to previous values
+            self.setPageOffset(offset)
+            self.setPageSize(size)
+
+            # re-raise for reporting in the view
+            raise exc
         logger.debug("pageOffset=%s, pageSize=%s", self.pageOffset(), self.pageSize())
 
     def isPagerAtStart(self):
@@ -132,22 +142,9 @@ class BRCTableModel(QtCore.QAbstractTableModel):
     def isPagerAtEnd(self):
         # number is zero-based
         last_row_number = self.pageOffset() + len(self.uidList())
-        return last_row_number >= self.catalog_length()
+        return last_row_number >= self.catalogCount()
 
     # ------------ local methods
-
-    def backgroundColor(self, run):
-        exit_status = tapi.get_md(run, "stop", "exit_status", "unknown")
-        bgcolor = BGCLUT.get(exit_status, BGCLUT["other"])
-        return bgcolor
-
-    def _get_uidList(self):
-        cat = self.catalog()
-        start = self.pageOffset()
-        end = start + self.pageSize()
-        ascending = 1 if self.ascending() else -1
-        gen = cat._keys_slice(start, end, ascending)
-        return list(gen)  # FIXME: #51: fails here with big catalogs, see issue #51
 
     def get_run_start_time(self, run):
         """Return the run's start time as ISO8601 string."""
@@ -168,22 +165,25 @@ class BRCTableModel(QtCore.QAbstractTableModel):
     # ------------ get & set methods
 
     def catalog(self):
-        return self._data
+        return self._catalog
 
-    def catalog_length(self):
-        return self._catalog_length
+    def catalogCount(self):
+        return self._catalog_count
 
     def setCatalog(self, catalog):
-        self._data = catalog
-        self._catalog_length = len(
-            catalog
-        )  # TODO: for #51 catalog.item["attributes"]["structure"]["count"]
+        self._catalog = catalog
+        self._catalog_count = len(catalog)
 
     def uidList(self):
         return self._uidList
 
-    def setUidList(self, value):
-        self._uidList = value
+    def setUidList(self):
+        self._uidList = utils.get_tiled_slice(
+            self.catalog(),
+            self.pageOffset(),
+            self.pageSize(),
+            self.ascending(),
+        )
 
     def pageOffset(self):
         return self._pageOffset
@@ -216,7 +216,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         self._ascending = value
 
     def pagerStatus(self):
-        total = self.catalog_length()
+        total = self.catalogCount()
         if total == 0:
             text = "No runs"
         else:

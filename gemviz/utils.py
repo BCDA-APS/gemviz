@@ -1,5 +1,5 @@
 """
-Support functions for this demo project.
+Support for GemViz.
 
 .. autosummary::
 
@@ -19,6 +19,10 @@ import pathlib
 import threading
 
 logger = logging.getLogger(__name__)
+
+
+class TiledServerError(RuntimeError):
+    """An error from the tiled server."""
 
 
 def iso2dt(iso_date_time):
