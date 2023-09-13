@@ -51,7 +51,7 @@ class BRCTableView(QtWidgets.QWidget):
         self.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
-        self.tableView.clicked.connect(self.doPopup)
+        self.tableView.doubleClicked.connect(self.doPopup)
 
     def doPagerButtons(self, action, **kwargs):
         # self.setStatus(f"{action=} {kwargs=}")
@@ -125,16 +125,17 @@ class BRCTableView(QtWidgets.QWidget):
     def doPopup(self, index):
         from functools import partial
 
-        logger.debug("index=%s", index)
+        # logger.debug("index=%s", index)
         r, c = index.row(), index.column()
-        logger.debug("row=%s  column=%s", r, c)
+        # logger.debug("row=%s  column=%s", r, c)
         pos_local = QtCore.QPoint(
             self.tableView.rowViewportPosition(r),
             self.tableView.columnViewportPosition(c),
         )
-        logger.debug("pos_local=%s", pos_local)
+        # logger.debug("pos_local=%s", pos_local)
         pos_global = self.tableView.mapToGlobal(pos_local)
-        logger.debug("pos_global=%s", pos_global)
+        # logger.debug("pos_global=%s", pos_global)
+
         popup = QtWidgets.QMenu(self.tableView)
         popup.addAction("Select")
         popup.addAction("Describe")
@@ -154,6 +155,7 @@ class BRCTableView(QtWidgets.QWidget):
 
     def doPlotRun(self, index):
         from functools import partial
+
         from .select_stream_fields import SelectStreamsDialog
 
         model = self.tableView.model()

@@ -62,7 +62,7 @@ class TableColumn:
 
     name: str
     column_type: ColumnDataType
-    _: KW_ONLY
+    _: KW_ONLY  # all parameters below are specified by keyword
     rule: (FieldRuleType, None) = None
 
 

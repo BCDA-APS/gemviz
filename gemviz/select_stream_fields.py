@@ -40,7 +40,7 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         self.parent = parent
         self.run = run
         self.analysis = SignalAxesFields(run)
-        self.default_stream_name = default_stream
+        self.stream_name = default_stream
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -55,10 +55,10 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         self.buttonbox.clicked.connect(self.dismiss)
 
         stream_list = list(self.run)
-        if self.default_stream_name in stream_list:
+        if self.stream_name in stream_list:
             # Move the default stream to the first position.
-            stream_list.remove(self.default_stream_name)
-            stream_list.insert(0, self.default_stream_name)
+            stream_list.remove(self.stream_name)
+            stream_list.insert(0, self.stream_name)
 
         if len(stream_list) > 0:
             self.setStream(stream_list[0])
@@ -72,10 +72,12 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         self.close()
 
     def setStream(self, stream_name):
+        self.stream_name = stream_name
         stream = self.run[stream_name]
         logger.debug("stream_name=%s, stream=%s", stream_name, stream)
 
         # TODO: This is for 1-D.  Generalize for multi-dimensional.
+        # hint: Checkbox column in the columns table might provide.
         x_name = None
         y_name = None
         if stream_name == self.analysis.stream_name:
@@ -106,5 +108,6 @@ class SelectStreamsDialog(QtWidgets.QDialog):
         layout.addWidget(view)
 
     def relayPlotSelections(self, action, selections):
-        # FIXME: add stream name
+        """Receive selections from the dialog and relay to the caller."""
+        selections["stream_name"] = self.stream_name
         self.selected.emit(action, selections)
