@@ -18,6 +18,7 @@ TAPI: Local support for the tiled API & data structures.
 
 import datetime
 
+from httpx import HTTPStatusError
 import tiled
 import tiled.queries
 
@@ -41,6 +42,23 @@ def connect_tiled_server(uri):
 def get_md(parent, doc, key, default=None):
     """Cautiously, get metadata from tiled object by document and key."""
     return (parent.metadata.get(doc) or {}).get(key) or default
+
+
+def get_tiled_slice(cat, offset, size, ascending=True):
+    end = offset + size
+    key_gen = cat.keys()
+
+    try:
+        return key_gen[offset:end]
+    except HTTPStatusError as exc:
+        # fmt: off
+        # logger.error("HTTPStatusError: %s", exc)
+        raise TiledServerError(
+            f"{exc.response.reason_phrase}"
+            f" ({exc.response.status_code})"
+            "  Adjust filters to reduce the catalog size."
+        )
+        # fmt: on
 
 
 def QueryTimeSince(isotime):

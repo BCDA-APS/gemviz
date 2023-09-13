@@ -82,7 +82,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
         elif role == QtCore.Qt.BackgroundRole:
             run = self.indexToRun(index)
-            exit_status = utils.get_md(run, "stop", "exit_status", "unknown")
+            exit_status = tapi.get_md(run, "stop", "exit_status", "unknown")
             bgcolor = BGCLUT.get(exit_status, BGCLUT["other"])
             if bgcolor is not None:
                 return QtGui.QBrush(bgcolor)
@@ -178,7 +178,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         return self._uidList
 
     def setUidList(self):
-        self._uidList = utils.get_tiled_slice(
+        self._uidList = tapi.get_tiled_slice(
             self.catalog(),
             self.pageOffset(),
             self.pageSize(),
