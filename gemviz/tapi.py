@@ -35,6 +35,8 @@ def connect_tiled_server(uri):
     from tiled.client import from_uri
 
     # leave out "dask" and get numpy by default
+    # https://examples.dask.org/array.html
+    # > Call .compute() when you want your result as a NumPy array.
     client = from_uri(uri, "dask")
     return client
 
