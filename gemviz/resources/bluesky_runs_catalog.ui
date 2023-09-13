@@ -19,9 +19,15 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="opaqueResize">
+      <bool>false</bool>
+     </property>
      <widget class="QSplitter" name="vsplitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
+      </property>
+      <property name="opaqueResize">
+       <bool>false</bool>
       </property>
       <widget class="QGroupBox" name="filter_groupbox">
        <property name="title">
@@ -35,6 +41,11 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </widget>
+     </widget>
+     <widget class="QGroupBox" name="fields_groupbox">
+      <property name="title">
+       <string>Stream Fields</string>
+      </property>
      </widget>
      <widget class="QGroupBox" name="viz_groupbox">
       <property name="title">
