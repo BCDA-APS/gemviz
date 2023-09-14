@@ -6,6 +6,7 @@ QWidget to select stream data fields for plotting.
     ~SelectStreamsWidget
 """
 
+import datetime
 import logging
 from dataclasses import dataclass
 
@@ -107,12 +108,18 @@ class SelectStreamsWidget(QtWidgets.QWidget):
 
 
 def to_datasets(stream, selections):
+    from . import chartview
+
     x_axis = selections.get("X")
+    x_datetime = False  # special scaling using datetime
     if x_axis is None:
         x_data = None
+        x_units = ""
+        x_axis = "data point number"
     else:
         x_data = stream["data"][x_axis].compute()
         x_shape = x_data.shape
+        x_units = ""  # TODO: How to get this?
         if len(x_shape) != 1:
             # fmt: off
             raise ValueError(
@@ -120,30 +127,50 @@ def to_datasets(stream, selections):
                 f" {x_axis} shape is {x_shape}"
             )
             # fmt: on
-        # if x_axis == "time":  # pyqtgraph does not plot datetime objects
-        #     x_data = list(map(datetime.datetime.fromtimestamp, x_data))
-        # https://pyqtgraph.readthedocs.io/en/latest/_modules/pyqtgraph/graphicsItems/DateAxisItem.html#
+        if x_axis == "time" and min(x_data) > chartview.TIMESTAMP_LIMIT:
+            x_units = ""
+            x_datetime = True
 
     datasets = []
     for y_axis in selections.get("Y", []):
+        ds, ds_options = [], {}
+        color = next(chartview.auto_pen)
+        symbol = next(chartview.auto_symbol)
+
         y_data = stream["data"][y_axis].compute()
-        if len(y_data.shape) != 1:
+        y_shape = y_data.shape
+        if len(y_shape) != 1:
             # fmt: off
             raise ValueError(
                 "Can only plot 1-D data now."
-                f" {y_axis} shape is {y_data.shape}"
+                f" {y_axis} shape is {y_shape}"
             )
+        ds_options["name"] = y_axis  # TODO: for the legend
+        ds_options["pen"] = color  # line color
+        ds_options["symbol"] = symbol
+        ds_options["symbolBrush"] = color  # fill color
+        ds_options["symbolPen"] = color  # outline color
+        # size in pixels (if pxMode==True, then data coordinates.)
+        ds_options["symbolSize"] = 5  # default: 10
 
-        if x_axis is None:
+        if x_data is None:
             ds = [y_data]  # , title=f"{y_axis} v index"
         else:
-            if x_shape != y_data.shape:
+            if x_shape != y_shape:
                 raise ValueError(
                     "Cannot plot.  Different shapes for"
                     f" X ({x_shape!r})"
-                    f" and Y ({y_data.shape!r}) data."
+                    f" and Y ({y_shape!r}) data."
                 )
             ds = [x_data, y_data]
-        datasets.append(ds)
+        datasets.append((ds, ds_options))
 
-    return datasets
+    plot_options = {
+        "x_datetime": x_datetime,
+        "x_units": x_units,
+        "x": x_axis,
+        "y_units": "counts",
+        "y": ", ".join(selections.get("Y", [])),
+    }
+
+    return datasets, plot_options

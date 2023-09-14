@@ -87,21 +87,27 @@ class BRC_MVC(QtWidgets.QWidget):
         from .chartview import ChartView
         from .select_stream_fields import to_datasets
 
-        # TODO: make the plots prettier (and configurable)
-
-        if action not in ("replace", "add"):  # TODO: implement "remove"
-            raise ValueError(f"Unsupported action: {action=}")
-        if action == "add":  # TODO: implement
-            print("Replacing {action=!r} with 'replace' for now.")
-            action = "replace"
+        # TODO: make the plots configurable
 
         # setup datasets
-        datasets = to_datasets(run[stream_name], selections)
-        # TODO: (add, remove): get self.brc_run_viz.plot.plot_widget
+        datasets, options = to_datasets(run[stream_name], selections)
+
+        # get the chartview widget, if exists
+        layout = self.brc_run_viz.plotPage.layout()
+        if layout.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widget = layout.itemAt(0).widget()
+        if not isinstance(widget, ChartView) or action == "replace":
+            widget = ChartView(self, **options)  # Make a blank chart.
+            if action == "add":
+                action == "replace"
+
+        if action in ("remove"):  # TODO: implement "remove"
+            raise ValueError(f"Unsupported action: {action=}")
+
         if action in ("replace", "add"):
-            widget = ChartView(self)  # blank chart
-            for ds in datasets:
-                widget.plot(*ds)
+            for ds, ds_options in datasets:
+                widget.plot(*ds, **ds_options)
             self.brc_run_viz.setPlot(widget)
 
     def doRunSelectedSlot(self, run):
