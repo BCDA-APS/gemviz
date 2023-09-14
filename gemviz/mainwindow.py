@@ -12,8 +12,9 @@ from .user_settings import settings
 
 # TODO: remove testing URLs before production
 
-logger = logging.getLogger(__name__)
+MAX_RECENT_URI = 5
 UI_FILE = utils.getUiFileName(__file__)
+logger = logging.getLogger(__name__)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -85,12 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         server_uri = TiledServerDialog.getServer(self)
         if not server_uri:
             self.clearContent()
-        uri_list = self.serverList()
-        if uri_list[0] == "":
-            uri_list[0] = server_uri
-        else:
-            uri_list.insert(0, server_uri)
-        self.setServers(uri_list)
+        self.setServers(server_uri)
 
     def catalog(self):
         return self._catalog
@@ -152,25 +148,26 @@ class MainWindow(QtWidgets.QMainWindow):
     def serverList(self):
         return self._serverList
 
-    def setServerList(self, uri_list=None):
-        """Set the list of server URIs and remove duplicate"""
-        unique_uris = set()
-        new_server_list = []
-
-        if not uri_list:
-            previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY)
-            candidate_uris = ["", previous_uri, TESTING_URL, LOCALHOST_URL, "Other..."]
+    def setServerList(self, selected_uri=None):
+        """Rebuild the list of server URIs."""
+        recent_uris_str = settings.getKey(TILED_SERVER_SETTINGS_KEY)
+        recent_uris_list = recent_uris_str.split(",") if recent_uris_str else []
+        if selected_uri and self.isValidServerUri(selected_uri):
+            final_uri_list = [selected_uri] + [
+                uri
+                for uri in recent_uris_list[: MAX_RECENT_URI - 1]
+                if uri != selected_uri
+            ]
+            settings.setKey(TILED_SERVER_SETTINGS_KEY, ",".join(final_uri_list))
         else:
-            candidate_uris = uri_list
-        for uri in candidate_uris:
-            if uri not in unique_uris:  # Check for duplicates
-                unique_uris.add(uri)
-                new_server_list.append(uri)
-        self._serverList = new_server_list
+            # if no server selected in open dialog, keep the first pull down menu value to ""
+            final_uri_list = [""] + recent_uris_list[:MAX_RECENT_URI]
+        final_uri_list = [*final_uri_list, TESTING_URL, LOCALHOST_URL, "Other..."]
+        self._serverList = final_uri_list
 
-    def setServers(self, uri_list):
+    def setServers(self, selected_uri):
         """Set the server URIs in the pop-up list"""
-        self.setServerList(uri_list)
+        self.setServerList(selected_uri)
         uri_list = self.serverList()
         self.server_uri.clear()
         self.server_uri.addItems(uri_list)
@@ -181,16 +178,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if server_uri == "Other...":
             self.doOpen()
         else:
-            # check the value
-            url = QtCore.QUrl(server_uri)
-            logger.debug(
-                "url=%s, valid=%s, relative=%s", url, url.isValid(), url.isRelative()
-            )
-            if url.isValid() and not url.isRelative():
-                settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
-            else:
+            if not self.isValidServerUri(server_uri):
+                self.setStatus("Invalid server URI.")
                 return
-            previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
             if server_uri is None:
                 self.setStatus("No tiled server selected.")
                 return
@@ -199,9 +189,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 client = utils.connect_tiled_server(server_uri)
             except Exception as exc:
                 self.setStatus(f"Error for {server_uri=!r}: {exc}")
-                settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
                 return
             self.setServer(server_uri, client)
+
+    def isValidServerUri(self, server_uri):
+        """Check if the server URI is valid and absolute."""
+        url = QtCore.QUrl(server_uri)
+        return url.isValid() and not url.isRelative()
 
     def server(self):
         return self._server
