@@ -6,10 +6,12 @@ Analyze a tiled run for its plottable data.
     ~SignalAxesFields
 """
 
+import logging
 import warnings
 
 from . import utils
 
+logger = logging.getLogger(__name__)
 DEFAULT_STREAM = "primary"
 
 
@@ -121,7 +123,7 @@ class SignalAxesFields:
         """Discover the motor (independent axis) fields."""
         hints = utils.get_md(self.run, "start", "hints", {})
         motors = utils.get_md(self.run, "start", "motors")
-        # print(f"{motors=}")
+        logger.debug("motors=%s", motors)
 
         # Prepare a guess about the dimensions (independent variables) in case
         # we need it.
@@ -130,7 +132,7 @@ class SignalAxesFields:
             if motors is None
             else [([motor], self.stream_name) for motor in motors]
         )
-        # print(f"{guess=}")
+        logger.debug("guess=%s", guess)
 
         # Ues the guess if there is nothint about dimensions.
         dimensions = hints.get("dimensions")
@@ -147,15 +149,15 @@ class SignalAxesFields:
                 "We are ignoring the dimensions hinted because we cannot combine streams."
             )
 
-        # print(f"{dimensions=}")
+        logger.debug("dimensions=%s", dimensions)
 
         # for each dimension, choose one field only
         # the plan can supply a list of fields. It's assumed the first
         # of the list is always the one plotted against
         self.plot_axes = [
-            fields[0] for fields, stream_name in dimensions if len(fields)
+            fields[0] for fields, stream_name in dimensions if len(fields) > 0
         ]
-        # print(f"{self.dim_fields=}")
+        logger.debug("plot_axes=%s", self.plot_axes)
 
         # make distinction between flattened fields and plotted fields
         # motivation for this is that when plotting, we find dependent variable

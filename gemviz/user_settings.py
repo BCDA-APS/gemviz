@@ -35,6 +35,7 @@ This module uses QtCore.QSettings.
 """
 
 import datetime
+import logging
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -43,6 +44,7 @@ from . import __package_name__
 from . import __settings_orgName__
 
 GLOBAL_GROUP = "___global___"
+logger = logging.getLogger(__name__)
 
 
 class ApplicationQSettings(QtCore.QSettings):
@@ -89,6 +91,7 @@ class ApplicationQSettings(QtCore.QSettings):
         return {k: self.getKey(k) for k in self.allKeys()}
 
     def init_global_keys(self):
+        logger.debug("fileName=%s", self.fileName)
         d = dict(
             this_file=self.fileName(),  # the .ini file, that is
             version=1.0,  #

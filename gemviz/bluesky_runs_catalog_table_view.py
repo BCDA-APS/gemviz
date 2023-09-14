@@ -55,10 +55,18 @@ class BRCTableView(QtWidgets.QWidget):
         model = self.tableView.model()
 
         if model is not None:
-            model.doPager(action)
-            self.setStatus(f"{model.pageOffset()=}")
-        self.doButtonPermissions()
-        self.setPagerStatus()
+            try:
+                model.doPager(action)
+                self.setStatus(f"{model.pageOffset()=}")
+                self.doButtonPermissions()
+                self.setPagerStatus()
+            except utils.TiledServerError as exc:
+                self.setStatus(str(exc))
+                dialog = QtWidgets.QMessageBox(self)
+                dialog.setWindowTitle("Notice")
+                dialog.setIcon(dialog.Warning)
+                dialog.setText(f"Error when paging.\n{exc}")
+                dialog.exec()
 
     def doPageSize(self, value):
         # self.setStatus(f"doPageSize {value =}")

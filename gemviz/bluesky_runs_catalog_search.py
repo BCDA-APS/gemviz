@@ -4,9 +4,13 @@ Search criteria for tiled "CatalogOfBlueskyRuns".
 BRC: BlueskyRunsCatalog
 """
 
+import logging
+
 from PyQt5 import QtWidgets
 
 from . import utils
+
+logger = logging.getLogger(__name__)
 
 
 class BRCSearchPanel(QtWidgets.QWidget):
@@ -56,7 +60,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         since = self.date_time_widget.low()
         until = self.date_time_widget.high()
         cat = utils.get_tiled_runs(cat, since=since, until=until)
-        # print(f"{since=} {until=}")
+        logger.debug("since=%s, until=%s", since, until)
 
         plan_name = self.plan_name.text().strip()
         if len(plan_name) > 0:
@@ -87,7 +91,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
         # TODO: exit status filtering
 
-        # print(f"filteredCatalog: {cat=}")
+        logger.debug("filteredCatalog=%s", cat)
         return cat
 
     def setStatus(self, text):
