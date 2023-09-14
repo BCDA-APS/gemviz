@@ -144,18 +144,20 @@ class MainWindow(QtWidgets.QMainWindow):
         return self._serverList
 
     def setServerList(self, selected_uri=None):
-        """Set the list of server URIs"""
+        """Rebuild the list of server URIs."""
         recent_uris_str = settings.getKey(TILED_SERVER_SETTINGS_KEY)
         recent_uris_list = recent_uris_str.split(",") if recent_uris_str else []
-        # fmt: off
         if selected_uri and self.isValidServerUri(selected_uri):
-            final_uri_list = [selected_uri] + [uri for uri in recent_uris_list[: MAX_RECENT_URI - 1] if uri != selected_uri]
+            final_uri_list = [selected_uri] + [
+                uri
+                for uri in recent_uris_list[: MAX_RECENT_URI - 1]
+                if uri != selected_uri
+            ]
             settings.setKey(TILED_SERVER_SETTINGS_KEY, ",".join(final_uri_list))
         else:
             # if no server selected in open dialog, keep the first pull down menu value to ""
-            final_uri_list = [""] + recent_uris_list[:MAX_RECENT_URI]  
+            final_uri_list = [""] + recent_uris_list[:MAX_RECENT_URI]
         final_uri_list = [*final_uri_list, TESTING_URL, LOCALHOST_URL, "Other..."]
-        # fmt: on
         self._serverList = final_uri_list
 
     def setServers(self, selected_uri):
