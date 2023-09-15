@@ -136,8 +136,8 @@ def to_datasets(stream, selections, scan_id=None):
     datasets = []
     for y_axis in selections.get("Y", []):
         ds, ds_options = [], {}
-        color = next(chartview.auto_pen)
-        symbol = next(chartview.auto_symbol)
+        color = chartview.auto_color()
+        symbol = chartview.auto_symbol()
 
         y_data = stream["data"][y_axis].compute()
         y_units = tapi.stream_data_field_units(stream, y_axis)

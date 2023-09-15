@@ -1,5 +1,11 @@
 """
 Charting widget
+
+.. autosummary::
+
+    ~auto_color
+    ~auto_symbol
+    ~ChartView
 """
 
 import datetime
@@ -14,7 +20,7 @@ TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 # https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
 # Do NOT sort these colors alphabetically!  There should be obvious
 # contrast between adjacent colors.
-PLOT_PENS = """
+PLOT_COLORS = """
     r g b c m
     goldenrod
     lime
@@ -34,13 +40,36 @@ pg.setConfigOption("background", "w")
 pg.setConfigOption("foreground", "k")
 GRID_OPACITY = 0.1
 
+_AUTO_COLOR_CYCLE = cycle(PLOT_COLORS)
+_AUTO_SYMBOL_CYCLE = cycle(PLOT_SYMBOLS)
 
-# Use: next(auto_pen) & next(auto_symbol)
-auto_pen = cycle(PLOT_PENS)
-auto_symbol = cycle(PLOT_SYMBOLS)
+
+def auto_color():
+    """Returns next color for pens and brushes."""
+    return next(_AUTO_COLOR_CYCLE)
+
+
+def auto_symbol():
+    """Returns next symbol for scatter plots."""
+    return next(_AUTO_SYMBOL_CYCLE)
 
 
 class ChartView(QtWidgets.QWidget):
+    """
+    PyqtGraph PlotWidget
+
+    .. autosummary::
+
+        ~plot
+        ~setAxisDateTime
+        ~setAxisLabel
+        ~setAxisUnits
+        ~setBottomAxisText
+        ~setLeftAxisText
+        ~setLeftAxisUnits
+        ~setPlotTitle
+    """
+
     def __init__(self, parent, **kwargs):
         self.parent = parent
 
@@ -86,7 +115,7 @@ class ChartView(QtWidgets.QWidget):
 
     def setAxisDateTime(self, choice):
         if choice:
-            item = pg.DateAxisItem(orientation='bottom')
+            item = pg.DateAxisItem(orientation="bottom")
             self.plot_widget.setAxisItems({"bottom": item})
 
     def setAxisLabel(self, axis, text):
