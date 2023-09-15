@@ -4,6 +4,7 @@ QWidget to select stream data fields for plotting.
 .. autosummary::
 
     ~SelectStreamsWidget
+    ~to_datasets
 """
 
 import datetime
@@ -107,7 +108,8 @@ class SelectStreamsWidget(QtWidgets.QWidget):
         self.selected.emit(stream_name, action, selections)
 
 
-def to_datasets(stream, selections):
+def to_datasets(stream, selections, scan_id=None):
+    """Prepare datasets and options for plotting."""
     from . import chartview
 
     x_axis = selections.get("X")
@@ -119,7 +121,7 @@ def to_datasets(stream, selections):
     else:
         x_data = stream["data"][x_axis].compute()
         x_shape = x_data.shape
-        x_units = ""  # TODO: How to get this?
+        x_units = tapi.stream_data_field_units(stream, x_axis)
         if len(x_shape) != 1:
             # fmt: off
             raise ValueError(
@@ -138,6 +140,7 @@ def to_datasets(stream, selections):
         symbol = next(chartview.auto_symbol)
 
         y_data = stream["data"][y_axis].compute()
+        y_units = tapi.stream_data_field_units(stream, y_axis)
         y_shape = y_data.shape
         if len(y_shape) != 1:
             # fmt: off
@@ -145,13 +148,17 @@ def to_datasets(stream, selections):
                 "Can only plot 1-D data now."
                 f" {y_axis} shape is {y_shape}"
             )
-        ds_options["name"] = y_axis  # TODO: for the legend
+        suffix = stream.metadata["stream_name"]
+        run_uid = stream.metadata["descriptors"][0].get("run_start", "")
+        if scan_id is not None:
+            suffix = f"#{scan_id} {suffix} {run_uid[:7]}"
+        ds_options["name"] = f"{y_axis} ({suffix})"
         ds_options["pen"] = color  # line color
         ds_options["symbol"] = symbol
         ds_options["symbolBrush"] = color  # fill color
         ds_options["symbolPen"] = color  # outline color
         # size in pixels (if pxMode==True, then data coordinates.)
-        ds_options["symbolSize"] = 5  # default: 10
+        ds_options["symbolSize"] = 10  # default: 10
 
         if x_data is None:
             ds = [y_data]  # , title=f"{y_axis} v index"
@@ -169,7 +176,7 @@ def to_datasets(stream, selections):
         "x_datetime": x_datetime,
         "x_units": x_units,
         "x": x_axis,
-        "y_units": "counts",
+        "y_units": y_units,
         "y": ", ".join(selections.get("Y", [])),
     }
 

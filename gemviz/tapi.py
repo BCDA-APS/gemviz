@@ -3,7 +3,6 @@ TAPI: Local support for the tiled API & data structures.
 
 .. autosummary:
 
-    ~TiledServerError
     ~connect_tiled_server
     ~get_md
     ~get_tiled_runs
@@ -12,15 +11,18 @@ TAPI: Local support for the tiled API & data structures.
     ~run_description_table
     ~run_summary
     ~run_summary_table
+    ~stream_data_field_pv
     ~stream_data_field_shape
+    ~stream_data_field_units
     ~stream_data_fields
+    ~TiledServerError
 """
 
 import datetime
 
-from httpx import HTTPStatusError
 import tiled
 import tiled.queries
+from httpx import HTTPStatusError
 
 from . import utils
 
@@ -230,3 +232,29 @@ def stream_data_field_shape(stream, field_name):
     except Exception:
         shape = ()
     return shape
+
+
+def stream_data_field_pv(stream, field_name):
+    """EPICS PV name of this field."""
+    pv = ""
+    try:
+        descriptors = list(stream.metadata["descriptors"])
+        assert len(descriptors) == 1, f"{stream=} has {len(descriptors)=}"
+        source = descriptors[0]["data_keys"][field_name].get("source", "")
+        if source.startswith("PV:"):
+            pv = source[3:]
+    except Exception:
+        pass
+    return pv
+
+
+def stream_data_field_units(stream, field_name):
+    """Engineering units of this field."""
+    units = ""
+    try:
+        descriptors = list(stream.metadata["descriptors"])
+        assert len(descriptors) == 1, f"{stream=} has {len(descriptors)=}"
+        units = descriptors[0]["data_keys"][field_name].get("units", "")
+    except Exception:
+        pass
+    return units

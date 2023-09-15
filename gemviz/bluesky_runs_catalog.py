@@ -88,9 +88,10 @@ class BRC_MVC(QtWidgets.QWidget):
         from .select_stream_fields import to_datasets
 
         # TODO: make the plots configurable
+        scan_id = tapi.get_md(run, "start", "scan_id")
 
         # setup datasets
-        datasets, options = to_datasets(run[stream_name], selections)
+        datasets, options = to_datasets(run[stream_name], selections, scan_id=scan_id)
 
         # get the chartview widget, if exists
         layout = self.brc_run_viz.plotPage.layout()
