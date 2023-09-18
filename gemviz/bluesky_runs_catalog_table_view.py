@@ -10,12 +10,16 @@ Uses :class:`bluesky_runs_catalog_table_model.BRCTableModel`.
     ~BRCTableView
 """
 
+import logging
 from functools import partial
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
+from . import tapi
 from . import utils
+
+logger = logging.getLogger(__name__)
 
 
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
@@ -28,6 +32,7 @@ class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
 
 class BRCTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
+    run_selected = QtCore.pyqtSignal(object)
 
     def __init__(self, parent):
         self.parent = parent
@@ -48,7 +53,7 @@ class BRCTableView(QtWidgets.QWidget):
         self.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
-        self.tableView.doubleClicked.connect(self.doRunSelected)
+        self.tableView.clicked.connect(self.doRunSelectedSlot)
 
     def doPagerButtons(self, action, **kwargs):
         # self.setStatus(f"{action=} {kwargs=}")
@@ -60,7 +65,7 @@ class BRCTableView(QtWidgets.QWidget):
                 self.setStatus(f"{model.pageOffset()=}")
                 self.doButtonPermissions()
                 self.setPagerStatus()
-            except utils.TiledServerError as exc:
+            except tapi.TiledServerError as exc:
                 self.setStatus(str(exc))
                 dialog = QtWidgets.QMessageBox(self)
                 dialog.setWindowTitle("Notice")
@@ -120,12 +125,10 @@ class BRCTableView(QtWidgets.QWidget):
         self.status.setText(text)
         self.setStatus(text)
 
-    def doRunSelected(self, index):
+    def doRunSelectedSlot(self, index):
         model = self.tableView.model()
         if model is not None:
-            self.parent.brc_run_viz.setMetadata(model.getMetadata(index))
-            self.parent.brc_run_viz.setData(model.getDataDescription(index))
-            self.setStatus(model.getSummary(index))
+            self.run_selected.emit(model.indexToRun(index))
 
     def setStatus(self, text):
         self.parent.setStatus(text)

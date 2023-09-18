@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>810</width>
+    <width>482</width>
     <height>374</height>
    </rect>
   </property>
@@ -151,6 +151,11 @@
      </item>
      <item>
       <widget class="QLabel" name="status">
+       <property name="font">
+        <font>
+         <pointsize>7</pointsize>
+        </font>
+       </property>
        <property name="toolTip">
         <string>Shows what runs are displayed in the table.</string>
        </property>

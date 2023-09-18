@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import APP_TITLE
+from . import tapi
 from . import utils
 from .tiledserverdialog import LOCALHOST_URL
 from .tiledserverdialog import TESTING_URL
@@ -186,7 +187,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
             self.setStatus(f"selected tiled {server_uri=!r}")
             try:
-                client = utils.connect_tiled_server(server_uri)
+                client = tapi.connect_tiled_server(server_uri)
             except Exception as exc:
                 self.setStatus(f"Error for {server_uri=!r}: {exc}")
                 return

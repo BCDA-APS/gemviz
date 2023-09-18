@@ -8,6 +8,7 @@ import logging
 
 from PyQt5 import QtWidgets
 
+from . import tapi
 from . import utils
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         from .date_time_range_slider import DAY
 
         def getStartTime(uid):
-            return utils.ts2iso(utils.get_md(cat[uid], "start", "time"))
+            return utils.ts2iso(tapi.get_md(cat[uid], "start", "time"))
 
         cat = self.catalog()
         if len(cat) == 0:
@@ -59,17 +60,17 @@ class BRCSearchPanel(QtWidgets.QWidget):
 
         since = self.date_time_widget.low()
         until = self.date_time_widget.high()
-        cat = utils.get_tiled_runs(cat, since=since, until=until)
+        cat = tapi.get_tiled_runs(cat, since=since, until=until)
         logger.debug("since=%s, until=%s", since, until)
 
         plan_name = self.plan_name.text().strip()
         if len(plan_name) > 0:
-            cat = utils.get_tiled_runs(cat, plan_name=plan_name)
+            cat = tapi.get_tiled_runs(cat, plan_name=plan_name)
 
         scan_id = self.scan_id.text().strip()
         if len(scan_id) > 0:
             try:
-                cat = utils.get_tiled_runs(cat, scan_id=int(scan_id))
+                cat = tapi.get_tiled_runs(cat, scan_id=int(scan_id))
             except ValueError:
                 self.setStatus("Invalid entry: scan_id must be an integer.")
                 pass

@@ -9,7 +9,7 @@ Analyze a tiled run for its plottable data.
 import logging
 import warnings
 
-from . import utils
+from . import tapi
 
 logger = logging.getLogger(__name__)
 DEFAULT_STREAM = "primary"
@@ -58,11 +58,12 @@ class SignalAxesFields:
 
         self._descriptors = None
 
-        self.plan_name = utils.get_md(run, "start", "plan_name")
-        self.scan_id = utils.get_md(run, "start", "scan_id")
-        self.status = utils.get_md(run, "stop", "exit_status")
-        self.time = utils.get_md(run, "start", "time")
-        self.uid = utils.get_md(run, "start", "uid")
+        self.plan_name = tapi.get_md(run, "start", "plan_name")
+        self.scan_id = tapi.get_md(run, "start", "scan_id")
+        self.status = tapi.get_md(run, "stop", "exit_status")
+        self.time = tapi.get_md(run, "start", "time")
+        self.title = tapi.get_md(run, "start", "title")
+        self.uid = tapi.get_md(run, "start", "uid")
 
         if self.status in self.status__with_data:
             self.identify_axes()  # call first, redefines self.stream_name
@@ -77,6 +78,7 @@ class SignalAxesFields:
             f" ScanID:{self.scan_id}"
             f" plan:{self.plan_name}"
             f" status:{self.status}"
+            f" title:{self.title!r}"
         )
         if self.plot_signal is not None:
             s += (
@@ -121,8 +123,8 @@ class SignalAxesFields:
 
     def identify_axes(self) -> None:
         """Discover the motor (independent axis) fields."""
-        hints = utils.get_md(self.run, "start", "hints", {})
-        motors = utils.get_md(self.run, "start", "motors")
+        hints = tapi.get_md(self.run, "start", "hints", {})
+        motors = tapi.get_md(self.run, "start", "motors")
         logger.debug("motors=%s", motors)
 
         # Prepare a guess about the dimensions (independent variables) in case
@@ -174,14 +176,14 @@ class SignalAxesFields:
         if rank == 1 and self.plot_signal is not None:
             shape = self.descriptors()[0]["data_keys"][self.plot_signal]["shape"]
             if len(shape) in (0, 1):
-                n_events = utils.get_md(self.run, "stop", "num_events", {})
+                n_events = tapi.get_md(self.run, "stop", "num_events", {})
                 events = n_events.get(self.stream_name)
                 if events > 1:
                     self.chart_type = "line_1D"
             elif len(shape) in (2, 3):
                 self.chart_type = f"unknown{len(shape)}D"
         elif rank == 2 and self.plot_signal is not None:
-            hints = utils.get_md(self.run, "start", "hints", {})
+            hints = tapi.get_md(self.run, "start", "hints", {})
             gridding = hints.get("gridding")
             self.chart_type = "grid_2D" if gridding == "rectilinear" else "scatter_2D"
         else:
@@ -203,7 +205,7 @@ class SignalAxesFields:
             return dtype == "number"
 
         detectors = []
-        for det_name in utils.get_md(self.run, "start", "detectors", []):
+        for det_name in tapi.get_md(self.run, "start", "detectors", []):
             detectors.extend(self.object_name_to_fields(det_name))
 
         # fmt: off

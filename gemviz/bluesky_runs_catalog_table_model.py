@@ -17,7 +17,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 
 from . import analyze_run
-from . import utils
+from . import tapi
 
 logger = logging.getLogger(__name__)
 DEFAULT_PAGE_SIZE = 5
@@ -37,15 +37,15 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
     def __init__(self, data):
         self.actions_library = {
-            "Scan ID": lambda run: utils.get_md(run, "start", "scan_id"),
-            "Plan Name": lambda run: utils.get_md(run, "start", "plan_name"),
+            "Scan ID": lambda run: tapi.get_md(run, "start", "scan_id"),
+            "Plan Name": lambda run: tapi.get_md(run, "start", "plan_name"),
             "Positioners": lambda run: self.get_str_list(run, "start", "motors"),
             "Detectors": lambda run: self.get_str_list(run, "start", "detectors"),
-            "#points": lambda run: utils.get_md(run, "start", "num_points"),
+            "#points": lambda run: tapi.get_md(run, "start", "num_points"),
             "Date": self.get_run_start_time,
-            "Status": lambda run: utils.get_md(run, "stop", "exit_status"),
+            "Status": lambda run: tapi.get_md(run, "stop", "exit_status"),
             "Streams": lambda run: self.get_str_list(run, "summary", "stream_names"),
-            # "uid": lambda run: utils.get_md(run, "start", "uid"),
+            # "uid": lambda run: tapi.get_md(run, "start", "uid"),
             # "uid7": self.get_run_uid7,
         }
         self.columnLabels = list(self.actions_library.keys())
@@ -82,7 +82,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
         elif role == QtCore.Qt.BackgroundRole:
             run = self.indexToRun(index)
-            exit_status = utils.get_md(run, "stop", "exit_status", "unknown")
+            exit_status = tapi.get_md(run, "stop", "exit_status", "unknown")
             bgcolor = BGCLUT.get(exit_status, BGCLUT["other"])
             if bgcolor is not None:
                 return QtGui.QBrush(bgcolor)
@@ -94,7 +94,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             else:
                 return str(section + 1)  # may want to alter at some point
 
-    # ------------ methods required by the QTableView
+    # ------------ methods required by the view
 
     def doPager(self, action, value=None):
         logger.debug("action=%s, value=%s", action, value)
@@ -127,7 +127,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
         try:
             self.setUidList()
-        except utils.TiledServerError as exc:
+        except tapi.TiledServerError as exc:
             # reset to previous values
             self.setPageOffset(offset)
             self.setPageSize(size)
@@ -148,18 +148,18 @@ class BRCTableModel(QtCore.QAbstractTableModel):
 
     def get_run_start_time(self, run):
         """Return the run's start time as ISO8601 string."""
-        ts = utils.get_md(run, "start", "time", 0)
+        ts = tapi.get_md(run, "start", "time", 0)
         dt = datetime.datetime.fromtimestamp(round(ts))
         return dt.isoformat(sep=" ")
 
     def get_run_uid7(self, run):
         """Return the run's uid, truncated to the first 7 characters."""
-        uid = utils.get_md(run, "start", "uid")
+        uid = tapi.get_md(run, "start", "uid")
         return uid[:7]
 
     def get_str_list(self, run, doc, key):
         """Return the document's key values as a list."""
-        items = utils.get_md(run, doc, key, [])
+        items = tapi.get_md(run, doc, key, [])
         return ", ".join(items)
 
     # ------------ get & set methods
@@ -178,7 +178,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         return self._uidList
 
     def setUidList(self):
-        self._uidList = utils.get_tiled_slice(
+        self._uidList = tapi.get_tiled_slice(
             self.catalog(),
             self.pageOffset(),
             self.pageSize(),
@@ -273,6 +273,6 @@ class BRCTableModel(QtCore.QAbstractTableModel):
     def getSummary(self, index):
         run = self.indexToRun(index)
         return (
-            f'#{utils.get_md(run, "start", "scan_id", "unknown")}'
-            f'  {utils.get_md(run, "start", "plan_name", "unknown")}'
+            f'#{tapi.get_md(run, "start", "scan_id", "unknown")}'
+            f'  {tapi.get_md(run, "start", "plan_name", "unknown")}'
         )

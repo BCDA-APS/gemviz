@@ -12,8 +12,10 @@ MVC implementation of CatalogOfBlueskyRuns.
 import time
 from functools import partial
 
+import yaml
 from PyQt5 import QtWidgets
 
+from . import tapi
 from . import utils
 
 
@@ -65,6 +67,8 @@ class BRC_MVC(QtWidgets.QWidget):
         for widget, signal in widgets:
             getattr(widget, signal).connect(self.brc_tableview.displayTable)
 
+        self.brc_tableview.run_selected.connect(self.doRunSelectedSlot)
+
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
             splitter = getattr(self, key)
@@ -77,6 +81,51 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def catalogName(self):
         return self.parent.catalogName()
+
+    def doPlotSlot(self, run, stream_name, action, selections):
+        """Slot: data field selected (for plotting) button is clicked."""
+        from .chartview import ChartView
+        from .select_stream_fields import to_datasets
+
+        # TODO: make the plots configurable
+        scan_id = tapi.get_md(run, "start", "scan_id")
+
+        # setup datasets
+        datasets, options = to_datasets(run[stream_name], selections, scan_id=scan_id)
+
+        # get the chartview widget, if exists
+        layout = self.brc_run_viz.plotPage.layout()
+        if layout.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widget = layout.itemAt(0).widget()
+        if not isinstance(widget, ChartView) or action == "replace":
+            widget = ChartView(self, **options)  # Make a blank chart.
+            if action == "add":
+                action == "replace"
+
+        if action in ("remove"):  # TODO: implement "remove"
+            raise ValueError(f"Unsupported action: {action=}")
+
+        if action in ("replace", "add"):
+            for ds, ds_options in datasets:
+                widget.plot(*ds, **ds_options)
+            self.brc_run_viz.setPlot(widget)
+
+    def doRunSelectedSlot(self, run):
+        """Slot: run is clicked in the table view."""
+        from functools import partial
+
+        from .select_stream_fields import SelectStreamsWidget
+
+        self.brc_run_viz.setMetadata(yaml.dump(dict(run.metadata), indent=4))
+        self.brc_run_viz.setData(tapi.run_description_table(run))
+        self.setStatus(tapi.run_summary(run))
+
+        widget = SelectStreamsWidget(self, run)
+        widget.selected.connect(partial(self.doPlotSlot, run))
+        layout = self.fields_groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+        layout.addWidget(widget)
 
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
