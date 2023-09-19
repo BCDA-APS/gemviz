@@ -53,14 +53,15 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
-[tool.setuptools_scm]
-
 [project.urls]
 "Homepage" = "https://github.com/BCDA-APS/gemviz"
 "Bug Tracker" = "https://github.com/BCDA-APS/gemviz/issues"
 
 [project.scripts]
 gemviz = "gemviz.app:main"
+
+[tool.black]
+line_length = 88
 
 [tool.flake8]
 max-line-length = 88
@@ -72,5 +73,8 @@ extend-ignore = ["E501"]
 line_length = 88
 include_trailing_comma = true
 
-[tool.black]
-line_length = 88
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+[tool.setuptools_scm]
