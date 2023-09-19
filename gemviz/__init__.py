@@ -32,7 +32,12 @@ AUTHOR_LIST = [
     """.strip().splitlines()
 ]
 
-COPYRIGHT_TEXT = "(c) 2023, UChicago Argonne, LLC, (see LICENSE file for details)"
+# fmt: off
+COPYRIGHT_TEXT = (
+    "(c) 2023, UChicago Argonne, LLC"
+    ", (see LICENSE file for details)"
+)
+# fmt: on
 DOCS_URL = "https://github.com/BCDA-APS/gemviz/blob/main/README.md"
 ISSUES_URL = "https://github.com/BCDA-APS/gemviz/issues"
 LICENSE_FILE = ROOT_DIR / "LICENSE"

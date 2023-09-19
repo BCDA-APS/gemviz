@@ -52,8 +52,13 @@ def test_ChartView_labels(title, x, y, qtbot):
         assert pw.getAxis("left").label.toPlainText().strip() == y
 
 
+# TODO: test with timestamps
+# fmt: off
 @pytest.mark.parametrize("x", [np.array([1, 2, 3, 4, 5]), None])
-@pytest.mark.parametrize("y", [np.array([1, 2, 3, 4, 5]), np.array([2, 2, 2, 2, 2])])
+@pytest.mark.parametrize(
+    "y", [np.array([1, 2, 3, 4, 5]), np.array([2, 2, 2, 2, 2])]
+)
+# fmt: on
 def test_ChartView_data(x, y, qtbot):
     chart = chartview.ChartView(None)
     if x is None:
