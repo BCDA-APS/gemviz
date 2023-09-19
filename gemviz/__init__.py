@@ -33,7 +33,6 @@ AUTHOR_LIST = [
 ]
 
 COPYRIGHT_TEXT = "(c) 2023, UChicago Argonne, LLC, (see LICENSE file for details)"
-DOCS_URL = "https://github.com/BCDA-APS/tiled-viz2023/blob/main/README.md"
-ISSUES_URL = "https://github.com/BCDA-APS/tiled-viz2023/issues"
+DOCS_URL = "https://github.com/BCDA-APS/gemviz/blob/main/README.md"
+ISSUES_URL = "https://github.com/BCDA-APS/gemviz/issues"
 LICENSE_FILE = ROOT_DIR / "LICENSE"
-VERSION = "0.0.1"
