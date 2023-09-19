@@ -5,21 +5,21 @@ from .. import chartview
 
 
 @pytest.mark.parametrize(
-    "count, series, auto",
+    "quantity, series, auto",
     [
         [16, chartview.PLOT_COLORS, chartview.auto_color],
         [9, chartview.PLOT_SYMBOLS, chartview.auto_symbol],
     ],
 )
-def test_auto_series(count, series, auto):
+def test_auto_series(quantity, series, auto):
     n = len(series)
-    assert n == count
+    assert n == quantity
 
-    # Test that one pass of the sequence generates unque values.
+    # Test that one pass of the sequence generates unique values.
     series = [auto() for _ in range(n)]
     assert len(set(series)) == n
 
-    # Test that series repeats exacttly.
+    # Test that series repeats exactly.
     series2 = [auto() for _ in range(n)]
     assert series == series2
 

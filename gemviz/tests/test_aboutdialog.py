@@ -4,7 +4,11 @@ from .. import aboutdialog
 
 
 def test_about_starts(qtbot):
+    """About dialog should start with no errors."""
+
     class SetStatusWidget(QtWidgets.QWidget):
+        """Test class with setStatus() method."""
+
         def setStatus(self, status):
             pass
 
@@ -13,4 +17,4 @@ def test_about_starts(qtbot):
     dialog = aboutdialog.AboutDialog(widget_with_status)
     dialog.show()
     qtbot.addWidget(dialog)
-    assert dialog is not None  # basic test that widget started with no error
+    assert dialog is not None

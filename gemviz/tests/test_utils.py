@@ -40,10 +40,7 @@ def test_iso2dt(iso, dt):
     "ts, dt",
     [
         [0, datetime.datetime(1970, 1, 1)],
-        [
-            1_711_977_255 - 3_600,  # DST
-            datetime.datetime(2024, 4, 1, 13, 14, 15)
-        ],
+        [1_711_977_255 - 3_600, datetime.datetime(2024, 4, 1, 13, 14, 15)],  # DST
         [631_152_000, datetime.datetime(1990, 1, 1)],
     ],
 )
