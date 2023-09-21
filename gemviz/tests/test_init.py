@@ -1,11 +1,18 @@
+import pathlib
+
 import pytest
 
-import gemviz  # TODO: Can this become a relative import?
-
-
-def getvar(var_name):
-    assert var_name in dir(gemviz)
-    return getattr(gemviz, var_name)
+from ..__init__ import APP_DESC
+from ..__init__ import APP_TITLE
+from ..__init__ import AUTHOR_LIST
+from ..__init__ import COPYRIGHT_TEXT
+from ..__init__ import DOCS_URL
+from ..__init__ import ISSUES_URL
+from ..__init__ import LICENSE_FILE
+from ..__init__ import UI_DIR
+from ..__init__ import __package_name__
+from ..__init__ import __settings_orgName__
+from ..__init__ import __version__
 
 
 def apply_str_assertion(var, where, fragment):
@@ -20,41 +27,33 @@ def apply_str_assertion(var, where, fragment):
 
 
 @pytest.mark.parametrize(
-    "var_name, where, fragment",
+    "var, where, fragment, type_",
     [
-        ["__package_name__", "equals", "gemviz"],
-        ["__settings_orgName__", "equals", "BCDA-APS"],
-        ["__version__", "contains", "."],
-        ["APP_DESC", "equals", "Visualize Bluesky data from tiled server."],
-        ["APP_TITLE", "equals", "gemviz"],
-        ["AUTHOR_LIST", "contains", "Fanny Rodolakis"],
-        ["AUTHOR_LIST", "contains", "Ollivier Gassant"],
-        ["AUTHOR_LIST", "contains", "Pete Jemian"],
-        ["COPYRIGHT_TEXT", "contains", "see LICENSE file"],
-        ["COPYRIGHT_TEXT", "contains", "UChicago Argonne, LLC"],
-        ["COPYRIGHT_TEXT", "start", "(c)"],
-        ["DOCS_URL", "contains", "BCDA-APS/gemviz"],
-        ["DOCS_URL", "start", "https://"],
-        ["ISSUES_URL", "contains", "BCDA-APS/gemviz"],
-        ["ISSUES_URL", "end", "issues"],
-        ["ISSUES_URL", "start", "https://"],
+        [__package_name__, "equals", "gemviz", str],
+        [__settings_orgName__, "equals", "BCDA-APS", str],
+        [__version__, "contains", ".", str],
+        [APP_DESC, "equals", "Visualize Bluesky data from tiled server.", str],
+        [APP_TITLE, "equals", "gemviz", str],
+        [AUTHOR_LIST, "contains", "Fanny Rodolakis", list],
+        [AUTHOR_LIST, "contains", "Ollivier Gassant", list],
+        [AUTHOR_LIST, "contains", "Pete Jemian", list],
+        [COPYRIGHT_TEXT, "contains", "see LICENSE file", str],
+        [COPYRIGHT_TEXT, "contains", "UChicago Argonne, LLC", str],
+        [COPYRIGHT_TEXT, "start", "(c)", str],
+        [DOCS_URL, "contains", "BCDA-APS/gemviz", str],
+        [DOCS_URL, "start", "https://", str],
+        [ISSUES_URL, "contains", "BCDA-APS/gemviz", str],
+        [ISSUES_URL, "end", "issues", str],
+        [ISSUES_URL, "start", "https://", str],
+        [LICENSE_FILE, "end", "LICENSE", pathlib.Path],
+        [UI_DIR, "end", "resources", pathlib.Path],
     ],
 )
-def test_text_content(var_name, where, fragment):
-    apply_str_assertion(getvar(var_name), where, fragment)
-
-
-@pytest.mark.parametrize(
-    "var_name, where, fragment",
-    [
-        ["LICENSE_FILE", "end", "LICENSE"],
-        ["UI_DIR", "end", "resources"],
-    ],
-)
-def test_paths(var_name, where, fragment):
-    apply_str_assertion(str(getvar(var_name)), where, fragment)
+def test_text_content(var, where, fragment, type_):
+    assert isinstance(var, type_)
+    apply_str_assertion(str(var), where, fragment)
 
 
 def test_license_file():
     """Is the license file present?"""
-    assert gemviz.LICENSE_FILE.exists()
+    assert LICENSE_FILE.exists()
