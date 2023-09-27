@@ -16,6 +16,7 @@ from ..__init__ import __version__
 
 
 def apply_str_assertion(var, where, fragment):
+    assert isinstance(var, str)
     if where == "start":
         assert var.startswith(fragment)
     elif where == "end":
