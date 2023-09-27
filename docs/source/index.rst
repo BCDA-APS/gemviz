@@ -10,6 +10,8 @@ Welcome to gemviz's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   testing
+
 
 
 Indices and tables

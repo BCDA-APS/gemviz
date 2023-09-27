@@ -1,0 +1,6 @@
+pydata-sphinx-theme
+pytest
+pytest-cov
+pytest-qt
+sphinx
+sphinx-tabs
