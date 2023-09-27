@@ -12,9 +12,9 @@ def test_about_starts(qtbot):
         def setStatus(self, status):
             pass
 
-    widget_with_status = SetStatusWidget()
+    fake_main_window = SetStatusWidget()
 
-    dialog = aboutdialog.AboutDialog(widget_with_status)
+    dialog = aboutdialog.AboutDialog(fake_main_window)
     dialog.show()
     qtbot.addWidget(dialog)
     assert dialog is not None
