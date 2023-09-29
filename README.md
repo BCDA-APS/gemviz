@@ -48,6 +48,13 @@ as would a developer by following these instructions:
 6. `pip install -e .`
 7. `gemviz &`
 
+The [gemviz package is now available on PyPI](https://pypi.org/project/gemviz/) which means
+a development version can be installed via `pip`:
+
+```bash
+pip install gemviz
+```
+
 ## Acknowledgements
 
 We'd like to thank the [GEM fellow program](https://www.gemfellowship.org/) for sponsoring
