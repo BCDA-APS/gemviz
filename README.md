@@ -2,6 +2,14 @@
 
 Python Qt5 application to visualize Bluesky data from tiled server.
 
+GH tag | GH release | PyPI | conda-forge
+--- | --- | --- | ---
+[![tag](https://img.shields.io/github/tag/BCDA-APS/gemviz.svg)](https://github.com/BCDA-APS/gemviz/tags) | [![release](https://img.shields.io/github/release/BCDA-APS/gemviz.svg)](https://github.com/BCDA-APS/gemviz/releases) | [![PyPi](https://img.shields.io/pypi/v/gemviz.svg)](https://pypi.python.org/pypi/gemviz) | [![conda-forge](https://img.shields.io/conda/vn/conda-forge/gemviz)](https://anaconda.org/conda-forge/gemviz)
+
+Python version(s) | Unit Tests | Code Coverage | License
+--- | --- | --- | ---
+[![Python version](https://img.shields.io/pypi/pyversions/gemviz.svg)](https://pypi.python.org/pypi/gemviz) | [![Unit Tests](https://github.com/BCDA-APS/gemviz/workflows/Unit%20Tests/badge.svg)](https://github.com/BCDA-APS/gemviz/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/gemviz/badge.svg?branch=main)](https://coveralls.io/github/BCDA-APS/gemviz?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](/LICENSE.txt)
+
 ## Goals
 
 - minimum: PyQt app that can select runs, show line charts
@@ -39,6 +47,13 @@ as would a developer by following these instructions:
 5. `conda activate gemviz`
 6. `pip install -e .`
 7. `gemviz &`
+
+The [gemviz package is now available on PyPI](https://pypi.org/project/gemviz/) which means
+a development version can be installed via `pip`:
+
+```bash
+pip install gemviz
+```
 
 ## Acknowledgements
 
