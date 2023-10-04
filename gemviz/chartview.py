@@ -105,7 +105,7 @@ class ChartView(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout()
         self.setLayout(layout)
 
-        ## plot
+        # plot
         size.setHorizontalStretch(4)
         self.plot_widget.setSizePolicy(size)
         layout.addWidget(self.plot_widget)
