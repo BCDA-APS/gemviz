@@ -1,0 +1,7 @@
+coverage
+coveralls
+setuptools-scm
+sphinx
+sphinx-tabs
+tzdata
+pytz
