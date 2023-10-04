@@ -100,7 +100,7 @@ jobs:
         # coverage run --concurrency=thread --parallel-mode -m pytest -vvv --exitfirst .
         # coverage combine
         # coverage report --precision 3
-        pytest -vvv ./gemviz/tests/test_init.py
+        pytest -vvv ./gemviz/tests/test_init.py ./gemviz/tests/test_utils.py
 
     # - name: Upload coverage data to coveralls.io
     #   shell: bash -l {0}
