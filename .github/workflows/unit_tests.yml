@@ -58,11 +58,10 @@ jobs:
     - name: Checkout the repository
       uses: actions/checkout@v3
 
-    # # TODO: Why is this needed?  What is missing from env.yml?
-    # - name: Install libGL.so.1
-    #   run: |
-    #     DEBIAN_FRONTEND=noninteractive apt-get update -y
-    #     DEBIAN_FRONTEND=noninteractive apt-get install -y libgl1
+    - name: Set timezone
+      uses: szenius/set-timezone@v1.2
+      with:
+        timezoneLinux: "America/Chicago"
 
     - name: Create Python ${{ matrix.python-version }} environment
       uses: mamba-org/setup-micromamba@v1
