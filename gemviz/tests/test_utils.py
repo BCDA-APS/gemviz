@@ -86,6 +86,7 @@ def test_widget1(qtbot):
     """Test a simple Qt widget."""
     widget = QtWidgets.QWidget(None)
     # qtbot.addWidget(widget)
+    assert widget is not None
 
 
 def test_widget2(qtbot):
