@@ -53,6 +53,8 @@ jobs:
           - "3.9"
           - "3.8"
       max-parallel: 5
+    env:
+      DISPLAY: ':99.0'
 
     steps:
     - name: Checkout the repository
@@ -62,6 +64,32 @@ jobs:
       uses: szenius/set-timezone@v1.2
       with:
         timezoneLinux: "America/Chicago"
+
+    - name: Install OS libraries for workflow build
+      run: |
+        sudo apt update -y
+        sudo apt install -y \
+          libxcb-icccm4 \
+          libxcb-image0 \
+          libxcb-keysyms1 \
+          libxcb-randr0 \
+          libxcb-render-util0 \
+          libxcb-xinerama0 \
+          libxcb-xfixes0 \
+          libxkbcommon-x11-0 \
+          x11-utils
+        # /sbin/start-stop-daemon \
+        #   --start \
+        #   --quiet \
+        #   --pidfile /tmp/custom_xvfb_99.pid \
+        #   --make-pidfile \
+        #   --background \
+        #   --exec /usr/bin/Xvfb -- \
+        #     :99 \
+        #     -screen 0 \
+        #     1920x1200x24 \
+        #     -ac \
+        #     +extension GLX
 
     - name: Create Python ${{ matrix.python-version }} environment
       uses: mamba-org/setup-micromamba@v1
@@ -77,6 +105,7 @@ jobs:
           pytest
           pytest-cov
           pytest-qt
+          pytest-xvfb
           python=${{ matrix.python-version }}
           setuptools-scm
 
