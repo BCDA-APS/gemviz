@@ -65,7 +65,7 @@ jobs:
       with:
         timezoneLinux: "America/Chicago"
 
-    - name: Install OS libraries for workflow build
+    - name: Install OS libraries to test Linux PyQt apps
       run: |
         sudo apt update -y
         sudo apt install -y \
@@ -117,7 +117,7 @@ jobs:
         # coverage run --concurrency=thread --parallel-mode -m pytest -vvv --exitfirst .
         # coverage combine
         # coverage report --precision 3
-        xvfb-run pytest -vvv ./gemviz/tests/test_init.py ./gemviz/tests/test_utils.py
+        xvfb-run pytest -vvv .  # /gemviz/tests/test_init.py ./gemviz/tests/test_utils.py
 
     # - name: Upload coverage data to coveralls.io
     #   shell: bash -l {0}
