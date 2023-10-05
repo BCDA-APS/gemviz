@@ -41,6 +41,9 @@ jobs:
         with:
           black_args: ". --check"
 
+      - name: Run isort
+        uses: isort/isort-action@master
+  
   test-matrix:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
