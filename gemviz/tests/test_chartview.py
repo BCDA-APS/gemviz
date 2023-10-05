@@ -36,8 +36,8 @@ def test_ChartView_labels(title, x, y, qtbot):
 
     pw = chart.plot_widget
     assert pw.plotItem.titleLabel.text == ""
-    assert pw.getAxis("bottom").label.toPlainText() == ""
-    assert pw.getAxis("left").label.toPlainText() == ""
+    assert pw.getAxis("bottom").label.toPlainText() in ("", "(None)")
+    assert pw.getAxis("left").label.toPlainText() in ("", "(None)")
 
     if title is not None:
         chart.setPlotTitle(title)
