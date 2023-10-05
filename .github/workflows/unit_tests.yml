@@ -67,8 +67,8 @@ jobs:
 
     - name: Install OS libraries for workflow build
       run: |
-        sudo apt update -y \
-        && sudo apt install -y \
+        sudo apt update -y
+        sudo apt install -y \
           libxcb-icccm4 \
           libxcb-image0 \
           libxcb-keysyms1 \
@@ -77,19 +77,8 @@ jobs:
           libxcb-xinerama0 \
           libxcb-xfixes0 \
           libxkbcommon-x11-0 \
-          x11-utils
-        # /sbin/start-stop-daemon \
-        #   --start \
-        #   --quiet \
-        #   --pidfile /tmp/custom_xvfb_99.pid \
-        #   --make-pidfile \
-        #   --background \
-        #   --exec /usr/bin/Xvfb -- \
-        #     :99 \
-        #     -screen 0 \
-        #     1920x1200x24 \
-        #     -ac \
-        #     +extension GLX
+          x11-utils \
+          xvfb
 
     - name: Create Python ${{ matrix.python-version }} environment
       uses: mamba-org/setup-micromamba@v1
@@ -128,7 +117,7 @@ jobs:
         # coverage run --concurrency=thread --parallel-mode -m pytest -vvv --exitfirst .
         # coverage combine
         # coverage report --precision 3
-        pytest -vvv ./gemviz/tests/test_init.py ./gemviz/tests/test_utils.py
+        xvfb-run pytest -vvv ./gemviz/tests/test_init.py ./gemviz/tests/test_utils.py
 
     # - name: Upload coverage data to coveralls.io
     #   shell: bash -l {0}
