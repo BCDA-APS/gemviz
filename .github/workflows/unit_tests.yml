@@ -114,10 +114,18 @@ jobs:
     - name: Run tests with pytest & coverage
       shell: bash -l {0}
       run: |
-        # coverage run --concurrency=thread --parallel-mode -m pytest -vvv --exitfirst .
-        # coverage combine
-        # coverage report --precision 3
-        xvfb-run pytest -vvv .  # /gemviz/tests/test_init.py ./gemviz/tests/test_utils.py
+        xvfb-run \
+          coverage \
+            run \
+            --concurrency=thread -\
+            -parallel-mode \
+            -m pytest \
+            -vvv \
+            --exitfirst \
+            .
+        coverage combine
+        coverage report --precision 3
+        # xvfb-run pytest -vvv .
 
     # - name: Upload coverage data to coveralls.io
     #   shell: bash -l {0}
