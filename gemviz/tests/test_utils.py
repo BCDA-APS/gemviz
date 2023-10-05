@@ -85,8 +85,8 @@ def test_getUiFileName(fname, uiname):
 def test_widget(qtbot):
     """Test a simple Qt widget."""
     widget = QtWidgets.QWidget()
-    widget.show()
     qtbot.addWidget(widget)
+    widget.show()
 
 
 @pytest.mark.parametrize(
