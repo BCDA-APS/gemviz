@@ -67,8 +67,8 @@ jobs:
 
     - name: Install OS libraries for workflow build
       run: |
-        sudo apt update -y
-        sudo apt install -y \
+        sudo apt update -y \
+        && sudo apt install -y \
           libxcb-icccm4 \
           libxcb-image0 \
           libxcb-keysyms1 \
