@@ -8,6 +8,8 @@ from .. import utils
 # TODO: run_in_thread
 
 
+# FIXME:  problems here with the time zone
+#   2024-02-04T13:14:15Z not recognized some times
 # @pytest.mark.parametrize(
 #     "iso, ts",
 #     [  # test using America/Chicago time zone
