@@ -8,14 +8,13 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:   # allow manual triggering
+  workflow_dispatch: # allow manual triggering
 
 defaults:
   run:
     shell: bash -l {0}
 
 jobs:
-
   lint:
     name: Code style
     runs-on: ubuntu-latest
@@ -26,7 +25,7 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Dependencies
         run: |
@@ -43,7 +42,7 @@ jobs:
 
       - name: Run isort
         uses: isort/isort-action@master
-  
+
   test-matrix:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
@@ -58,64 +57,64 @@ jobs:
           - "3.8"
       max-parallel: 5
     env:
-      DISPLAY: ':99.0'
+      DISPLAY: ":99.0"
 
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v3
+      - name: Checkout the repository
+        uses: actions/checkout@v3
 
-    - name: Set timezone
-      uses: szenius/set-timezone@v1.2
-      with:
-        timezoneLinux: "America/Chicago"
+      - name: Set timezone
+        uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: "America/Chicago"
 
-    - name: Install OS libraries to test Linux PyQt apps
-      run: |
-        sudo apt update -y
-        sudo apt install -y \
-          libxcb-icccm4 \
-          libxcb-image0 \
-          libxcb-keysyms1 \
-          libxcb-randr0 \
-          libxcb-render-util0 \
-          libxcb-xinerama0 \
-          libxcb-xfixes0 \
-          libxkbcommon-x11-0 \
-          x11-utils \
-          xvfb
+      - name: Install OS libraries to test Linux PyQt apps
+        run: |
+          sudo apt update -y
+          sudo apt install -y \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-xinerama0 \
+            libxcb-xfixes0 \
+            libxkbcommon-x11-0 \
+            x11-utils \
+            xvfb
 
-    - name: Create Python ${{ matrix.python-version }} environment
-      uses: mamba-org/setup-micromamba@v1
-      with:
-        cache-environment: true
-        cache-environment-key: env-key-${{ matrix.python-version }}
-        condarc: |
-          channel-priority: flexible
-        environment-file: env.yml
-        environment-name: anaconda-test-env-py-${{ matrix.python-version }}
-        create-args: >-
-          coveralls
-          pytest
-          pytest-cov
-          pytest-qt
-          pytest-xvfb
-          python=${{ matrix.python-version }}
-          setuptools-scm
+      - name: Create Python ${{ matrix.python-version }} environment
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          cache-environment: true
+          cache-environment-key: env-key-${{ matrix.python-version }}
+          condarc: |
+            channel-priority: flexible
+          environment-file: env.yml
+          environment-name: anaconda-test-env-py-${{ matrix.python-version }}
+          create-args: >-
+            coveralls
+            pytest
+            pytest-cov
+            pytest-qt
+            pytest-xvfb
+            python=${{ matrix.python-version }}
+            setuptools-scm
 
-    - name: Initial diagnostics
-      run: |
-        micromamba info
-        micromamba list
-        conda config --show-sources
-        conda config --show
-        micromamba env list
-        printenv | sort
+      - name: Initial diagnostics
+        run: |
+          micromamba info
+          micromamba list
+          conda config --show-sources
+          conda config --show
+          micromamba env list
+          printenv | sort
 
-    - name: Install this package
-      shell: bash -l {0}
-      run: pip install --no-deps -e .
+      - name: Install this package
+        shell: bash -l {0}
+        run: pip install --no-deps -e .
 
-    - name: Run tests with pytest
-      shell: bash -l {0}
-      run: |
-        xvfb-run pytest -vvv .
+      - name: Run tests with pytest
+        shell: bash -l {0}
+        run: |
+          xvfb-run pytest -vvv .
