@@ -31,8 +31,8 @@ def test_ChartView_labels(title, x, y, qtbot):
     chart = chartview.ChartView(None)
     assert chart.parent is None
 
-    chart.show()
     qtbot.addWidget(chart)
+    chart.show()
 
     pw = chart.plot_widget
     assert pw.plotItem.titleLabel.text == ""
@@ -65,8 +65,8 @@ def test_ChartView_data(x, y, qtbot):
         chart.plot(y)
     else:
         chart.plot(x, y)
-    chart.show()
     qtbot.addWidget(chart)
+    chart.show()
 
     # Test for the plot data.
     pw = chart.plot_widget

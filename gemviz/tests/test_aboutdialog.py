@@ -15,6 +15,6 @@ def test_about_starts(qtbot):
     fake_main_window = SetStatusWidget()
 
     dialog = aboutdialog.AboutDialog(fake_main_window)
-    dialog.show()
     qtbot.addWidget(dialog)
+    dialog.show()
     assert dialog is not None

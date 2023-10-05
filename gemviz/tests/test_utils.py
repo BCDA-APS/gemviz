@@ -84,7 +84,7 @@ def test_getUiFileName(fname, uiname):
 
 def test_widget(qtbot):
     """Test a simple Qt widget."""
-    widget = QtWidgets.QWidget()
+    widget = QtWidgets.QWidget(None)
     qtbot.addWidget(widget)
     widget.show()
 
@@ -107,8 +107,8 @@ def test_myLoadUi(uiname, parts, qtbot):
             utils.myLoadUi(self.ui_file, baseinstance=self)
 
     widget = Widget(None)
-    widget.show()
     qtbot.addWidget(widget)
+    widget.show()
 
     for p in parts:
         assert hasattr(widget, p)
@@ -133,8 +133,8 @@ def test_removeAllLayoutWidgets(uiname, groupbox, qtbot):
             utils.myLoadUi(self.ui_file, baseinstance=self)
 
     widget = Widget(None)
-    widget.show()
     qtbot.addWidget(widget)
+    widget.show()
 
     layout = getattr(widget, groupbox).layout()
     assert isinstance(layout, QtWidgets.QLayout)
