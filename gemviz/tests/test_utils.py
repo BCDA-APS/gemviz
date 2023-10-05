@@ -12,8 +12,8 @@ from .. import utils
     "iso, ts",
     [  # test using UTC time zone
         ["2024-02-04T13:14:15Z", 1_707_052_455],
-        ["1990-01-01+0000Z", 631_152_000],
-        ["1970-01-01+0000Z", 0],
+        ["1990-01-01T00:00:00Z", 631_152_000],
+        ["1970-01-01T00:00:00Z", 0],
     ],
 )
 def test_iso2ts(iso, ts):
@@ -77,20 +77,6 @@ def test_ts2iso(ts, iso):
 )
 def test_getUiFileName(fname, uiname):
     assert utils.getUiFileName(fname) == uiname
-
-
-def test_widget1(qtbot):
-    """Test a simple Qt widget."""
-    widget = QtWidgets.QWidget(None)
-    # qtbot.addWidget(widget)
-    assert widget is not None
-
-
-def test_widget2(qtbot):
-    """Test a simple Qt widget."""
-    widget = QtWidgets.QWidget(None)
-    qtbot.addWidget(widget)
-    # widget.show()
 
 
 @pytest.mark.parametrize(
