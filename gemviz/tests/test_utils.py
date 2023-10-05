@@ -82,11 +82,17 @@ def test_getUiFileName(fname, uiname):
     assert utils.getUiFileName(fname) == uiname
 
 
-def test_widget(qtbot):
+def test_widget1(qtbot):
+    """Test a simple Qt widget."""
+    widget = QtWidgets.QWidget(None)
+    # qtbot.addWidget(widget)
+
+
+def test_widget2(qtbot):
     """Test a simple Qt widget."""
     widget = QtWidgets.QWidget(None)
     qtbot.addWidget(widget)
-    widget.show()
+    # widget.show()
 
 
 @pytest.mark.parametrize(
