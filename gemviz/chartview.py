@@ -11,8 +11,8 @@ Charting widget
 import datetime
 from itertools import cycle
 
-from PyQt5 import QtWidgets
 import pyqtgraph as pg
+from PyQt5 import QtWidgets
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 
