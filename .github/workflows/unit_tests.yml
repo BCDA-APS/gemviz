@@ -30,7 +30,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8
+          pip install flake8  # TODO: isort
 
       - name: Run flake8
         run: flake8
@@ -111,49 +111,7 @@ jobs:
       shell: bash -l {0}
       run: pip install --no-deps -e .
 
-    - name: Run tests with pytest & coverage
+    - name: Run tests with pytest
       shell: bash -l {0}
       run: |
-        xvfb-run \
-          coverage \
-            run \
-            --concurrency=thread -\
-            -parallel-mode \
-            -m pytest \
-            -vvv \
-            --exitfirst \
-            .
-        coverage combine
-        coverage report --precision 3
-        # xvfb-run pytest -vvv .
-
-    # - name: Upload coverage data to coveralls.io
-    #   shell: bash -l {0}
-    #   run: |
-    #     micromamba list coveralls
-    #     which coveralls
-    #     coveralls debug
-    #     coveralls --service=github
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
-    #     COVERALLS_PARALLEL: true
-
-  # # https://coveralls-python.readthedocs.io/en/latest/usage/configuration.html#github-actions-support
-  # coveralls:
-  #   name: Report unit test coverage to coveralls
-  #   needs: test-matrix
-  #   runs-on: ubuntu-latest
-  #   container: python:3-slim
-
-  #   steps:
-  #     - name: Gather coverage and report to Coveralls
-  #       run: |
-  #         echo "Finally!"
-  #         pip3 install --upgrade coveralls
-  #         # debug mode: output prepared json and reported files list to stdout
-  #         # https://coveralls-python.readthedocs.io/en/latest/troubleshooting.html
-  #         coveralls debug
-  #         coveralls --service=github --finish
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        xvfb-run pytest -vvv .
