@@ -11,8 +11,8 @@ Charting widget
 import datetime
 from itertools import cycle
 
-from PyQt5 import QtWidgets
 import pyqtgraph as pg
+from PyQt5 import QtWidgets
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 
@@ -105,7 +105,7 @@ class ChartView(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout()
         self.setLayout(layout)
 
-        ## plot
+        # plot
         size.setHorizontalStretch(4)
         self.plot_widget.setSizePolicy(size)
         layout.addWidget(self.plot_widget)
