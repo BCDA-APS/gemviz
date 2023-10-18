@@ -8,7 +8,7 @@ GH tag | GH release | PyPI | conda-forge
 
 Python version(s) | Unit Tests | Code Coverage | License
 --- | --- | --- | ---
-[![Python version](https://img.shields.io/pypi/pyversions/gemviz.svg)](https://pypi.python.org/pypi/gemviz) | [![Unit Tests](https://github.com/BCDA-APS/gemviz/workflows/Unit%20Tests/badge.svg)](https://github.com/BCDA-APS/gemviz/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/gemviz/badge.svg?branch=main)](https://coveralls.io/github/BCDA-APS/gemviz?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](/LICENSE.txt)
+[![Python version](https://img.shields.io/pypi/pyversions/gemviz.svg)](https://pypi.python.org/pypi/gemviz) | [![Unit Tests](https://github.com/BCDA-APS/gemviz/workflows/Unit%20Tests%20%26%20Code%20Coverage/badge.svg)](https://github.com/BCDA-APS/gemviz/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/gemviz/badge.svg?branch=main)](https://coveralls.io/github/BCDA-APS/gemviz?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](/LICENSE.txt)
 
 ## Goals
 
