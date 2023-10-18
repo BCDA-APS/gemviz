@@ -12,7 +12,7 @@ Welcome to gemviz's documentation!
 
    testing
 
-- home: https://blueskyproject.io/hklpy/
+- home: https://bcda-aps.github.io/gemviz/
 - bug tracker: https://github.com/BCDA-APS/gemviz/issues
 - source: https://github.com/BCDA-APS/gemviz
 
