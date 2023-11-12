@@ -31,7 +31,7 @@ class BRCSearchPanel(QtWidgets.QWidget):
         return self.parent.catalog()
 
     def setupCatalog(self, catalog_name, *args, **kwargs):
-        from .date_time_range_slider import DAY
+        from .utils import DAY
 
         def getStartTime(uid):
             return utils.ts2iso(tapi.get_md(cat[uid], "start", "time"))
