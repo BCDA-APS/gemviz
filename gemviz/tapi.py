@@ -61,6 +61,7 @@ class MdCache:
         for key in key_list:
             if self.cache[key]["expires"] < t_now:
                 self.cache.pop(key)
+                logger.debug("Removed cached metadata with key %s", key)
 
         self.cache_expires = t_now + self.cache_lifetime
 
