@@ -19,12 +19,17 @@ TAPI: Local support for the tiled API & data structures.
 """
 
 import datetime
+import logging
+import time
+import uuid
 
 import tiled
 import tiled.queries
 from httpx import HTTPStatusError
 
 from . import utils
+
+logger = logging.getLogger(__name__)
 
 
 class TiledServerError(RuntimeError):
@@ -41,9 +46,77 @@ def connect_tiled_server(uri):
     return client
 
 
+class MdCache:
+    """Cache the metadata of a tiled Container (run, stream, ...)."""
+    cache = {}
+    cache_lifetime = 5 * utils.MINUTE
+    cache_expires = time.time() + cache_lifetime
+
+    def _discard_expired_cache_items(self):
+        t_now = time.time()
+        if t_now < self.cache_expires:
+            return  # nothing to do
+
+        key_list = list(self.cache)  # copy the keys since we might remove some
+        for key in key_list:
+            if self.cache[key]["expires"] < t_now:
+                self.cache.pop(key)
+
+        self.cache_expires = t_now + self.cache_lifetime
+
+    def get(self, parent):
+        try:
+            # parent is not hashable, cannot use as key
+            key = parent.uri
+        except RuntimeError as exc:
+            logger.warning(f"Unexpected parent={parent}, assigning new uuid: {exc}")
+            key = f"{uuid.uuid4():x}"
+
+        self._discard_expired_cache_items()  # dispose "old" cache entries
+
+        try:
+            md = self.cache[key]["md"]
+            # logger.debug("Found parent=%s with key=%s in cache", parent, key)
+        except KeyError:
+            md = parent.metadata
+            self.cache[key] = {"parent": parent, "md": md}
+            logging.debug(
+                "Added parent=%s with key=%s to cache (%d)",
+                parent,
+                key,
+                len(self.cache),
+            )
+        
+        # Cached item can be discard if its time has expired.
+        self.cache[key]["expires"] = time.time() + self.cache_lifetime
+
+        return md
+
+
+md_cache = MdCache()
+
+
 def get_md(parent, doc, key, default=None):
     """Cautiously, get metadata from tiled object by document and key."""
-    return (parent.metadata.get(doc) or {}).get(key) or default
+    t0 = time.time()
+    md = md_cache.get(parent)  # get cached value or new tiled request
+    t1 = time.time() - t0  # time to retrieve md from cache or tiled
+
+    md_doc = md.get(doc) or {}
+    t2 = time.time() - t0 - t1  # time to retrieve doc from md
+
+    md_value = md_doc.get(key) or default
+    t3 = time.time() - t0 - t2  # time to retrieve key value from document
+    logger.debug(
+        "DIAGNOSTIC: t1=%.03fus t2=%.03fus t3=%.03fus get_md(): parent=%s, doc=%s  key=%s",
+        1e6 * t1,  # typical values either millis (tiled request) or micros (Python memory)
+        1e6 * t2,  # typical values micros (Python memory)
+        1e6 * t3,  # typical values micros (Python memory)
+        parent,
+        doc,
+        key,
+    )
+    return md_value
 
 
 def get_tiled_slice(cat, offset, size, ascending=True):
