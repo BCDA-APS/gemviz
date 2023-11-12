@@ -87,7 +87,7 @@ class MdCache:
                 key,
                 len(self.cache),
             )
-        
+
         # Cached item can be discard if its time has expired.
         self.cache[key]["expires"] = time.time() + self.cache_lifetime
 
