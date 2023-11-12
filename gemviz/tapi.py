@@ -48,6 +48,7 @@ def connect_tiled_server(uri):
 
 class MdCache:
     """Cache the metadata of a tiled Container (run, stream, ...)."""
+
     cache = {}
     cache_lifetime = 5 * utils.MINUTE
     cache_expires = time.time() + cache_lifetime
@@ -110,7 +111,7 @@ def get_md(parent, doc, key, default=None):
     t3 = time.time() - t0 - t2  # time to retrieve key value from document
     logger.debug(
         "DIAGNOSTIC: t1=%.03fus t2=%.03fus t3=%.03fus get_md(): parent=%s, doc=%s  key=%s",
-        1e6 * t1,  # typical values either millis (tiled request) or micros (Python memory)
+        1e6 * t1,  # typical values either millis (tiled request) or micros
         1e6 * t2,  # typical values micros (Python memory)
         1e6 * t3,  # typical values micros (Python memory)
         parent,
