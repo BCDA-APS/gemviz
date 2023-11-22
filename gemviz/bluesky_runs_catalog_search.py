@@ -40,9 +40,10 @@ class BRCSearchPanel(QtWidgets.QWidget):
         if len(cat) == 0:
             self.setStatus(f"Catalog {catalog_name!r} has no runs.")
             return
+        keys = cat.keys()
         start_times = [
-            getStartTime(cat.keys().first()),
-            getStartTime(cat.keys().last()),
+            getStartTime(keys.first()),
+            getStartTime(keys.last()),
         ]
         t_low = min(start_times)
         t_high = max(start_times)
