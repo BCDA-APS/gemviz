@@ -5,6 +5,7 @@ TAPI: Local support for the tiled API & data structures.
 
     ~connect_tiled_server
     ~get_md
+    ~get_md_doc
     ~get_tiled_runs
     ~QueryTimeSince
     ~QueryTimeUntil
@@ -76,10 +77,8 @@ class MdCache:
 
         self._discard_expired_cache_items()  # dispose "old" cache entries
 
-        try:
-            md = self.cache[key]["md"]
-            # logger.debug("Found parent=%s with key=%s in cache", parent, key)
-        except KeyError:
+        if self.cache.get(key) is None:
+            # print(f"{__name__}: DIAGNOSTIC: {key=}")
             md = parent.metadata
             self.cache[key] = {"parent": parent, "md": md}
             logging.debug(
@@ -88,8 +87,10 @@ class MdCache:
                 key,
                 len(self.cache),
             )
+        else:
+            md = self.cache[key]["md"]
 
-        # Cached item can be discard if its time has expired.
+        # Cached item can be discarded if its time has expired.
         self.cache[key]["expires"] = time.time() + self.cache_lifetime
 
         return md
@@ -98,26 +99,16 @@ class MdCache:
 md_cache = MdCache()
 
 
+def get_md_doc(parent, doc, default={}):
+    md = md_cache.get(parent)  # get cached value or new tiled request
+    md_doc = md.get(doc) or default
+    return md_doc
+
+
 def get_md(parent, doc, key, default=None):
     """Cautiously, get metadata from tiled object by document and key."""
-    t0 = time.time()
-    md = md_cache.get(parent)  # get cached value or new tiled request
-    t1 = time.time() - t0  # time to retrieve md from cache or tiled
-
-    md_doc = md.get(doc) or {}
-    t2 = time.time() - t0 - t1  # time to retrieve doc from md
-
+    md_doc = get_md_doc(parent, doc, {})
     md_value = md_doc.get(key) or default
-    t3 = time.time() - t0 - t2  # time to retrieve key value from document
-    logger.debug(
-        "DIAGNOSTIC: t1=%.03fus t2=%.03fus t3=%.03fus get_md(): parent=%s, doc=%s  key=%s",
-        1e6 * t1,  # typical values either millis (tiled request) or micros
-        1e6 * t2,  # typical values micros (Python memory)
-        1e6 * t3,  # typical values micros (Python memory)
-        parent,
-        doc,
-        key,
-    )
     return md_value
 
 
