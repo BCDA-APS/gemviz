@@ -167,6 +167,7 @@ cython_debug/
 
 # local developer code
 dev_*.py
+dev_*/
 
 # Qt (on Windows)
 gemviz/resources/*.py
