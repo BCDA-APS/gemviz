@@ -6,7 +6,6 @@ from PyQt5 import QtWidgets
 from . import APP_TITLE
 from . import tapi
 from . import utils
-
 # TODO: remove testing URLs before production
 from .tiledserverdialog import LOCALHOST_URL
 from .tiledserverdialog import TESTING_URL

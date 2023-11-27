@@ -14,7 +14,6 @@ from PyQt5 import QtWidgets
 
 from . import tapi
 from . import utils
-
 from .select_fields_tablemodel import ColumnDataType
 from .select_fields_tablemodel import FieldRuleType
 from .select_fields_tablemodel import TableColumn
