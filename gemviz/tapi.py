@@ -4,14 +4,10 @@ TAPI: Local support for the tiled API & data structures.
 .. autosummary:
 
     ~connect_tiled_server
-    ~get_md
-    ~get_md_doc
     ~get_tiled_runs
     ~QueryTimeSince
     ~QueryTimeUntil
-    ~run_description_table
-    ~run_summary
-    ~run_summary_table
+    ~RunMetadata
     ~stream_data_field_pv
     ~stream_data_field_shape
     ~stream_data_field_units
@@ -19,16 +15,11 @@ TAPI: Local support for the tiled API & data structures.
     ~TiledServerError
 """
 
-import datetime
 import logging
-import time
-import uuid
 
 import tiled
 import tiled.queries
 from httpx import HTTPStatusError
-
-from . import utils
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +28,168 @@ class TiledServerError(RuntimeError):
     """An error from the tiled server."""
 
 
+class RunMetadata:
+    """Cache the metadata for a single run."""
+
+    def __init__(self, cat, uid):
+        self.catalog = cat
+        self.uid = uid
+        self.request_from_tiled_server()
+
+    def __str__(self) -> str:
+        return (
+            f"{__class__.__name__}(catalog={self.catalog.item['id']!r},"
+            f" uid7={self.uid[:7]!r},"
+            f" active={self.active})"
+        )
+
+    def request_from_tiled_server(self):
+        """Get run details from server."""
+        self.run = self.catalog[self.uid]
+        self.run_md = self.run.metadata
+        self.active = (
+            self.uid == self.catalog.keys().last() and "stop" not in self.run_md
+        )
+        self.streams_md = {
+            stream_name: self.run[stream_name].metadata for stream_name in self.run
+        }
+
+    def get_run_md(self, doc, key, default=None):
+        """Get metadata by key from run document."""
+        return (self.run_md.get(doc) or {}).get(key, default)
+
+    def plottable_signals(self):
+        """
+        Return a dict with the plottable data for this run.
+
+        * field: any available numeric data keys
+        * motors: any data keys for motors declared by the run
+        * detectors: any numeric data keys that are not motors or excluded names
+        * plot_signal: the first detector signal
+        * plot_axes: the first motor signal for each dimension
+
+        * run.metadata[hints][dimensions] show the independent axes object names
+        * Any given dimension may have more than one motor object (a2scan, ...)
+        * This code chooses to only use the first motor of each dimension.
+        * The stream descriptor list is usually length = 1.
+        * object_keys are used to get lists of data_keys (fields)
+        """
+        # dimensions of the run
+        run_dims = self.get_run_md("start", "hints", {}).get("dimensions", [])
+
+        # data stream to be used
+        streams = [d[1] for d in run_dims]
+        if len(set(streams)) != 1:
+            # All hinted dimensions should come from the same stream.
+            raise ValueError(f"Not handling hinted dimensions: {run_dims}")
+        stream = streams[0]
+
+        # description of the data stream objects
+        descriptors = self.streams_md[stream].get("descriptors", {})
+        if len(descriptors) != 1:
+            raise ValueError(f"Not handling situation of {len(descriptors)=}")
+
+        descriptor = descriptors[0]
+
+        # Mapping from object_keys to data_keys.
+        stream_hints = descriptor.get("hints", {})
+
+        def get_signal(object_key):
+            if object_key in stream_hints:
+                return stream_hints[object_key]["fields"][0]
+            if object_key != "time":
+                raise KeyError(f"Unexpected motor key: {object_key!r}")
+            return object_key  # "time" is a special case
+
+        # First motor signal for each dimension.
+        try:
+            axes = [get_signal(d[0][0]) for d in run_dims]
+        except KeyError as exc:
+            raise exc
+
+        # All motor signals.
+        motors = [
+            signal
+            for motor in self.get_run_md("start", "motors", [])
+            for signal in stream_hints[motor]["fields"]
+        ]
+
+        def is_numeric(signal):
+            dtype = descriptor["data_keys"][signal]["dtype"]
+            if dtype == "array":
+                # TODO: optimize
+                #   Calls tiled server for each signal.
+                ntype = self.run_md[self.stream_name]["data"][signal].dtype.name
+                if ntype.startswith("int") or ntype.startswith("float"):
+                    dtype = "number"
+            return dtype == "number"
+
+        # All detector signals.
+        detectors = [
+            signal
+            for detector in self.get_run_md("start", "detectors")
+            for signal in stream_hints[detector]["fields"]
+            if is_numeric(signal)
+        ]
+
+        fields = []
+        for descriptor in descriptors:
+            hints = descriptor.get("hints", {})
+            for obj_name in descriptor["object_keys"]:
+                try:
+                    signals = hints.get(obj_name, {})["fields"]
+                except KeyError:
+                    # ``ophyd.Device`` can have multiple signals
+                    signals = descriptor["object_keys"].get(obj_name, [])
+                fields.extend([k for k in signals if is_numeric(k)])
+
+        status = self.get_run_md("stop", "exit_status")
+        plot_signal = None
+        if status in "abort success".split():
+            # These runs probably have plottable data fields.
+
+            # Do not choose any of these fields as the default
+            # (NeXus-style plottable) signal data.
+            not_plottable_signals = """
+                timebase
+                preset_time
+            """.split()
+
+            names_to_avoid = motors + not_plottable_signals
+            possible_signals = detectors + fields
+            for field in possible_signals:
+                if field not in names_to_avoid:
+                    plot_signal = field
+                    break
+
+        return {
+            "catalog": self.catalog.item["id"],
+            "uid": self.uid,
+            "stream": stream,
+            "plot_signal": plot_signal,
+            "plot_axes": axes,
+            "motors": motors,
+            "detectors": detectors,
+            "fields": fields,
+        }
+
+    def stream_data(self, stream_name):
+        """Return the data structure for this stream."""
+        stream = self.run[stream_name]
+        data = stream["data"].read()
+        return data
+
+    def summary(self):
+        """Summary (text) of this run."""
+        return (
+            f"{self.get_run_md('start', 'plan_name', '')}"
+            f" {self.get_run_md('start', 'scan_id', '?')}"
+            f"{ self.get_run_md('start', 'title', '')}"
+        ).strip()
+
+
 def connect_tiled_server(uri):
+    """Make connection with the tiled server URI.  Return a client object."""
     from tiled.client import from_uri
 
     # leave out "dask" and get numpy by default
@@ -45,71 +197,6 @@ def connect_tiled_server(uri):
     # > Call .compute() when you want your result as a NumPy array.
     client = from_uri(uri, "dask")
     return client
-
-
-class MdCache:
-    """Cache the metadata of a tiled Container (run, stream, ...)."""
-
-    cache = {}
-    cache_lifetime = 5 * utils.MINUTE
-    cache_expires = time.time() + cache_lifetime
-
-    def _discard_expired_cache_items(self):
-        t_now = time.time()
-        if t_now < self.cache_expires:
-            return  # nothing to do
-
-        key_list = list(self.cache)  # copy the keys since we might remove some
-        for key in key_list:
-            if self.cache[key]["expires"] < t_now:
-                self.cache.pop(key)
-                logger.debug("Removed cached metadata with key %s", key)
-
-        self.cache_expires = t_now + self.cache_lifetime
-
-    def get(self, parent):
-        try:
-            # parent is not hashable, cannot use as key
-            key = parent.uri
-        except RuntimeError as exc:
-            logger.warning(f"Unexpected parent={parent}, assigning new uuid: {exc}")
-            key = f"{uuid.uuid4():x}"
-
-        self._discard_expired_cache_items()  # dispose "old" cache entries
-
-        if self.cache.get(key) is None:
-            # print(f"{__name__}: DIAGNOSTIC: {key=}")
-            md = parent.metadata
-            self.cache[key] = {"parent": parent, "md": md}
-            logging.debug(
-                "Added parent=%s with key=%s to cache (%d)",
-                parent,
-                key,
-                len(self.cache),
-            )
-        else:
-            md = self.cache[key]["md"]
-
-        # Cached item can be discarded if its time has expired.
-        self.cache[key]["expires"] = time.time() + self.cache_lifetime
-
-        return md
-
-
-md_cache = MdCache()
-
-
-def get_md_doc(parent, doc, default={}):
-    md = md_cache.get(parent)  # get cached value or new tiled request
-    md_doc = md.get(doc) or default
-    return md_doc
-
-
-def get_md(parent, doc, key, default=None):
-    """Cautiously, get metadata from tiled object by document and key."""
-    md_doc = get_md_doc(parent, doc, {})
-    md_value = md_doc.get(key) or default
-    return md_value
 
 
 def get_tiled_slice(cat, offset, size, ascending=True):
@@ -131,18 +218,22 @@ def get_tiled_slice(cat, offset, size, ascending=True):
 
 def QueryTimeSince(isotime):
     """Tiled client query: all runs since given date/time."""
+    from . import utils
+
     return tiled.queries.Key("time") >= utils.iso2ts(isotime)
 
 
 def QueryTimeUntil(isotime):
     """Tiled client query: all runs until given date/time."""
+    from . import utils
+
     return tiled.queries.Key("time") <= utils.iso2ts(isotime)
 
 
 def get_run(uri=None, catalog="training", reference=None):
     """Get referenced run from tiled server catalog."""
-    from gemviz.tapi import connect_tiled_server
-    from gemviz.tapi import get_tiled_runs
+    # from gemviz.tapi import connect_tiled_server
+    # from gemviz.tapi import get_tiled_runs
 
     uri = uri or "http://localhost:8020"
     client = connect_tiled_server(uri)
@@ -192,80 +283,6 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     return cat
 
 
-def run_description_table(run):
-    """Provide text description of the data streams."""
-    import pyRestTable
-
-    from . import analyze_run
-
-    # Describe what will be plotted.
-    analysis = analyze_run.SignalAxesFields(run).to_dict()
-    table = pyRestTable.Table()
-    table.labels = "item description".split()
-    table.addRow(("scan", analysis["scan_id"]))
-    table.addRow(("plan", analysis["plan"]))
-    table.addRow(("chart", analysis["chart_type"]))
-    if analysis["plot_signal"] is not None:
-        table.addRow(("stream", analysis["stream"]))
-        table.addRow(("plot signal", analysis["plot_signal"]))
-        table.addRow(("plot axes", ", ".join(analysis["plot_axes"])))
-        table.addRow(("all detectors", ", ".join(analysis["detectors"])))
-        table.addRow(("all positioners", ", ".join(analysis["positioners"])))
-    text = "plot summary"
-    text += "\n" + "-" * len(text) + "\n" * 2
-    text += f"{table.reST()}\n"
-
-    # information about each stream
-    rows = []
-    for sname in run:
-        title = f"stream: {sname}"
-        rows.append(title)
-        rows.append("-" * len(title))
-        stream = run[sname]
-        data = stream["data"].read()
-        rows.append(str(data))
-        rows.append("")
-
-    text += "\n".join(rows).strip()
-    return text
-
-
-def run_summary(run):
-    """Summary (text) of this run."""
-    md = run.metadata
-    return (
-        f"{md.get('start', {}).get('plan_name', '')}"
-        f" #{md.get('start', {}).get('scan_id', '?')}"
-        # f" {utils.ts2iso(md.get('start', {}).get('time', 0))}"
-        # f" ({md.get('start', {}).get('uid', '')[:7]})"
-        f" {md.get('start', {}).get('title', '')}"
-    ).strip()
-
-
-def run_summary_table(runs):
-    import pyRestTable
-
-    table = pyRestTable.Table()
-    table.labels = "# uid7 scan# plan #points exit started streams".split()
-    for i, uid in enumerate(runs, start=1):
-        run = runs[uid]
-        md = run.metadata
-        t0 = md["start"].get("time")
-        table.addRow(
-            (
-                i,
-                uid[:7],
-                md["summary"].get("scan_id"),
-                md["summary"].get("plan_name"),
-                md["start"].get("num_points"),
-                (md["stop"] or {}).get("exit_status"),  # if no stop document!
-                datetime.datetime.fromtimestamp(t0).isoformat(sep=" "),
-                ", ".join(md["summary"].get("stream_names")),
-            )
-        )
-    return table
-
-
 def stream_data_fields(stream):
     """
     Data field (names) of this BlueskyEventStream.
@@ -293,6 +310,8 @@ def stream_data_fields(stream):
 
 def stream_data_field_shape(stream, field_name):
     """Shape of this data field."""
+    # TODO: Optimize.
+    #   This is called for each field_name, new tiled request each time.
     try:
         shape = stream["data"][field_name].shape
     except Exception:

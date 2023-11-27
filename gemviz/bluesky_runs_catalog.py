@@ -18,6 +18,9 @@ from PyQt5 import QtWidgets
 from . import tapi
 from . import utils
 
+PAGE_START = -1
+PAGE_SIZE = 10
+
 
 class BRC_MVC(QtWidgets.QWidget):
     """MVC class for CatalogOfBlueskyRuns."""
@@ -39,22 +42,22 @@ class BRC_MVC(QtWidgets.QWidget):
         from .bluesky_runs_catalog_table_view import BRCTableView
         from .user_settings import settings
 
+        self.selected_run_uid = None
+
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.filter_groupbox.layout()
         layout.addWidget(self.brc_search_panel)
         self.brc_search_panel.setupCatalog(self.catalogName())
 
-        self.brc_tableview = BRCTableView(self)
+        self.brc_tableview = BRCTableView(self, self.catalog(), PAGE_START, PAGE_SIZE)
         layout = self.runs_groupbox.layout()
         layout.addWidget(self.brc_tableview)
-        self.brc_tableview.displayTable()
 
         self.brc_run_viz = BRCRunVisualization(self)
         layout = self.viz_groupbox.layout()
         layout.addWidget(self.brc_run_viz)
 
         # connect search signals with tableview update
-        # fmt: off
         widgets = [
             [self.brc_search_panel.plan_name, "returnPressed"],
             [self.brc_search_panel.scan_id, "returnPressed"],
@@ -63,9 +66,8 @@ class BRC_MVC(QtWidgets.QWidget):
             [self.brc_search_panel.detectors, "returnPressed"],
             [self.brc_search_panel.date_time_widget.apply, "released"],
         ]
-        # fmt: on
         for widget, signal in widgets:
-            getattr(widget, signal).connect(self.brc_tableview.displayTable)
+            getattr(widget, signal).connect(self.refreshFilteredCatalogView)
 
         self.brc_tableview.run_selected.connect(self.doRunSelectedSlot)
 
@@ -88,10 +90,16 @@ class BRC_MVC(QtWidgets.QWidget):
         from .select_stream_fields import to_datasets
 
         # TODO: make the plots configurable
-        scan_id = tapi.get_md(run, "start", "scan_id")
+        scan_id = run.get_run_md("start", "scan_id")
 
         # setup datasets
-        datasets, options = to_datasets(run[stream_name], selections, scan_id=scan_id)
+        try:
+            datasets, options = to_datasets(
+                run.run[stream_name], selections, scan_id=scan_id
+            )
+        except ValueError as exc:
+            self.setStatus(f"No plot: {exc}")
+            return
 
         # get the chartview widget, if exists
         layout = self.brc_run_viz.plotPage.layout()
@@ -112,20 +120,63 @@ class BRC_MVC(QtWidgets.QWidget):
             self.brc_run_viz.setPlot(widget)
 
     def doRunSelectedSlot(self, run):
-        """Slot: run is clicked in the table view."""
+        """
+        Slot: run is clicked in the table view.
+
+        run *object*:
+            Instance of ``tapi.RunMetadata``
+        """
         from functools import partial
 
-        from .select_stream_fields import SelectStreamsWidget
+        from .select_stream_fields import SelectFieldsWidget
 
-        self.brc_run_viz.setMetadata(yaml.dump(dict(run.metadata), indent=4))
-        self.brc_run_viz.setData(tapi.run_description_table(run))
-        self.setStatus(tapi.run_summary(run))
+        run_md = run.run_md
+        self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
+        self.brc_run_viz.setData(self.getDataDescription(run))
+        self.setStatus(run.summary())
+        self.selected_run_uid = run.get_run_md("start", "uid")
 
-        widget = SelectStreamsWidget(self, run)
+        widget = SelectFieldsWidget(self, run)
         widget.selected.connect(partial(self.doPlotSlot, run))
         layout = self.fields_groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(widget)
+
+    def getDataDescription(self, run):
+        """Provide text description of the data streams in the run."""
+        import pyRestTable
+
+        # Describe what will be plotted.  Show in the viz panel "Data" tab.
+        analysis = run.plottable_signals()
+        table = pyRestTable.Table()
+        table.labels = "item description".split()
+        table.addRow(("scan", run.get_run_md("start", "scan_id")))
+        table.addRow(("plan", run.get_run_md("start", "plan_name")))
+        if analysis["plot_signal"] is not None:
+            table.addRow(("stream", analysis["stream"]))
+            table.addRow(("plot signal", analysis["plot_signal"]))
+            table.addRow(("plot axes", ", ".join(analysis["plot_axes"])))
+            table.addRow(("all detectors", ", ".join(analysis["detectors"])))
+            table.addRow(("all positioners", ", ".join(analysis["motors"])))
+        text = "plot summary"
+        text += "\n" + "-" * len(text) + "\n" * 2
+        text += f"{table.reST()}\n"
+
+        # Show information about each stream.
+        rows = []
+        for sname in run.streams_md:
+            title = f"stream: {sname}"
+            # row = [title, "-" * len(title), str(run.stream_data(sname)), ""]
+            rows += [title, "-" * len(title), str(run.stream_data(sname)), ""]
+
+        text += "\n".join(rows).strip()
+        return text
+
+    def refreshFilteredCatalogView(self, *args, **kwargs):
+        """Update the view with the new filtered catalog."""
+        # print(f"{__name__}.{__class__.__name__} {args=} {kwargs=}")
+        filtered_catalog = self.brc_search_panel.filteredCatalog()
+        self.brc_tableview.setCatalog(filtered_catalog)
 
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)

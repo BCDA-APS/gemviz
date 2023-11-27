@@ -44,7 +44,7 @@
      </widget>
      <widget class="QGroupBox" name="fields_groupbox">
       <property name="title">
-       <string>Stream Fields</string>
+       <string>Select Fields to Plot</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2"/>
      </widget>

@@ -6,15 +6,19 @@ from PyQt5 import QtWidgets
 from . import APP_TITLE
 from . import tapi
 from . import utils
+
+# TODO: remove testing URLs before production
 from .tiledserverdialog import LOCALHOST_URL
 from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
 from .user_settings import settings
 
-# TODO: remove testing URLs before production
-
+TESTING_URLS = [TESTING_URL, LOCALHOST_URL]
 MAX_RECENT_URI = 5
 UI_FILE = utils.getUiFileName(__file__)
+SORT_ASCENDING = 1
+SORT_DESCENDING = -SORT_ASCENDING
+SORT_DIRECTION = SORT_ASCENDING
 logger = logging.getLogger(__name__)
 
 
@@ -109,7 +113,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def catalogName(self):
         return self._catalogName
 
-    def setCatalog(self, catalog_name):
+    def setCatalog(self, catalog_name, sort_direction=SORT_DIRECTION):
         """A catalog was selected (from the pop-up menu)."""
         self.setStatus(f"Selected catalog {catalog_name!r}.")
         if len(catalog_name) == 0 or catalog_name not in self.server():
@@ -117,7 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
             return
         self._catalogName = catalog_name
-        self._catalog = self.server()[catalog_name]
+        self._catalog = self.server()[catalog_name].sort(("time", sort_direction))
 
         spec_name = self.catalogType()
         self.spec_name.setText(spec_name)
@@ -132,13 +136,25 @@ class MainWindow(QtWidgets.QMainWindow):
             self.mvc_catalog = BRC_MVC(self)
             layout.addWidget(self.mvc_catalog)
         else:
+            # Not expected to run this branch since cannot select
+            # catalog we cannot handle.
             self.mvc_catalog = None
             layout.addWidget(QtWidgets.QWidget())  # nothing to show
 
     def setCatalogs(self, catalogs):
-        """Set the names (of server's catalogs) in the pop-up list."""
+        """
+        Set the names (of server's catalogs) in the pop-up list.
+
+        Only add catalogs of CatalogOfBlueskyRuns.
+        """
         self.catalogs.clear()
-        self.catalogs.addItems(catalogs)
+        for catalog_name in catalogs:
+            try:
+                spec = self.server()[catalog_name].specs[0]
+                if spec.name == "CatalogOfBlueskyRuns" and spec.version == "1":
+                    self.catalogs.addItem(catalog_name)
+            except Exception:
+                pass
 
     def clearContent(self, clear_cat=True):
         layout = self.groupbox.layout()
@@ -161,9 +177,11 @@ class MainWindow(QtWidgets.QMainWindow):
             ]
             settings.setKey(TILED_SERVER_SETTINGS_KEY, ",".join(final_uri_list))
         else:
-            # if no server selected in open dialog, keep the first pull down menu value to ""
+            # if no server selected in open dialog,
+            # keep the first pull down menu value to ""
             final_uri_list = [""] + recent_uris_list[:MAX_RECENT_URI]
-        final_uri_list = [*final_uri_list, TESTING_URL, LOCALHOST_URL, "Other..."]
+        final_uri_list += TESTING_URLS
+        final_uri_list.append("Other...")
         self._serverList = final_uri_list
 
     def setServers(self, selected_uri):
