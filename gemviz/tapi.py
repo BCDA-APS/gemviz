@@ -83,7 +83,7 @@ class RunMetadata:
 
         def get_signal(key):
             try:
-                return find_name_device_or_signal(key)
+                return find_name_device_or_signal(key)[0]  # just the first one
             except KeyError:
                 if key != "time":
                     raise KeyError(f"Unexpected key: {key!r}")
