@@ -205,7 +205,7 @@ class RunMetadata:
         return (
             f"{self.get_run_md('start', 'plan_name', '')}"
             f" {self.get_run_md('start', 'scan_id', '?')}"
-            f"{ self.get_run_md('start', 'title', '')}"
+            f" {self.get_run_md('start', 'title', '')}"
         ).strip()
 
 
