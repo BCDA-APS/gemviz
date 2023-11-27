@@ -105,7 +105,7 @@ class RunMetadata:
         streams = [d[1] for d in run_dims]
         if len(set(streams)) != 1:
             # All hinted dimensions should come from the same stream.
-            raise ValueError(f"Not handling hinted dimensions: {run_dims}")
+            raise ValueError(f"Not handling hinted dimensions: {run_dims=}")
         stream = streams[0]
 
         # description of the data stream objects
@@ -194,9 +194,7 @@ class RunMetadata:
         """Return the metadata dictionary for this stream."""
         if self.streams_md is None:
             # Optimize with a cache.
-            self.streams_md = {
-                sname: self.run[sname].metadata for sname in self.run
-            }
+            self.streams_md = {sname: self.run[sname].metadata for sname in self.run}
 
         if stream_name is None:
             return self.streams_md
