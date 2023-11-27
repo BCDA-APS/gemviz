@@ -164,7 +164,7 @@ class BRC_MVC(QtWidgets.QWidget):
 
         # Show information about each stream.
         rows = []
-        for sname in run.streams_md:
+        for sname in run.stream_metadata():
             title = f"stream: {sname}"
             # row = [title, "-" * len(title), str(run.stream_data(sname)), ""]
             rows += [title, "-" * len(title), str(run.stream_data(sname)), ""]

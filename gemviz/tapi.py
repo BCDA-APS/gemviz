@@ -50,9 +50,8 @@ class RunMetadata:
         self.active = (
             self.uid == self.catalog.keys().last() and "stop" not in self.run_md
         )
-        self.streams_md = {
-            stream_name: self.run[stream_name].metadata for stream_name in self.run
-        }
+        self.streams_md = None
+        self.streams_data = None
 
     def get_run_md(self, doc, key, default=None):
         """Get metadata by key from run document."""
@@ -74,6 +73,31 @@ class RunMetadata:
         * The stream descriptor list is usually length = 1.
         * object_keys are used to get lists of data_keys (fields)
         """
+
+        def find_name_device_or_signal(key):
+            if key in stream_hints:  # from ophyd.Device
+                return stream_hints[key]["fields"]
+            elif key in descriptor["data_keys"]:  # from ophyd.Signal
+                return [key]
+            raise KeyError(f"Could not find {key=}")
+
+        def get_signal(key):
+            try:
+                return find_name_device_or_signal(key)
+            except KeyError:
+                if key != "time":
+                    raise KeyError(f"Unexpected key: {key!r}")
+                return key  # "time" is a special case
+
+        def is_numeric(signal):
+            dtype = descriptor["data_keys"][signal]["dtype"]
+            if dtype == "array":
+                stream_data = self.stream_data(self.stream_name)
+                ntype = stream_data["data"][signal].dtype.name
+                if ntype.startswith("int") or ntype.startswith("float"):
+                    dtype = "number"
+            return dtype == "number"
+
         # dimensions of the run
         run_dims = self.get_run_md("start", "hints", {}).get("dimensions", [])
 
@@ -85,7 +109,7 @@ class RunMetadata:
         stream = streams[0]
 
         # description of the data stream objects
-        descriptors = self.streams_md[stream].get("descriptors", {})
+        descriptors = self.stream_metadata(stream).get("descriptors", {})
         if len(descriptors) != 1:
             raise ValueError(f"Not handling situation of {len(descriptors)=}")
 
@@ -93,13 +117,6 @@ class RunMetadata:
 
         # Mapping from object_keys to data_keys.
         stream_hints = descriptor.get("hints", {})
-
-        def get_signal(object_key):
-            if object_key in stream_hints:
-                return stream_hints[object_key]["fields"][0]
-            if object_key != "time":
-                raise KeyError(f"Unexpected motor key: {object_key!r}")
-            return object_key  # "time" is a special case
 
         # First motor signal for each dimension.
         try:
@@ -111,24 +128,14 @@ class RunMetadata:
         motors = [
             signal
             for motor in self.get_run_md("start", "motors", [])
-            for signal in stream_hints[motor]["fields"]
+            for signal in find_name_device_or_signal(motor)
         ]
-
-        def is_numeric(signal):
-            dtype = descriptor["data_keys"][signal]["dtype"]
-            if dtype == "array":
-                # TODO: optimize
-                #   Calls tiled server for each signal.
-                ntype = self.run_md[self.stream_name]["data"][signal].dtype.name
-                if ntype.startswith("int") or ntype.startswith("float"):
-                    dtype = "number"
-            return dtype == "number"
 
         # All detector signals.
         detectors = [
             signal
             for detector in self.get_run_md("start", "detectors")
-            for signal in stream_hints[detector]["fields"]
+            for signal in find_name_device_or_signal(detector)
             if is_numeric(signal)
         ]
 
@@ -175,9 +182,25 @@ class RunMetadata:
 
     def stream_data(self, stream_name):
         """Return the data structure for this stream."""
-        stream = self.run[stream_name]
-        data = stream["data"].read()
-        return data
+        if self.streams_data is None:
+            # Optimize with a cache.
+            self.streams_data = {
+                sname: self.run[sname]["data"].read() for sname in self.run
+            }
+
+        return self.streams_data[stream_name]
+
+    def stream_metadata(self, stream_name=None):
+        """Return the metadata dictionary for this stream."""
+        if self.streams_md is None:
+            # Optimize with a cache.
+            self.streams_md = {
+                sname: self.run[sname].metadata for sname in self.run
+            }
+
+        if stream_name is None:
+            return self.streams_md
+        return self.streams_md[stream_name]
 
     def summary(self):
         """Summary (text) of this run."""

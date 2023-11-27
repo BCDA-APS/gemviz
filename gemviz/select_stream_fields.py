@@ -51,7 +51,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
     def setup(self):
         self.run_summary.setText(self.run.summary())
 
-        stream_list = list(self.run.streams_md)
+        stream_list = list(self.run.stream_metadata())
         if "baseline" in stream_list:
             # Too many signals! 2 points each.  Do not plot from "baseline" stream.
             stream_list.pop(stream_list.index("baseline"))
