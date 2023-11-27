@@ -153,8 +153,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 spec = self.server()[catalog_name].specs[0]
                 if spec.name == "CatalogOfBlueskyRuns" and spec.version == "1":
                     self.catalogs.addItem(catalog_name)
-            except Exception:
-                pass
+            except Exception as exc:
+                message = f"Problem with catalog {catalog_name}: {exc}"
+                logger.debug(message)
+                self.setStatus(message)
 
     def clearContent(self, clear_cat=True):
         layout = self.groupbox.layout()
