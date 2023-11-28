@@ -12,7 +12,6 @@ import logging
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-from . import tapi
 from . import utils
 from .select_fields_tablemodel import ColumnDataType
 from .select_fields_tablemodel import FieldRuleType
@@ -77,7 +76,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         y_name = self.analysis["plot_signal"]
 
         # describe the data fields for the dialog.
-        sdf = tapi.stream_data_fields(stream)
+        sdf = self.run.stream_data_fields(stream_name)
         # print(f"{__name__}.{__class__.__name__}: {sdf=}")
         fields = []
         for field_name in sdf:
@@ -86,7 +85,15 @@ class SelectFieldsWidget(QtWidgets.QWidget):
                 selection = "X"
             elif y_name is not None and field_name == y_name:
                 selection = "Y"
-            shape = tapi.stream_data_field_shape(stream, field_name)
+            shape = self.run.stream_data_field_shape(stream_name, field_name)
+            if len(shape) == 0:
+                # print(f"{stream_name=} {field_name=} {shape=}")
+                logger.debug(
+                    "stream_name=%s field_name=%s shape=%s",
+                    stream_name,
+                    field_name,
+                    shape,
+                )
             field = TableField(field_name, selection=selection, shape=shape)
             fields.append(field)
         logger.debug("fields=%s", fields)
@@ -106,9 +113,12 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         self.selected.emit(stream_name, action, selections)
 
 
-def to_datasets(stream, selections, scan_id=None):
+def to_datasets(run, stream_name, selections, scan_id=None):
     """Prepare datasets and options for plotting."""
     from . import chartview
+
+    stream = run.stream_data(stream_name)
+    stream_md = run.stream_metadata(stream_name)
 
     x_axis = selections.get("X")
     x_datetime = False  # special scaling using datetime
@@ -117,9 +127,9 @@ def to_datasets(stream, selections, scan_id=None):
         x_units = ""
         x_axis = "data point number"
     else:
-        x_data = stream["data"][x_axis].compute()
+        x_data = stream[x_axis].compute()
         x_shape = x_data.shape
-        x_units = tapi.stream_data_field_units(stream, x_axis)
+        x_units = run.stream_data_field_units(stream_name, x_axis)
         if len(x_shape) != 1:
             # fmt: off
             raise ValueError(
@@ -140,8 +150,8 @@ def to_datasets(stream, selections, scan_id=None):
         color = chartview.auto_color()
         symbol = chartview.auto_symbol()
 
-        y_data = stream["data"][y_axis].compute()
-        y_units = tapi.stream_data_field_units(stream, y_axis)
+        y_data = stream[y_axis].compute()
+        y_units = run.stream_data_field_units(stream_name, y_axis)
         y_shape = y_data.shape
         if len(y_shape) != 1:
             # fmt: off
@@ -149,11 +159,9 @@ def to_datasets(stream, selections, scan_id=None):
                 "Can only plot 1-D data now."
                 f" {y_axis} shape is {y_shape}"
             )
-        suffix = stream.metadata["stream_name"]
-        run_uid = stream.metadata["descriptors"][0].get("run_start", "")
-        if scan_id is not None:
-            suffix = f"#{scan_id} {suffix} {run_uid[:7]}"
-        ds_options["name"] = f"{y_axis} ({suffix})"
+
+        run_uid = run.get_run_md("start", "uid")
+        ds_options["name"] = f"{y_axis} ({run.summary()} {run_uid[:7]})"
         ds_options["pen"] = color  # line color
         ds_options["symbol"] = symbol
         ds_options["symbolBrush"] = color  # fill color

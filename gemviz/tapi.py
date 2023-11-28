@@ -8,10 +8,6 @@ TAPI: Local support for the tiled API & data structures.
     ~QueryTimeSince
     ~QueryTimeUntil
     ~RunMetadata
-    ~stream_data_field_pv
-    ~stream_data_field_shape
-    ~stream_data_field_units
-    ~stream_data_fields
     ~TiledServerError
 """
 
@@ -190,6 +186,57 @@ class RunMetadata:
 
         return self.streams_data[stream_name]
 
+    def stream_data_field_shape(self, stream_name, field_name):
+        """Shape of this data field."""
+        stream = self.stream_data(stream_name)
+        try:
+            shape = stream[field_name].shape
+        except Exception:
+            shape = ()
+        return shape
+
+    def stream_data_fields(self, stream_name):
+        """
+        Data field (names) of this BlueskyEventStream.
+
+        Sort the list by relevance.
+
+        First "time" (epoch timestamp for each event document), then "config" (the
+        caller provided these names as parameters for this stream), then "data"
+        (other signals in this stream, usually added from a Device hint).
+        """
+        fields = sorted(self.stream_data(stream_name))
+
+        # Promote "time" field to first place.
+        if "time" in fields:
+            fields.remove("time")
+        fields.insert(0, "time")
+        return fields
+
+    def stream_data_field_pv(self, stream_name, field_name):
+        """EPICS PV name of this field."""
+        pv = ""
+        try:
+            descriptors = self.stream_metadata(stream_name).get("descriptors", {})
+            assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
+            source = descriptors[0]["data_keys"][field_name].get("source", "")
+            if source.startswith("PV:"):
+                pv = source[3:]
+        except Exception:
+            pass
+        return pv
+
+    def stream_data_field_units(self, stream_name, field_name):
+        """Engineering units of this field."""
+        units = ""
+        try:
+            descriptors = self.stream_metadata(stream_name).get("descriptors", {})
+            assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
+            units = descriptors[0]["data_keys"][field_name].get("units", "")
+        except Exception:
+            pass
+        return units
+
     def stream_metadata(self, stream_name=None):
         """Return the metadata dictionary for this stream."""
         if self.streams_md is None:
@@ -302,65 +349,3 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     for v in text_case:
         cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
-
-
-def stream_data_fields(stream):
-    """
-    Data field (names) of this BlueskyEventStream.
-
-    Sort the list by relevance.
-
-    First "time" (epoch timestamp for each event document), then "config" (the
-    caller provided these names as parameters for this stream), then "data"
-    (other signals in this stream, usually added from a Device hint).
-    """
-    # List any stream["config"] names first.
-    fields = sorted(stream.get("config", []))
-
-    # Other names from "data" are sorted alphabetically.
-    for nm in sorted(stream.get("data", [])):
-        if nm not in fields:
-            fields.append(nm)
-
-    # Promote "time" field to first place.
-    if "time" in fields:
-        fields.remove("time")
-        fields.insert(0, "time")
-    return fields
-
-
-def stream_data_field_shape(stream, field_name):
-    """Shape of this data field."""
-    # TODO: Optimize.
-    #   This is called for each field_name, new tiled request each time.
-    try:
-        shape = stream["data"][field_name].shape
-    except Exception:
-        shape = ()
-    return shape
-
-
-def stream_data_field_pv(stream, field_name):
-    """EPICS PV name of this field."""
-    pv = ""
-    try:
-        descriptors = list(stream.metadata["descriptors"])
-        assert len(descriptors) == 1, f"{stream=} has {len(descriptors)=}"
-        source = descriptors[0]["data_keys"][field_name].get("source", "")
-        if source.startswith("PV:"):
-            pv = source[3:]
-    except Exception:
-        pass
-    return pv
-
-
-def stream_data_field_units(stream, field_name):
-    """Engineering units of this field."""
-    units = ""
-    try:
-        descriptors = list(stream.metadata["descriptors"])
-        assert len(descriptors) == 1, f"{stream=} has {len(descriptors)=}"
-        units = descriptors[0]["data_keys"][field_name].get("units", "")
-    except Exception:
-        pass
-    return units

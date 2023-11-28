@@ -95,7 +95,7 @@ class BRC_MVC(QtWidgets.QWidget):
         # setup datasets
         try:
             datasets, options = to_datasets(
-                run.run[stream_name], selections, scan_id=scan_id
+                run, stream_name, selections, scan_id=scan_id
             )
         except ValueError as exc:
             self.setStatus(f"No plot: {exc}")
