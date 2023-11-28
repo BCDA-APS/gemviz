@@ -118,7 +118,6 @@ def to_datasets(run, stream_name, selections, scan_id=None):
     from . import chartview
 
     stream = run.stream_data(stream_name)
-    stream_md = run.stream_metadata(stream_name)
 
     x_axis = selections.get("X")
     x_datetime = False  # special scaling using datetime
