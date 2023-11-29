@@ -3,20 +3,16 @@ QWidget to select stream data fields for plotting.
 
 .. autosummary::
 
-    ~SelectStreamsWidget
+    ~SelectFieldsWidget
     ~to_datasets
 """
 
-import datetime
 import logging
-from dataclasses import dataclass
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-from . import tapi
 from . import utils
-from .analyze_run import SignalAxesFields
 from .select_fields_tablemodel import ColumnDataType
 from .select_fields_tablemodel import FieldRuleType
 from .select_fields_tablemodel import TableColumn
@@ -34,28 +30,33 @@ STREAM_COLUMNS = [
 ]
 
 
-class SelectStreamsWidget(QtWidgets.QWidget):
+class SelectFieldsWidget(QtWidgets.QWidget):
+    """Panel to select fields (signals) for plotting."""
+
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, str, dict)
 
-    def __init__(self, parent, run, default_stream=DEFAULT_STREAM):
+    def __init__(self, parent, run):
         self.parent = parent
-        self.run = run
-        self.analysis = SignalAxesFields(run)
-        self.stream_name = default_stream
+        self.run = run  # tapi.RunMetadata object
+        self.analysis = run.plottable_signals()
+        self.stream_name = self.analysis.get("stream", DEFAULT_STREAM)
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
     def setup(self):
-        self.run_summary.setText(tapi.run_summary(self.run))
+        self.run_summary.setText(self.run.summary())
 
-        stream_list = list(self.run)
-        if self.stream_name in stream_list:
+        stream_list = list(self.run.stream_metadata())
+        if "baseline" in stream_list:
+            # Too many signals! 2 points each.  Do not plot from "baseline" stream.
+            stream_list.pop(stream_list.index("baseline"))
+        index = stream_list.index(self.stream_name)
+        if index > 0:
             # Move the default stream to the first position.
-            stream_list.remove(self.stream_name)
-            stream_list.insert(0, self.stream_name)
+            stream_list.insert(0, stream_list.pop(index))
 
         if len(stream_list) > 0:
             self.setStream(stream_list[0])
@@ -68,27 +69,31 @@ class SelectStreamsWidget(QtWidgets.QWidget):
         from functools import partial
 
         self.stream_name = stream_name
-        stream = self.run[stream_name]
+        stream = self.run.run[stream_name]
         logger.debug("stream_name=%s, stream=%s", stream_name, stream)
 
-        # TODO: This is for 1-D.  Generalize for multi-dimensional.
-        # hint: Checkbox column in the columns table might provide.
-        x_name = None
-        y_name = None
-        if stream_name == self.analysis.stream_name:
-            if len(self.analysis.plot_axes) > 0:
-                x_name = self.analysis.plot_axes[0]
-            y_name = self.analysis.plot_signal
+        x_names = self.analysis["plot_axes"]
+        y_name = self.analysis["plot_signal"]
 
         # describe the data fields for the dialog.
+        sdf = self.run.stream_data_fields(stream_name)
+        # print(f"{__name__}.{__class__.__name__}: {sdf=}")
         fields = []
-        for field_name in tapi.stream_data_fields(stream):
+        for field_name in sdf:
             selection = None
-            if x_name is not None and field_name == x_name:
+            if x_names is not None and field_name in x_names:
                 selection = "X"
             elif y_name is not None and field_name == y_name:
                 selection = "Y"
-            shape = tapi.stream_data_field_shape(stream, field_name)
+            shape = self.run.stream_data_field_shape(stream_name, field_name)
+            if len(shape) == 0:
+                # print(f"{stream_name=} {field_name=} {shape=}")
+                logger.debug(
+                    "stream_name=%s field_name=%s shape=%s",
+                    stream_name,
+                    field_name,
+                    shape,
+                )
             field = TableField(field_name, selection=selection, shape=shape)
             fields.append(field)
         logger.debug("fields=%s", fields)
@@ -108,9 +113,11 @@ class SelectStreamsWidget(QtWidgets.QWidget):
         self.selected.emit(stream_name, action, selections)
 
 
-def to_datasets(stream, selections, scan_id=None):
+def to_datasets(run, stream_name, selections, scan_id=None):
     """Prepare datasets and options for plotting."""
     from . import chartview
+
+    stream = run.stream_data(stream_name)
 
     x_axis = selections.get("X")
     x_datetime = False  # special scaling using datetime
@@ -119,9 +126,9 @@ def to_datasets(stream, selections, scan_id=None):
         x_units = ""
         x_axis = "data point number"
     else:
-        x_data = stream["data"][x_axis].compute()
+        x_data = stream[x_axis].compute()
         x_shape = x_data.shape
-        x_units = tapi.stream_data_field_units(stream, x_axis)
+        x_units = run.stream_data_field_units(stream_name, x_axis)
         if len(x_shape) != 1:
             # fmt: off
             raise ValueError(
@@ -134,13 +141,16 @@ def to_datasets(stream, selections, scan_id=None):
             x_datetime = True
 
     datasets = []
-    for y_axis in selections.get("Y", []):
+    y_selections = selections.get("Y", [])
+    if len(y_selections) == 0:
+        raise ValueError("No Y data selected.")
+    for y_axis in y_selections:
         ds, ds_options = [], {}
         color = chartview.auto_color()
         symbol = chartview.auto_symbol()
 
-        y_data = stream["data"][y_axis].compute()
-        y_units = tapi.stream_data_field_units(stream, y_axis)
+        y_data = stream[y_axis].compute()
+        y_units = run.stream_data_field_units(stream_name, y_axis)
         y_shape = y_data.shape
         if len(y_shape) != 1:
             # fmt: off
@@ -148,11 +158,9 @@ def to_datasets(stream, selections, scan_id=None):
                 "Can only plot 1-D data now."
                 f" {y_axis} shape is {y_shape}"
             )
-        suffix = stream.metadata["stream_name"]
-        run_uid = stream.metadata["descriptors"][0].get("run_start", "")
-        if scan_id is not None:
-            suffix = f"#{scan_id} {suffix} {run_uid[:7]}"
-        ds_options["name"] = f"{y_axis} ({suffix})"
+
+        run_uid = run.get_run_md("start", "uid")
+        ds_options["name"] = f"{y_axis} ({run.summary()} {run_uid[:7]})"
         ds_options["pen"] = color  # line color
         ds_options["symbol"] = symbol
         ds_options["symbolBrush"] = color  # fill color

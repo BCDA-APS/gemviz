@@ -31,18 +31,21 @@ class BRCSearchPanel(QtWidgets.QWidget):
         return self.parent.catalog()
 
     def setupCatalog(self, catalog_name, *args, **kwargs):
-        from .date_time_range_slider import DAY
+        from .utils import DAY
 
         def getStartTime(uid):
-            return utils.ts2iso(tapi.get_md(cat[uid], "start", "time"))
+            md = cat[uid].metadata
+            ts = (md.get("start") or {}).get("time")
+            return utils.ts2iso(ts)
 
         cat = self.catalog()
         if len(cat) == 0:
             self.setStatus(f"Catalog {catalog_name!r} has no runs.")
             return
+        keys = cat.keys()
         start_times = [
-            getStartTime(cat.keys().first()),
-            getStartTime(cat.keys().last()),
+            getStartTime(keys.first()),
+            getStartTime(keys.last()),
         ]
         t_low = min(start_times)
         t_high = max(start_times)
@@ -72,13 +75,9 @@ class BRCSearchPanel(QtWidgets.QWidget):
             try:
                 cat = tapi.get_tiled_runs(cat, scan_id=int(scan_id))
             except ValueError:
-                self.setStatus("Invalid entry: scan_id must be an integer.")
-                pass
-                # TODO: PR #145 https://github.com/BCDA-APS/gemviz/pull/145
-                # after updating tiled is updated (issue #53), we should try this:
-                # import tiled.catalogs
-                # empty_catalog = tiled.catalogs.Catalog.from_dict({})
-                # return empty_catalog
+                self.setStatus(
+                    f"Invalid entry: scan_id must be an integer.  Received {scan_id=!r}"
+                )
 
         motors = self.positioners.text().strip()
         if len(motors) > 0:

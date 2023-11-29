@@ -21,6 +21,13 @@ import threading
 logger = logging.getLogger(__name__)
 
 
+SECOND = 1
+MINUTE = 60 * SECOND
+HOUR = 60 * MINUTE
+DAY = 24 * HOUR
+WEEK = 7 * DAY
+
+
 def iso2dt(iso_date_time):
     """Convert ISO8601 time string to datetime object."""
     return datetime.datetime.fromisoformat(iso_date_time)

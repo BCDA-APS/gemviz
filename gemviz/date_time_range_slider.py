@@ -10,12 +10,6 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
-SECOND = 1
-MINUTE = 60 * SECOND
-HOUR = 60 * MINUTE
-DAY = 24 * HOUR
-WEEK = 7 * DAY
-
 DEFAULT_MINIMUM = "1995-01-01"
 DEFAULT_LOW = "2023-01-01"
 DEFAULT_HIGH = "2024-05-01"
@@ -82,11 +76,11 @@ class DateTimeRangeSlider(QtWidgets.QWidget):
 
     def _timestamp_units(self, slider):
         """Convert slider units (days) to timestamp units (seconds)."""
-        return slider * DAY
+        return slider * utils.DAY
 
     def _slider_units(self, timestamp):
         """Convert timestamp units (seconds) to slider units (days)."""
-        return int(timestamp / DAY)
+        return int(timestamp / utils.DAY)
 
     def adjustDates(self, low, high):
         """
