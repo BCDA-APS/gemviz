@@ -59,7 +59,7 @@ classifiers = [
 gemviz = "gemviz.app:main"
 
 [tool.black]
-line_length = 88
+line-length = 88
 
 [tool.flake8]
 max-line-length = 88
