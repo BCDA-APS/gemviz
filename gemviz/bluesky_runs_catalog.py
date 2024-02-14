@@ -109,7 +109,7 @@ class BRC_MVC(QtWidgets.QWidget):
         if not isinstance(widget, ChartView) or action == "replace":
             widget = ChartView(self, **options)  # Make a blank chart.
             if action == "add":
-                action == "replace"
+                action = "replace"
 
         if action in ("remove"):  # TODO: implement "remove"
             raise ValueError(f"Unsupported action: {action=}")
