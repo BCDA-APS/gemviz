@@ -110,8 +110,6 @@ def test_myLoadUi(uiname, parts, qtbot):
     "uiname, groupbox",
     [
         ["bluesky_runs_catalog.ui", "fields_groupbox"],
-        ["bluesky_runs_catalog.ui", "filter_groupbox"],
-        ["bluesky_runs_catalog.ui", "runs_groupbox"],
         ["bluesky_runs_catalog.ui", "viz_groupbox"],
     ],
 )

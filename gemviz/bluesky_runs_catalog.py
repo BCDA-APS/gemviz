@@ -45,12 +45,12 @@ class BRC_MVC(QtWidgets.QWidget):
         self.selected_run_uid = None
 
         self.brc_search_panel = BRCSearchPanel(self)
-        layout = self.filter_groupbox.layout()
+        layout = self.tab_filter.layout()
         layout.addWidget(self.brc_search_panel)
         self.brc_search_panel.setupCatalog(self.catalogName())
 
         self.brc_tableview = BRCTableView(self, self.catalog(), PAGE_START, PAGE_SIZE)
-        layout = self.runs_groupbox.layout()
+        layout = self.tab_matches.layout()
         layout.addWidget(self.brc_tableview)
 
         self.brc_run_viz = BRCRunVisualization(self)
