@@ -34,7 +34,7 @@ AUTHOR_LIST = [
 
 # fmt: off
 COPYRIGHT_TEXT = (
-    "(c) 2023, UChicago Argonne, LLC"
+    "(c) 2023-2024, UChicago Argonne, LLC"
     ", (see LICENSE file for details)"
 )
 # fmt: on
