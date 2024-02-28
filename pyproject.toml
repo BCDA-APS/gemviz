@@ -1,11 +1,7 @@
 [build-system]
-# qt ==5
-# pyqt ==5
 requires = [
-  "pyRestTable",
-  "setuptools>=61.0",
-  "setuptools_scm[toml]>=6.2",
-  "tiled"
+  "setuptools>=64",
+  "setuptools_scm[toml]>=8",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -23,7 +19,7 @@ maintainers = [
 ]
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8, <3.12"
 keywords = ["bluesky", "databroker", "tiled", "catalog"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "gemviz/LICENSE"}
@@ -49,6 +45,14 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Scientific/Engineering",
     "Topic :: Utilities",
+]
+
+# qt ==5
+# pyqt ==5
+dependencies = [
+  "pyqtgraph",
+  "pyRestTable",
+  "tiled",
 ]
 
 [project.urls]
