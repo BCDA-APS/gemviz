@@ -275,3 +275,11 @@ class RangeSlider(QtWidgets.QSlider):
             slider_max - slider_min,
             opt.upsideDown,
         )
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------

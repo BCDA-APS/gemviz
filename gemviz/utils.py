@@ -106,3 +106,11 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 def getUiFileName(py_file_name):
     """UI file name matches the Python file, different extension."""
     return f"{pathlib.Path(py_file_name).stem}.ui"
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------

@@ -22,3 +22,11 @@ class LicenseDialog(QtWidgets.QDialog):
         self.setModal(True)
         license_text = open(LICENSE_FILE, "r").read()
         self.license.setText(license_text)
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------

@@ -44,3 +44,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def responder(self, action):
         """Modify the plot with the described action."""
         self.selected.emit(action, self.tableView.model().plotFields())
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------

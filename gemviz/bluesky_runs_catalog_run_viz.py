@@ -43,3 +43,11 @@ class BRCRunVisualization(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------

@@ -200,3 +200,11 @@ if __name__ == "__main__":
     # main.raise_()
     app.exec()
     print(f"{main.low()=}  {main.high()=}")
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------
