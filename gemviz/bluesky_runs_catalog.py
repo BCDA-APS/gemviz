@@ -15,7 +15,6 @@ from functools import partial
 import yaml
 from PyQt5 import QtWidgets
 
-from . import tapi
 from . import utils
 
 PAGE_START = -1
