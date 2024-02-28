@@ -253,20 +253,28 @@ class ApplicationQSettings(QtCore.QSettings):
 settings = ApplicationQSettings(__settings_orgName__, __package_name__)
 
 
-def main():
-    ss = settings
-    print(f"{ss=}")
+# def main():
+#     ss = settings
+#     print(f"{ss=}")
 
-    print(f"{ss.fileName()=}")
-    print(f"{ss.applicationName()=}")
-    print(f"{ss.organizationName()=}")
-    print(f"{ss.status()=}")
-    ss.setKey("billy/goat", "gruff")
-    for key in ss.allKeys():
-        print(f"{key=} {ss.getKey(key)=} {ss._keySplit_(key)=}")
-    print(f"{ss.getKey(None)=}")
-    ss.resetDefaults()
+#     print(f"{ss.fileName()=}")
+#     print(f"{ss.applicationName()=}")
+#     print(f"{ss.organizationName()=}")
+#     print(f"{ss.status()=}")
+#     ss.setKey("billy/goat", "gruff")
+#     for key in ss.allKeys():
+#         print(f"{key=} {ss.getKey(key)=} {ss._keySplit_(key)=}")
+#     print(f"{ss.getKey(None)=}")
+#     ss.resetDefaults()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------

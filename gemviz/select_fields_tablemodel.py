@@ -373,3 +373,12 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             elif column_number in self.multipleSelectionColumns:
                 choices[column_name].append(field_name)
         return choices
+
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------
