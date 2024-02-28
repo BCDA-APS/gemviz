@@ -131,7 +131,13 @@ class BRC_MVC(QtWidgets.QWidget):
 
         run_md = run.run_md
         self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
-        self.brc_run_viz.setData(self.getDataDescription(run))
+        try:
+            self.brc_run_viz.setData(self.getDataDescription(run))
+        except (KeyError, ValueError) as exinfo:
+            self.setStatus(
+                f"Can't select that run: ({exinfo.__class__.__name__}) {exinfo}"
+            )
+            return
         self.setStatus(run.summary())
         self.selected_run_uid = run.get_run_md("start", "uid")
 
