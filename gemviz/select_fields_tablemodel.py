@@ -354,7 +354,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     def setSelectionsItem(self, key, value):
         """Set the key in the plot selections dictionary."""
-        self.selections()[key] = value
+        self._selections[key] = value
 
     # ------------ reporting
 
