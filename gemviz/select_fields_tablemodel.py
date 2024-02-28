@@ -209,7 +209,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     def checkbox(self, index):
         """Return the checkbox state."""
         nm = self.columnName(index.column())  # selection name of THIS column
-        selection = self._selections.get(index.row())  # user selection
+        selection = self.selections().get(index.row())  # user selection
         return QtCore.Qt.Checked if selection == nm else QtCore.Qt.Unchecked
 
     def setCheckbox(self, index, state):
@@ -217,10 +217,10 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
         checked = state == QtCore.Qt.Checked
-        prior = self._selections.get(row)
+        prior = self.selections().get(row)
         self.setSelectionsItem(row, column_name if checked else None)  # Rule 1
-        changes = self.selections(row) != prior
-        logger.debug("selections: %s", self._selections)
+        changes = self.selections()[row] != prior
+        logger.debug("selections: %s", self.selections())
 
         changes = self.applySelectionRules(index, changes)
 
@@ -234,7 +234,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         """Apply selection rules 2-4."""
         row = index.row()
         column_name = self.columnName(index.column())
-        for r, v in sorted(self._selections.items()):
+        for r, v in sorted(self.selections().items()):
             if v is not None:
                 if self.columnNumber(v) in self.uniqueSelectionColumns:
                     if r != row and column_name == v:
@@ -244,8 +244,8 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     def updateCheckboxes(self):
         """Update checkboxes to agree with self.selections."""
-        if len(self._selections) > 0:
-            top, bottom = min(self._selections), max(self._selections)
+        if len(self.selections()) > 0:
+            top, bottom = min(self.selections()), max(self.selections())
         else:
             top, bottom = 0, self.rowCount() - 1
         left, right = min(self.checkboxColumns), max(self.checkboxColumns)
@@ -257,7 +257,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
 
         # prune empty data from self.selections
-        self.setSelections(self._selections)
+        self.setSelections(self.selections())
 
     def logCheckboxSelections(self):
         logger.debug("checkbox selections:")
@@ -343,9 +343,9 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                 if column_number in self.checkboxColumns:
                     self.setSelectionsItem(row, field.selection)
 
-    def selections(self, key):
-        """Pick the key from the plot selections dictionary."""
-        return self._selections[key]
+    def selections(self):
+        """Return the plot selections dictionary."""
+        return self._selections
 
     def setSelections(self, selections=None):
         """Plot selections: dict(row_number=column number}"""
@@ -354,7 +354,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     def setSelectionsItem(self, key, value):
         """Set the key in the plot selections dictionary."""
-        self._selections[key] = value
+        self.selections()[key] = value
 
     # ------------ reporting
 
@@ -365,7 +365,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         key=column_name, value=field_name(s)
         """
         choices = dict(Y=[])
-        for row, column_name in self._selections.items():
+        for row, column_name in self.selections().items():
             field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
