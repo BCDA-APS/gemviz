@@ -66,6 +66,7 @@ class TiledServerDialog(QtWidgets.QDialog):
 
         return selected
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

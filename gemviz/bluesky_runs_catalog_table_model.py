@@ -110,6 +110,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
         self.runs = runs
         self.layoutChanged.emit()  # Tell the view there is new data.
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

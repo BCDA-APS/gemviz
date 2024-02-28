@@ -230,6 +230,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._server = server
         self.setCatalogs(list(server))
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

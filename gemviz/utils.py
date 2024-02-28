@@ -107,6 +107,7 @@ def getUiFileName(py_file_name):
     """UI file name matches the Python file, different extension."""
     return f"{pathlib.Path(py_file_name).stem}.ui"
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

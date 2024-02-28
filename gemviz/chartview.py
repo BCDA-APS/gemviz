@@ -139,6 +139,7 @@ class ChartView(QtWidgets.QWidget):
     def setPlotTitle(self, text):
         self.plot_widget.plotItem.setTitle(text)
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

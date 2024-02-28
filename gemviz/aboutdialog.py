@@ -89,6 +89,7 @@ class AboutDialog(QtWidgets.QDialog):
     def setStatus(self, text):
         self.parent.setStatus(text)
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

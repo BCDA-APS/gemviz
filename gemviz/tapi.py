@@ -350,6 +350,7 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
         cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

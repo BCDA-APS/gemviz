@@ -362,6 +362,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                 choices[column_name].append(field_name)
         return choices
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

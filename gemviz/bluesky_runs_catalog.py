@@ -215,6 +215,7 @@ class BRC_MVC(QtWidgets.QWidget):
     def setStatus(self, text):
         self.parent.setStatus(text)
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

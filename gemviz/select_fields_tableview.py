@@ -45,6 +45,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         """Modify the plot with the described action."""
         self.selected.emit(action, self.tableView.model().plotFields())
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

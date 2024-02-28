@@ -190,6 +190,7 @@ def to_datasets(run, stream_name, selections, scan_id=None):
 
     return datasets, plot_options
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #

@@ -23,6 +23,7 @@ class LicenseDialog(QtWidgets.QDialog):
         license_text = open(LICENSE_FILE, "r").read()
         self.license.setText(license_text)
 
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2024, UChicago Argonne, LLC
 #
