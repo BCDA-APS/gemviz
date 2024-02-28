@@ -34,10 +34,18 @@ AUTHOR_LIST = [
 
 # fmt: off
 COPYRIGHT_TEXT = (
-    "(c) 2023, UChicago Argonne, LLC"
+    "(c) 2023-2024, UChicago Argonne, LLC"
     ", (see LICENSE file for details)"
 )
 # fmt: on
 DOCS_URL = "https://github.com/BCDA-APS/gemviz/blob/main/README.md"
 ISSUES_URL = "https://github.com/BCDA-APS/gemviz/issues"
 LICENSE_FILE = ROOT_DIR / "LICENSE"
+
+# -----------------------------------------------------------------------------
+# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+#
+# Distributed under the terms of the Argonne National Laboratory Open Source License.
+#
+# The full license is in the file LICENSE.txt, distributed with this software.
+# -----------------------------------------------------------------------------
