@@ -143,12 +143,15 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         ~fields
         ~setFields
         ~plotFields
+        ~selections
+        ~setSelections
+        ~setSelectionsItem
 
     https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html
     """
 
     def __init__(self, columns, fields):
-        self.selections = {}  # dict(row_number=column number}
+        self.setSelections()
 
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
@@ -206,7 +209,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     def checkbox(self, index):
         """Return the checkbox state."""
         nm = self.columnName(index.column())  # selection name of THIS column
-        selection = self.selections.get(index.row())  # user selection
+        selection = self._selections.get(index.row())  # user selection
         return QtCore.Qt.Checked if selection == nm else QtCore.Qt.Unchecked
 
     def setCheckbox(self, index, state):
@@ -214,10 +217,10 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
         checked = state == QtCore.Qt.Checked
-        prior = self.selections.get(row)
-        self.selections[row] = column_name if checked else None  # Rule 1
-        changes = self.selections[row] != prior
-        logger.debug("selections: %s", self.selections)
+        prior = self._selections.get(row)
+        self.setSelectionsItem(row, column_name if checked else None)  # Rule 1
+        changes = self.selections(row) != prior
+        logger.debug("selections: %s", self._selections)
 
         changes = self.applySelectionRules(index, changes)
 
@@ -231,18 +234,18 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         """Apply selection rules 2-4."""
         row = index.row()
         column_name = self.columnName(index.column())
-        for r, v in sorted(self.selections.items()):
+        for r, v in sorted(self._selections.items()):
             if v is not None:
                 if self.columnNumber(v) in self.uniqueSelectionColumns:
                     if r != row and column_name == v:
-                        self.selections[r] = None
+                        self.setSelectionsItem(r, None)
                         changes = True
         return changes
 
     def updateCheckboxes(self):
         """Update checkboxes to agree with self.selections."""
-        if len(self.selections) > 0:
-            top, bottom = min(self.selections), max(self.selections)
+        if len(self._selections) > 0:
+            top, bottom = min(self._selections), max(self._selections)
         else:
             top, bottom = 0, self.rowCount() - 1
         left, right = min(self.checkboxColumns), max(self.checkboxColumns)
@@ -254,11 +257,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
 
         # prune empty data from self.selections
-        # fmt: off
-        self.selections = {
-            k: v for k, v in self.selections.items() if v is not None
-        }
-        # fmt: on
+        self.setSelections(self._selections)
 
     def logCheckboxSelections(self):
         logger.debug("checkbox selections:")
@@ -342,7 +341,20 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             if field.selection is not None:
                 column_number = self.columnNumber(field.selection)
                 if column_number in self.checkboxColumns:
-                    self.selections[row] = field.selection
+                    self.setSelectionsItem(row, field.selection)
+
+    def selections(self, key):
+        """Pick the key from the plot selections dictionary."""
+        return self._selections[key]
+
+    def setSelections(self, selections=None):
+        """Plot selections: dict(row_number=column number}"""
+        selections = selections or {}
+        self._selections = {k: v for k, v in selections.items() if v is not None}
+
+    def setSelectionsItem(self, key, value):
+        """Set the key in the plot selections dictionary."""
+        self._selections[key] = value
 
     # ------------ reporting
 
@@ -353,7 +365,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         key=column_name, value=field_name(s)
         """
         choices = dict(Y=[])
-        for row, column_name in self.selections.items():
+        for row, column_name in self._selections.items():
             field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
