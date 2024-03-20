@@ -21,14 +21,6 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 
-class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
-    """https://stackoverflow.com/a/61722299"""
-
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
-        option.displayAlignment = QtCore.Qt.AlignCenter
-
-
 class BRCTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     run_selected = QtCore.pyqtSignal(object)
@@ -70,17 +62,6 @@ class BRCTableView(QtWidgets.QWidget):
         self.parent.brc_search_panel.enableDateRange(
             len(self.parent.brc_search_panel.catalog()) > 0
         )
-
-        labels = self.model.columnLabels
-
-        def centerColumn(label):
-            if label in labels:
-                column = labels.index(label)
-                delegate = _AlignCenterDelegate(self.tableView)
-                self.tableView.setItemDelegateForColumn(column, delegate)
-
-        centerColumn("Scan ID")
-        centerColumn("#points")
 
         self.setButtonPermissions()
         self.setPagerStatus()

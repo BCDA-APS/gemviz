@@ -86,6 +86,12 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             if bgcolor is not None:
                 return QtGui.QBrush(bgcolor)
 
+        elif role == QtCore.Qt.TextAlignmentRole:
+            if index.column() in [0, 4]:
+                return QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter
+            else:
+                return QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         """Return the column label. Called by QTableView."""
         if role == QtCore.Qt.DisplayRole:
