@@ -61,7 +61,7 @@ def auto_symbol():
 
 class ChartView(QtWidgets.QWidget):
     """
-    MatPlotLib PlotWidget
+    MatPlotLib ??PlotWidget??
 
     .. autosummary::
 
