@@ -11,7 +11,11 @@ Charting widget
 import datetime
 from itertools import cycle
 
-import pyqtgraph as pg
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
+# import pyqtgraph as pg
 from PyQt5 import QtWidgets
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
@@ -36,8 +40,9 @@ PLOT_COLORS = """
 """.split()
 PLOT_SYMBOLS = """o + x star s d t t2 t3""".split()
 
-pg.setConfigOption("background", "w")
-pg.setConfigOption("foreground", "k")
+# FIXME: this is pyqtgraph
+# pg.setConfigOption("background", "w")
+# pg.setConfigOption("foreground", "k")
 GRID_OPACITY = 0.1
 
 _AUTO_COLOR_CYCLE = cycle(PLOT_COLORS)
@@ -56,7 +61,7 @@ def auto_symbol():
 
 class ChartView(QtWidgets.QWidget):
     """
-    PyqtGraph PlotWidget
+    MatPlotLib PlotWidget
 
     .. autosummary::
 
@@ -79,50 +84,66 @@ class ChartView(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
 
-        self.plot_widget = pg.PlotWidget()
-        self.plot_widget.addLegend()
-        self.plot_widget.plotItem.showAxes(True)
-        self.plot_widget.plotItem.showGrid(x=True, y=True, alpha=GRID_OPACITY)
-        # see: https://stackoverflow.com/a/70200326
-        label = pg.LabelItem(
-            f"plot: {datetime.datetime.now()}", color="lightgrey", size="8pt"
-        )
-        label.setParentItem(self.plot_widget.plotItem)
-        label.anchor(itemPos=(0, 1), parentPos=(0, 1))
+        # Create a Matplotlib figure and canvas
+        self.figure = Figure()
+        self.canvas = FigureCanvas(self.figure)
+        self.main_axes = self.figure.add_subplot(111)
+        # Adjust margins
+        self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
 
-        config = {
-            "title": self.setPlotTitle,
-            "y": self.setLeftAxisText,
-            "x": self.setBottomAxisText,
-            "x_units": self.setBottomAxisUnits,
-            "y_units": self.setLeftAxisUnits,
-            "x_datetime": self.setAxisDateTime,
-        }
-        for k, func in config.items():
-            func(kwargs.get(k))
+        # FIXME: this is pyqtgraph
+        # self.plot_widget = pg.PlotWidget()
+        # self.plot_widget.addLegend()
+        # self.plot_widget.plotItem.showAxes(True)
+        # self.plot_widget.plotItem.showGrid(x=True, y=True, alpha=GRID_OPACITY)
+        # # see: https://stackoverflow.com/a/70200326
+        # label = pg.LabelItem(
+        #     f"plot: {datetime.datetime.now()}", color="lightgrey", size="8pt"
+        # )
+        # label.setParentItem(self.plot_widget.plotItem)
+        # label.anchor(itemPos=(0, 1), parentPos=(0, 1))
+
+        # config = {
+        #     "title": self.setPlotTitle,
+        #     "y": self.setLeftAxisText,
+        #     "x": self.setBottomAxisText,
+        #     "x_units": self.setBottomAxisUnits,
+        #     "y_units": self.setLeftAxisUnits,
+        #     "x_datetime": self.setAxisDateTime,
+        # }
+        # for k, func in config.items():
+        #     func(kwargs.get(k))
 
         # QWidget Layout
-        layout = QtWidgets.QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
+        # Add directly unless we plan to use the toolbar later.
+        layout.addWidget(NavigationToolbar(self.canvas, self))
+        layout.addWidget(self.canvas)
 
         # plot
         size.setHorizontalStretch(4)
-        self.plot_widget.setSizePolicy(size)
-        layout.addWidget(self.plot_widget)
+        # FIXME: this is pyqtgraph
+        # self.plot_widget.setSizePolicy(size)
+        # layout.addWidget(self.plot_widget)
 
     def plot(self, *args, **kwargs):
-        return self.plot_widget.plot(*args, **kwargs)
+        # return self.plot_widget.plot(*args, **kwargs)
+        pass  # FIXME: this is pyqtgraph
 
     def setAxisDateTime(self, choice):
-        if choice:
-            item = pg.DateAxisItem(orientation="bottom")
-            self.plot_widget.setAxisItems({"bottom": item})
+        # if choice:
+        #     item = pg.DateAxisItem(orientation="bottom")
+        #     self.plot_widget.setAxisItems({"bottom": item})
+        pass  # FIXME: this is pyqtgraph
 
     def setAxisLabel(self, axis, text):
-        self.plot_widget.plotItem.setLabel(axis, text)
+        # self.plot_widget.plotItem.setLabel(axis, text)
+        pass  # FIXME: this is pyqtgraph
 
     def setAxisUnits(self, axis, text):
-        self.plot_widget.plotItem.axes[axis]["item"].labelUnits = text
+        # self.plot_widget.plotItem.axes[axis]["item"].labelUnits = text
+        pass  # FIXME: this is pyqtgraph
 
     def setBottomAxisText(self, text):
         self.setAxisLabel("bottom", text)
@@ -137,7 +158,8 @@ class ChartView(QtWidgets.QWidget):
         self.setAxisUnits("left", text)
 
     def setPlotTitle(self, text):
-        self.plot_widget.plotItem.setTitle(text)
+        # self.plot_widget.plotItem.setTitle(text)
+        pass  # FIXME: this is pyqtgraph
 
 
 # -----------------------------------------------------------------------------

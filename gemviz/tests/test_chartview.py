@@ -24,6 +24,7 @@ def test_auto_series(quantity, series, auto):
     assert series == series2
 
 
+# FIXME: this is pyqtgraph
 @pytest.mark.parametrize("title", [None, "one line text"])
 @pytest.mark.parametrize("x", [None, "axis label"])
 @pytest.mark.parametrize("y", [None, "axis label"])
@@ -34,7 +35,7 @@ def test_ChartView_labels(title, x, y, qtbot):
     qtbot.addWidget(chart)
     chart.show()
 
-    pw = chart.plot_widget
+    pw = chart.plot_widget  # FIXME: this is pyqtgraph
     assert pw.plotItem.titleLabel.text == ""
     assert pw.getAxis("bottom").label.toPlainText() in ("", "(None)")
     assert pw.getAxis("left").label.toPlainText() in ("", "(None)")
@@ -52,6 +53,7 @@ def test_ChartView_labels(title, x, y, qtbot):
         assert pw.getAxis("left").label.toPlainText().strip() == y
 
 
+# FIXME: this is pyqtgraph
 # TODO: test with timestamps
 # fmt: off
 @pytest.mark.parametrize("x", [np.array([1, 2, 3, 4, 5]), None])
@@ -69,7 +71,7 @@ def test_ChartView_data(x, y, qtbot):
     chart.show()
 
     # Test for the plot data.
-    pw = chart.plot_widget
+    pw = chart.plot_widget  # FIXME: this is pyqtgraph
     curves = pw.getPlotItem().curves
 
     if len(curves) > 0:
