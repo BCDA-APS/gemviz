@@ -239,12 +239,14 @@ class ChartView(QtWidgets.QWidget):
         # Update labels and titles:
         # TODO: title -- first and last start dates of all curves
         self.setPlotTitle("data from ... (TODO)")
+
         iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
-        if self.parent is None:
-            self.setPlotSubtitle(f"plotted: {iso8601}")
-        else:
+        subtitle = f"plotted: {iso8601}"
+        if self.parent is not None:
             cat_name = self.parent.catalogName() or ""
-            self.setPlotSubtitle(f"catalog={cat_name!r}  plotted: {iso8601}")
+            subtitle = f"catalog={cat_name!r}  {subtitle}"
+        self.setPlotSubtitle(subtitle)
+
         self.setBottomAxisText(self.xlabel())
         self.setLeftAxisText(self.ylabel())
 
