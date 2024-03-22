@@ -240,9 +240,11 @@ class ChartView(QtWidgets.QWidget):
         # TODO: title -- first and last start dates of all curves
         self.setPlotTitle("data from ... (TODO)")
         iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
-        self.setPlotSubtitle(
-            f"catalog={self.parent.catalogName()!r}  plotted: {iso8601}"
-        )
+        if self.parent is None:
+            self.setPlotSubtitle(f"plotted: {iso8601}")
+        else:
+            cat_name = self.parent.catalogName() or ""
+            self.setPlotSubtitle(f"catalog={cat_name!r}  plotted: {iso8601}")
         self.setBottomAxisText(self.xlabel())
         self.setLeftAxisText(self.ylabel())
 
