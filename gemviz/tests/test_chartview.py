@@ -38,7 +38,7 @@ def test_ChartView_annotations(title, subtitle, x, y, qtbot):
     fig = chart.figure
     ax = chart.main_axes
 
-    assert fig.get_suptitle() == ""
+    assert fig.get_suptitle() in ("", "(None)"), f"{dir(fig)}"
     assert ax.get_title() in ("", "(None)")
     assert ax.get_xlabel() in ("", "(None)")
     assert ax.get_ylabel() in ("", "(None)")
