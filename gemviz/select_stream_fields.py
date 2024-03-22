@@ -7,7 +7,9 @@ QWidget to select stream data fields for plotting.
     ~to_datasets
 """
 
+import datetime
 import logging
+import xarray
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -139,6 +141,12 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         if x_axis == "time" and min(x_data) > chartview.TIMESTAMP_LIMIT:
             x_units = ""
             x_datetime = True
+            x_data = xarray.DataArray(
+                data=list(map(datetime.datetime.fromtimestamp, x_data[x_axis].data)),
+                name=x_axis,
+                # dims=x_axis,
+                # coords=?,
+            )
 
     datasets = []
     y_selections = selections.get("Y", [])
@@ -160,13 +168,11 @@ def to_datasets(run, stream_name, selections, scan_id=None):
             )
 
         run_uid = run.get_run_md("start", "uid")
-        ds_options["name"] = f"{y_axis} ({run.summary()} {run_uid[:7]})"
-        ds_options["pen"] = color  # line color
-        ds_options["symbol"] = symbol
-        ds_options["symbolBrush"] = color  # fill color
-        ds_options["symbolPen"] = color  # outline color
-        # size in pixels (if pxMode==True, then data coordinates.)
-        ds_options["symbolSize"] = 10  # default: 10
+        # keys used here must match the plotting back-end (matplotlib)
+        ds_options["label"] = f"{y_axis} ({run.summary()} {run_uid[:7]})"
+        ds_options["color"] = color  # line color
+        ds_options["marker"] = symbol
+        ds_options["markersize"] = 5  # default: 10
 
         if x_data is None:
             ds = [y_data]  # , title=f"{y_axis} v index"
