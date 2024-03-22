@@ -6,20 +6,27 @@ Charting widget
     ~auto_color
     ~auto_symbol
     ~ChartView
+
+.. seealso:: https://matplotlib.org/stable/users/index.html
+
+Plot Symbols
+
+# https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
+# from matplotlib.lines import Line2D
+# print(Line2D.markers)
+
 """
 
 import datetime
 from itertools import cycle
 
-import pyqtgraph as pg
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
 from PyQt5 import QtWidgets
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 
-# https://pyqtgraph.readthedocs.io/en/latest/api_reference/graphicsItems/scatterplotitem.html#pyqtgraph.ScatterPlotItem.setSymbol
-# https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
-# Do NOT sort these colors alphabetically!  There should be obvious
-# contrast between adjacent colors.
 PLOT_COLORS = """
     r g b c m
     goldenrod
@@ -30,15 +37,32 @@ PLOT_COLORS = """
     teal
     olive
     lightcoral
+    gold
     cornflowerblue
     forestgreen
     salmon
 """.split()
-PLOT_SYMBOLS = """o + x star s d t t2 t3""".split()
+"""
+Select subset of the MatPlotLib named colors.
 
-pg.setConfigOption("background", "w")
-pg.setConfigOption("foreground", "k")
-GRID_OPACITY = 0.1
+Do **NOT** sort these colors alphabetically!  There should be obvious
+contrast between adjacent colors.
+
+.. seealso:: https://matplotlib.org/stable/gallery/color/named_colors.html
+.. seealso:: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
+"""
+
+PLOT_SYMBOLS = """o + x * s d ^ v""".split()
+"""
+Select subset of the MatPlotLib marker symbols.
+
+To print the full dictionary of symbols available::
+
+    from matplotlib.lines import Line2D
+    print(Line2D.markers)
+
+.. seealso:: https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
+"""
 
 _AUTO_COLOR_CYCLE = cycle(PLOT_COLORS)
 _AUTO_SYMBOL_CYCLE = cycle(PLOT_SYMBOLS)
@@ -56,12 +80,11 @@ def auto_symbol():
 
 class ChartView(QtWidgets.QWidget):
     """
-    PyqtGraph PlotWidget
+    MatPlotLib Figure
 
     .. autosummary::
 
         ~plot
-        ~setAxisDateTime
         ~setAxisLabel
         ~setAxisUnits
         ~setBottomAxisText
@@ -79,19 +102,18 @@ class ChartView(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
 
-        self.plot_widget = pg.PlotWidget()
-        self.plot_widget.addLegend()
-        self.plot_widget.plotItem.showAxes(True)
-        self.plot_widget.plotItem.showGrid(x=True, y=True, alpha=GRID_OPACITY)
-        # see: https://stackoverflow.com/a/70200326
-        label = pg.LabelItem(
-            f"plot: {datetime.datetime.now()}", color="lightgrey", size="8pt"
-        )
-        label.setParentItem(self.plot_widget.plotItem)
-        label.anchor(itemPos=(0, 1), parentPos=(0, 1))
+        # Remember these Matplotlib figure, canvas, and axes objects.
+        self.figure = Figure()
+        self.canvas = FigureCanvas(self.figure)
+        self.main_axes = self.figure.add_subplot(111)
+
+        # Adjust margins
+        self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
+        self.setOptions()
 
         config = {
             "title": self.setPlotTitle,
+            "subtitle": self.setPlotSubtitle,
             "y": self.setLeftAxisText,
             "x": self.setBottomAxisText,
             "x_units": self.setBottomAxisUnits,
@@ -102,27 +124,65 @@ class ChartView(QtWidgets.QWidget):
             func(kwargs.get(k))
 
         # QWidget Layout
-        layout = QtWidgets.QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
+        # Add directly unless we plan to use the toolbar later.
+        layout.addWidget(NavigationToolbar(self.canvas, self))
+        layout.addWidget(self.canvas)
 
         # plot
         size.setHorizontalStretch(4)
-        self.plot_widget.setSizePolicy(size)
-        layout.addWidget(self.plot_widget)
+
+        self.curves = {}  # all the curves on the graph, key = label
+
+    def addCurve(self, *args, **kwargs):
+        """Add to graph."""
+        plot_obj = self.main_axes.plot(*args, **kwargs)
+        self.updatePlot()
+        # Add to the dictionary
+        label = kwargs.get("label")
+        if label is None:
+            raise KeyError("This curve has no label.")
+        self.curves[label] = plot_obj[0], *args
+
+    def option(self, key, default=None):
+        return self.plotOptions().get(key, default)
 
     def plot(self, *args, **kwargs):
-        return self.plot_widget.plot(*args, **kwargs)
+        """
+        Plot from the supplied (x, y) or (y) data.
+
+        PARAMETERS
+
+        - args tuple: x & y xarray.DataArrays.  When only y is supplied, x will
+          be the index.
+        - kwargs (dict): dict(str, obj)
+        """
+        self.setOptions(**kwargs.get("plot_options", {}))
+        ds_options = kwargs.get("ds_options", kwargs)
+        self.main_axes.axis("on")
+
+        label = ds_options.get("label")
+        if label is None:
+            raise KeyError("This curve has no label.")
+        if label not in self.curves:
+            self.addCurve(*args, **ds_options)
+
+    def plotOptions(self):
+        return self._plot_options
 
     def setAxisDateTime(self, choice):
-        if choice:
-            item = pg.DateAxisItem(orientation="bottom")
-            self.plot_widget.setAxisItems({"bottom": item})
+        pass  # data provided in datetime objects
 
     def setAxisLabel(self, axis, text):
-        self.plot_widget.plotItem.setLabel(axis, text)
+        set_axis_label_method = {
+            "bottom": self.main_axes.set_xlabel,
+            "left": self.main_axes.set_ylabel,
+        }[axis]
+        set_axis_label_method(text)
 
     def setAxisUnits(self, axis, text):
-        self.plot_widget.plotItem.axes[axis]["item"].labelUnits = text
+        pass  # TODO: not implemented yet
 
     def setBottomAxisText(self, text):
         self.setAxisLabel("bottom", text)
@@ -130,14 +190,87 @@ class ChartView(QtWidgets.QWidget):
     def setBottomAxisUnits(self, text):
         self.setAxisUnits("bottom", text)
 
+    def setConfigPlot(self, grid=True):
+        self.setLeftAxisText(self.ylabel())
+        self.setBottomAxisText(self.xlabel())
+        self.setPlotTitle(self.title())
+        if grid:
+            self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+        else:
+            self.main_axes.grid(False)
+        self.canvas.draw()
+
     def setLeftAxisText(self, text):
         self.setAxisLabel("left", text)
 
     def setLeftAxisUnits(self, text):
         self.setAxisUnits("left", text)
 
+    def setOption(self, key, value):
+        self._plot_options[key] = value
+
+    def setOptions(self, **options):
+        self._plot_options = options
+
     def setPlotTitle(self, text):
-        self.plot_widget.plotItem.setTitle(text)
+        if text is not None:
+            self.figure.suptitle(text)
+
+    def setPlotSubtitle(self, text):
+        if text is not None:
+            self.main_axes.set_title(text, size=7, x=1, ha="right", color="lightgrey")
+
+    def setSubtitle(self, text):
+        self.setOption("subtitle", text)
+
+    def setTitle(self, text):
+        self.setOption("title", text)
+
+    def setXLabel(self, text):
+        self.setOption("xlabel", text)
+
+    def setYLabel(self, text):
+        self.setOption("ylabel", text)
+
+    def subtitle(self):
+        return self.option("subtitle")
+
+    def title(self):
+        return self.option("title")
+
+    def updateLegend(self):
+        labels = self.main_axes.get_legend_handles_labels()[1]
+        valid_labels = [label for label in labels if not label.startswith("_")]
+        if valid_labels:
+            self.main_axes.legend()
+
+    def updatePlot(self):
+        """Update annotations (titles & axis labels)."""
+        # TODO: title -- first and last start dates of all curves
+        self.setPlotTitle("data from ... (TODO)")
+
+        iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+        subtitle = f"plotted: {iso8601}"
+        if self.parent is not None:
+            cat_name = self.parent.catalogName() or ""
+            subtitle = f"catalog={cat_name!r}  {subtitle}"
+        self.setPlotSubtitle(subtitle)
+
+        self.setBottomAxisText(self.xlabel())
+        self.setLeftAxisText(self.ylabel())
+
+        # Recompute the axes limits and autoscale:
+        self.main_axes.relim()
+        self.main_axes.autoscale_view()
+        self.updateLegend()
+        self.setConfigPlot()
+        self.canvas.draw()
+
+    def xlabel(self):
+        return self.option("xlabel")
+
+    def ylabel(self):
+        return self.option("ylabel")
 
 
 # -----------------------------------------------------------------------------

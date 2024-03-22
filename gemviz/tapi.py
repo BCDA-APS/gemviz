@@ -250,8 +250,8 @@ class RunMetadata:
     def summary(self):
         """Summary (text) of this run."""
         return (
-            f"{self.get_run_md('start', 'plan_name', '')}"
-            f" {self.get_run_md('start', 'scan_id', '?')}"
+            f"{self.get_run_md('start', 'scan_id', '?')}"
+            f" {self.get_run_md('start', 'plan_name', '')}"
             f" {self.get_run_md('start', 'title', '')}"
         ).strip()
 
