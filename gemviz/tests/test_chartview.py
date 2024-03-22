@@ -38,12 +38,18 @@ def test_ChartView_annotations(title, subtitle, x, y, qtbot):
     fig = chart.figure
     ax = chart.main_axes
 
-    assert fig.get_suptitle() in ("", "(None)"), f"{dir(fig)}"
+    try:
+        # new method in MPL 3.8
+        assert fig.get_suptitle() in ("", "(None)"), f"{dir(fig)}"
+        has_get_suptitle = True
+    except AttributeError:
+        # not in MPL 3.7.3
+        has_get_suptitle = False
     assert ax.get_title() in ("", "(None)")
     assert ax.get_xlabel() in ("", "(None)")
     assert ax.get_ylabel() in ("", "(None)")
 
-    if title is not None:
+    if title is not None and has_get_suptitle:
         chart.setPlotTitle(title)
         assert fig.get_suptitle() == title
 
