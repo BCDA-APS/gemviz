@@ -7,7 +7,7 @@ from .. import chartview
 @pytest.mark.parametrize(
     "quantity, series, auto",
     [
-        [16, chartview.PLOT_COLORS, chartview.auto_color],
+        [17, chartview.PLOT_COLORS, chartview.auto_color],
         [8, chartview.PLOT_SYMBOLS, chartview.auto_symbol],
     ],
 )

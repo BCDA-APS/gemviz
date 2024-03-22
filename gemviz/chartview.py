@@ -37,6 +37,7 @@ PLOT_COLORS = """
     teal
     olive
     lightcoral
+    gold
     cornflowerblue
     forestgreen
     salmon
