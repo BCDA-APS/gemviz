@@ -56,6 +56,7 @@ def auto_symbol():
     """Returns next symbol for scatter plots."""
     return next(_AUTO_SYMBOL_CYCLE)
 
+
 # https://matplotlib.org/stable/users/index.html
 
 
@@ -144,7 +145,7 @@ class ChartView(QtWidgets.QWidget):
 
         PARAMETERS
 
-        - args tuple: x & y xarray.Datasets
+        - args tuple: x & y xarray.DataArrays
         - kwargs (dict): dict(str, obj)
         """
         self.setOptions(**kwargs.get("plot_options", {}))
