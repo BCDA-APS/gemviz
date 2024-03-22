@@ -209,7 +209,7 @@ class ChartView(QtWidgets.QWidget):
 
     def setPlotSubtitle(self, text):
         if text is not None:
-            self.main_axes.set_title(text, size=8)
+            self.main_axes.set_title(text, size=7, x=1, ha="right", color="lightgrey")
 
     def setSubtitle(self, text):
         self.setOption("subtitle", text)
@@ -236,9 +236,13 @@ class ChartView(QtWidgets.QWidget):
             self.main_axes.legend()
 
     def updatePlot(self):
-        # Update labels and title:
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.setPlotSubtitle(now)
+        # Update labels and titles:
+        # TODO: title -- first and last start dates of all curves
+        self.setPlotTitle("data from ... (TODO)")
+        iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+        self.setPlotSubtitle(
+            f"catalog={self.parent.catalogName()!r}  plotted: {iso8601}"
+        )
         self.setBottomAxisText(self.xlabel())
         self.setLeftAxisText(self.ylabel())
 
