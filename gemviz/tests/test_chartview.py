@@ -8,7 +8,7 @@ from .. import chartview
     "quantity, series, auto",
     [
         [16, chartview.PLOT_COLORS, chartview.auto_color],
-        [9, chartview.PLOT_SYMBOLS, chartview.auto_symbol],
+        [8, chartview.PLOT_SYMBOLS, chartview.auto_symbol],
     ],
 )
 def test_auto_series(quantity, series, auto):
@@ -24,36 +24,42 @@ def test_auto_series(quantity, series, auto):
     assert series == series2
 
 
-# FIXME: this is pyqtgraph
 @pytest.mark.parametrize("title", [None, "one line text"])
+@pytest.mark.parametrize("subtitle", [None, "the subtitle"])
 @pytest.mark.parametrize("x", [None, "axis label"])
 @pytest.mark.parametrize("y", [None, "axis label"])
-def test_ChartView_labels(title, x, y, qtbot):
+def test_ChartView_annotations(title, subtitle, x, y, qtbot):
     chart = chartview.ChartView(None)
     assert chart.parent is None
 
     qtbot.addWidget(chart)
     chart.show()
 
-    pw = chart.plot_widget  # FIXME: this is pyqtgraph
-    assert pw.plotItem.titleLabel.text == ""
-    assert pw.getAxis("bottom").label.toPlainText() in ("", "(None)")
-    assert pw.getAxis("left").label.toPlainText() in ("", "(None)")
+    fig = chart.figure
+    ax = chart.main_axes
+
+    assert fig.get_suptitle() == ""
+    assert ax.get_title() in ("", "(None)")
+    assert ax.get_xlabel() in ("", "(None)")
+    assert ax.get_ylabel() in ("", "(None)")
 
     if title is not None:
         chart.setPlotTitle(title)
-        assert pw.plotItem.titleLabel.text == title
+        assert fig.get_suptitle() == title
+
+    if subtitle is not None:
+        chart.setPlotSubtitle(subtitle)
+        assert ax.get_title() == subtitle
 
     if x is not None:
         chart.setBottomAxisText(x)
-        assert pw.getAxis("bottom").label.toPlainText().strip() == x
+        assert ax.get_xlabel().strip() == x
 
     if y is not None:
         chart.setLeftAxisText(y)
-        assert pw.getAxis("left").label.toPlainText().strip() == y
+        assert ax.get_ylabel().strip() == y
 
 
-# FIXME: this is pyqtgraph
 # TODO: test with timestamps
 # fmt: off
 @pytest.mark.parametrize("x", [np.array([1, 2, 3, 4, 5]), None])
@@ -63,24 +69,33 @@ def test_ChartView_labels(title, x, y, qtbot):
 # fmt: on
 def test_ChartView_data(x, y, qtbot):
     chart = chartview.ChartView(None)
+    label = "testing"
     if x is None:
-        chart.plot(y)
+        chart.plot(y, label=label)
     else:
-        chart.plot(x, y)
+        chart.plot(x, y, label=label)
     qtbot.addWidget(chart)
     chart.show()
 
     # Test for the plot data.
-    pw = chart.plot_widget  # FIXME: this is pyqtgraph
-    curves = pw.getPlotItem().curves
-
-    if len(curves) > 0:
-        curve = curves[0].curve
-        assert curve.yData.shape == y.shape  # compare shapes
-        assert (curve.yData == y).all()  # compare values
+    if len(chart.curves) > 0:
+        data = chart.curves[label]
         if x is None:
-            assert curve.xData.shape == y.shape
-            assert (curve.xData != x).all()
+            assert len(data) == 2
+            line2d, yraw = data
+            # With only y data, Line2D fills x with index number, starting at 0.
+            assert len(line2d.get_data()) == 2
+            xarr, yarr = line2d.get_data()
+            assert isinstance(yarr, type(yraw))
+            assert len(yarr) == len(yraw)
+            assert xarr[-1] == len(yraw) - 1
         else:
-            assert curve.xData.shape == x.shape
-            assert (curve.xData == x).all()
+            assert len(data) == 3
+            line2d, xraw, yraw = data
+            assert xraw.shape == yraw.shape
+            assert len(line2d.get_data()) == 2
+            xarr, yarr = line2d.get_data()
+            assert isinstance(xarr, type(xraw))
+            assert isinstance(yarr, type(yraw))
+            assert len(xarr) == len(xraw)
+            assert len(yarr) == len(yraw)

@@ -125,15 +125,14 @@ class ChartView(QtWidgets.QWidget):
 
     def addCurve(self, *args, **kwargs):
         """Add to graph."""
-        x, y = args
         # print(f"addCurve(): {kwargs=}")
-        plot_obj = self.main_axes.plot(x, y, **kwargs)
+        plot_obj = self.main_axes.plot(*args, **kwargs)
         self.updatePlot()
         # Add to the dictionary
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        self.curves[label] = plot_obj[0], x, y
+        self.curves[label] = plot_obj[0], *args
         # TODO: # Add to CurveBox
 
     def option(self, key, default=None):
@@ -141,11 +140,12 @@ class ChartView(QtWidgets.QWidget):
 
     def plot(self, *args, **kwargs):
         """
-        Plot from the supplied data (x, y) data.
+        Plot from the supplied (x, y) or (y) data.
 
         PARAMETERS
 
-        - args tuple: x & y xarray.DataArrays
+        - args tuple: x & y xarray.DataArrays.  When only y is supplied, x will
+          be the index.
         - kwargs (dict): dict(str, obj)
         """
         self.setOptions(**kwargs.get("plot_options", {}))
