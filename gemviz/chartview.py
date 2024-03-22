@@ -6,6 +6,15 @@ Charting widget
     ~auto_color
     ~auto_symbol
     ~ChartView
+
+.. seealso:: https://matplotlib.org/stable/users/index.html
+
+Plot Symbols
+
+# https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
+# from matplotlib.lines import Line2D
+# print(Line2D.markers)
+
 """
 
 import datetime
@@ -18,10 +27,6 @@ from PyQt5 import QtWidgets
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 
-# https://matplotlib.org/stable/gallery/color/named_colors.html
-# https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
-# Do NOT sort these colors alphabetically!  There should be obvious
-# contrast between adjacent colors.
 PLOT_COLORS = """
     r g b c m
     goldenrod
@@ -36,12 +41,27 @@ PLOT_COLORS = """
     forestgreen
     salmon
 """.split()
-# https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
-# from matplotlib.lines import Line2D
-# print(Line2D.markers)
-PLOT_SYMBOLS = """o + x * s d ^ v""".split()
+"""
+Select subset of the MatPlotLib named colors.
 
-GRID_OPACITY = 0.1
+Do **NOT** sort these colors alphabetically!  There should be obvious
+contrast between adjacent colors.
+
+.. seealso:: https://matplotlib.org/stable/gallery/color/named_colors.html
+.. seealso:: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
+"""
+
+PLOT_SYMBOLS = """o + x * s d ^ v""".split()
+"""
+Select subset of the MatPlotLib marker symbols.
+
+To print the full dictionary of symbols available::
+
+    from matplotlib.lines import Line2D
+    print(Line2D.markers)
+
+.. seealso:: https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
+"""
 
 _AUTO_COLOR_CYCLE = cycle(PLOT_COLORS)
 _AUTO_SYMBOL_CYCLE = cycle(PLOT_SYMBOLS)
@@ -55,9 +75,6 @@ def auto_color():
 def auto_symbol():
     """Returns next symbol for scatter plots."""
     return next(_AUTO_SYMBOL_CYCLE)
-
-
-# https://matplotlib.org/stable/users/index.html
 
 
 class ChartView(QtWidgets.QWidget):
@@ -84,20 +101,14 @@ class ChartView(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
         )
 
-        # Create a Matplotlib figure and canvas
+        # Remember these Matplotlib figure, canvas, and axes objects.
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         self.main_axes = self.figure.add_subplot(111)
+
         # Adjust margins
         self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
-        # self.figure.tight_layout()
         self.setOptions()
-
-        # https://stackoverflow.com/questions/16066695/add-an-extra-information-in-a-python-plot
-        # https://matplotlib.org/stable/gallery/text_labels_and_annotations/annotation_demo.html
-
-        # now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # self.figure.text(0, 0, f"plot: {now}", ha="left", size=8, color="lightgrey")
 
         config = {
             "title": self.setPlotTitle,
@@ -125,7 +136,6 @@ class ChartView(QtWidgets.QWidget):
 
     def addCurve(self, *args, **kwargs):
         """Add to graph."""
-        # print(f"addCurve(): {kwargs=}")
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.updatePlot()
         # Add to the dictionary
@@ -133,7 +143,6 @@ class ChartView(QtWidgets.QWidget):
         if label is None:
             raise KeyError("This curve has no label.")
         self.curves[label] = plot_obj[0], *args
-        # TODO: # Add to CurveBox
 
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
@@ -172,7 +181,6 @@ class ChartView(QtWidgets.QWidget):
         set_axis_label_method(text)
 
     def setAxisUnits(self, axis, text):
-        # self.plot_widget.plotItem.axes[axis]["item"].labelUnits = text
         pass  # TODO: not implemented yet
 
     def setBottomAxisText(self, text):
@@ -236,7 +244,7 @@ class ChartView(QtWidgets.QWidget):
             self.main_axes.legend()
 
     def updatePlot(self):
-        # Update labels and titles:
+        """Update annotations (titles & axis labels)."""
         # TODO: title -- first and last start dates of all curves
         self.setPlotTitle("data from ... (TODO)")
 
@@ -249,8 +257,6 @@ class ChartView(QtWidgets.QWidget):
 
         self.setBottomAxisText(self.xlabel())
         self.setLeftAxisText(self.ylabel())
-
-        # TODO: curveBox - analysis of selected curve
 
         # Recompute the axes limits and autoscale:
         self.main_axes.relim()
