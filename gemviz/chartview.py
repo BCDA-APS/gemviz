@@ -1,19 +1,22 @@
 """
-Charting widget
+Qt widget that shows the plot.
 
 .. autosummary::
 
     ~auto_color
     ~auto_symbol
     ~ChartView
+    ~PLOT_COLORS
+    ~PLOT_SYMBOLS
+    ~TIMESTAMP_LIMIT
 
-.. seealso:: https://matplotlib.org/stable/users/index.html
+:see: https://matplotlib.org/stable/users/index.html
 
-Plot Symbols
+..  note:: To see the full list of plot symbols from
+    MatPlotLib (https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html)::
 
-# https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
-# from matplotlib.lines import Line2D
-# print(Line2D.markers)
+        from matplotlib.lines import Line2D
+        print(Line2D.markers)
 
 """
 
@@ -26,6 +29,7 @@ from matplotlib.figure import Figure
 from PyQt5 import QtWidgets
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
+"""Earliest date for a run in any Bluesky catalog (1990-01-01)."""
 
 PLOT_COLORS = """
     r g b c m
@@ -48,8 +52,8 @@ Select subset of the MatPlotLib named colors.
 Do **NOT** sort these colors alphabetically!  There should be obvious
 contrast between adjacent colors.
 
-.. seealso:: https://matplotlib.org/stable/gallery/color/named_colors.html
-.. seealso:: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
+* :see: https://matplotlib.org/stable/gallery/color/named_colors.html
+* :see: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
 """
 
 PLOT_SYMBOLS = """o + x * s d ^ v""".split()
@@ -61,9 +65,10 @@ To print the full dictionary of symbols available::
     from matplotlib.lines import Line2D
     print(Line2D.markers)
 
-.. seealso:: https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
+:see: https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html
 """
 
+# iterators for colors & symbols
 _AUTO_COLOR_CYCLE = cycle(PLOT_COLORS)
 _AUTO_SYMBOL_CYCLE = cycle(PLOT_SYMBOLS)
 
