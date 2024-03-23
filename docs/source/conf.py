@@ -61,11 +61,12 @@ html_theme = "alabaster"
 html_static_path = ["_static"]
 
 autodoc_mock_imports = """
-    matplotlib
-    tiled
     h5py
+    matplotlib
     numpy
+    pyqt5
     pyRestTable
     spec2nexus
+    tiled
     xarray
 """.split()
