@@ -58,6 +58,9 @@ jobs:
       id: deployment
       run: make -C docs html
 
+    - name: Diagnostic
+      run: ls -lAFgh ${{ steps.deployment.outputs.artifact }}
+
     - name: Upload Docs ZIP file as artifact
       uses: actions/upload-artifact@v4
       with:
