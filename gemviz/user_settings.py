@@ -26,7 +26,7 @@ This module uses QtCore.QSettings.
     For now, keep the windows on the main screen
     or learn how to edit the settings file.
 
-.. see:: https://github.com/prjemian/assign_gup/blob/master/src/Assign_GUP/settings.py
+:see:: https://github.com/prjemian/assign_gup/blob/master/src/Assign_GUP/settings.py
 
 .. autosummary::
 
