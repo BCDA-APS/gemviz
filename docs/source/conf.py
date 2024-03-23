@@ -59,3 +59,13 @@ exclude_patterns = []
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
+
+autodoc_mock_imports = """
+    matplotlib
+    tiled
+    h5py
+    numpy
+    pyRestTable
+    spec2nexus
+    xarray
+""".split()
