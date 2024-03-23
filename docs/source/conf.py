@@ -5,10 +5,10 @@
 
 # -- Path setup --------------------------------------------------------------
 
-from importlib.metadata import version
 import pathlib
 import sys
 import tomllib
+from importlib.metadata import version
 
 sys.path.insert(0, str(pathlib.Path().absolute().parent.parent))
 import gemviz  # noqa
