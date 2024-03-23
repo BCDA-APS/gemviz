@@ -49,6 +49,7 @@ extensions = """
     sphinx.ext.todo
     sphinx.ext.viewcode
 """.split()
+extensions.append("sphinx_tabs.tabs")  # this must be last
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -57,11 +58,13 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "alabaster"
 html_static_path = ["_static"]
+html_theme = "pydata_sphinx_theme"
 
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports
 autodoc_mock_imports = """
     h5py
+    httpx
     matplotlib
     numpy
     PyQt5
@@ -69,4 +72,5 @@ autodoc_mock_imports = """
     spec2nexus
     tiled
     xarray
+    yaml
 """.split()

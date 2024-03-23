@@ -1,5 +1,6 @@
 coverage
 coveralls
+pydata-sphinx-theme
 pytz
 setuptools-scm
 sphinx
