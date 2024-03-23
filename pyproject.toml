@@ -65,6 +65,9 @@ gemviz = "gemviz.app:main"
 [tool.black]
 line-length = 88
 
+[tool.copyright]
+copyright = "2023-2024, UChicago Argonne, LLC"
+
 [tool.flake8]
 max-line-length = 88
 extend-ignore = ["E501"]
