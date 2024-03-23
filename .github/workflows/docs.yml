@@ -59,13 +59,15 @@ jobs:
       run: make -C docs html
 
     - name: Diagnostic
-      run: ls -lAFgh ${{ steps.deployment.outputs.artifact }}
+      run: ls -lAFgh docs/build/html
+      # ${{ steps.deployment.outputs.artifact }}
 
     - name: Upload Docs ZIP file as artifact
       uses: actions/upload-artifact@v4
       with:
         name: gemviz-docs
-        path: ${{ steps.deployment.outputs.artifact }}
+        path: docs/build/html
+        # ${{ steps.deployment.outputs.artifact }}
     
     - name: Publish (push gh-pages branch) only on demand
       uses: peaceiris/actions-gh-pages@v3
