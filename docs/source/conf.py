@@ -64,7 +64,7 @@ autodoc_mock_imports = """
     h5py
     matplotlib
     numpy
-    pyqt5
+    PyQt5
     pyRestTable
     spec2nexus
     tiled
