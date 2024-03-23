@@ -12,3 +12,11 @@ Command-line
 ------------
 
 todo
+
+.. todo:
+    Export
+    ------
+
+    * data
+    * plot script (such as SVG)
+    * plot image
