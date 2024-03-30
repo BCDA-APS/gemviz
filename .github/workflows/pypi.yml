@@ -6,7 +6,7 @@ on:
       branches:
         - main
       tags:
-        - '*'  # all tags
+        - "*"  # all tags
 
 jobs:
   publish-to-pypi:
@@ -19,6 +19,8 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@v5
+      with:
+        python-version: "3.11" 
 
     - name: Install pypa/build
       run: >-
