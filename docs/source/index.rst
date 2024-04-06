@@ -19,11 +19,11 @@ gemviz: View Bluesky Data
       :link-type: doc
 
     .. grid-item-card:: :material-regular:`install_desktop;3em` Install
-      :link: user_guide
+      :link: install
       :link-type: doc
 
     .. grid-item-card:: :material-regular:`api;3em` API
-      :link: user_guide
+      :link: api
       :link-type: doc
 
 .. toctree::
