@@ -43,7 +43,7 @@ jobs:
       - name: Run isort
         uses: isort/isort-action@master
 
-  test-matrix:
+  tests:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     needs: lint
