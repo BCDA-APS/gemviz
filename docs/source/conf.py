@@ -48,6 +48,7 @@ extensions = """
     sphinx.ext.mathjax
     sphinx.ext.todo
     sphinx.ext.viewcode
+    sphinx_design
 """.split()
 extensions.append("sphinx_tabs.tabs")  # this must be last
 
@@ -60,6 +61,7 @@ exclude_patterns = []
 
 html_static_path = ["_static"]
 html_theme = "pydata_sphinx_theme"
+html_title = f"{project} {version}"
 
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports
 autodoc_mock_imports = """
