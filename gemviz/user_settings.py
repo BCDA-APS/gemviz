@@ -8,11 +8,12 @@ Use this for remembering:
 
 
 The name of the settings file is given in the main window.
-Note, the settings file may have the suffix ".ini" on some operating systems.
+Note, the settings file may have the suffix ``.ini`` on some operating systems.
 Remove the settings file to clear any settings.
-There is also a menu item to clear this file and reset it to defaults.
 
-This module uses QtCore.QSettings.
+.. TODO: There is also a menu item to clear this file and reset it to defaults.
+
+This module uses ``QtCore.QSettings``.
 (https://doc.qt.io/qtforpython-5/PySide2/QtCore/QSettings.html#qsettings)
 
 ..  note:: Multi-monitor support : method restoreWindowGeometry()
@@ -26,7 +27,7 @@ This module uses QtCore.QSettings.
     For now, keep the windows on the main screen
     or learn how to edit the settings file.
 
-.. see:: https://github.com/prjemian/assign_gup/blob/master/src/Assign_GUP/settings.py
+:see: https://github.com/prjemian/assign_gup/blob/master/src/Assign_GUP/settings.py
 
 .. autosummary::
 
@@ -40,11 +41,12 @@ import logging
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-from . import __package_name__
-from . import __settings_orgName__
+from .__init__ import __package_name__
+from .__init__ import __settings_orgName__
 
 GLOBAL_GROUP = "___global___"
 logger = logging.getLogger(__name__)
+settings = None  # Edge case during Sphinx documentation.
 
 
 class ApplicationQSettings(QtCore.QSettings):
@@ -69,13 +71,16 @@ class ApplicationQSettings(QtCore.QSettings):
         ~restoreSplitter
     """
 
-    def __init__(self, orgName, appName):
-        QtCore.QSettings.__init__(
-            self,
+    def __init__(self, *args):
+        if len(args) != 2:  # Edge case during Sphinx documentation.
+            return settings  # return the singleton
+        organization, application = args
+        super().__init__(
+            # self,
             QtCore.QSettings.IniFormat,
             QtCore.QSettings.UserScope,
-            orgName,
-            appName,
+            organization,
+            application,
         )
         self.init_global_keys()
 
@@ -249,32 +254,5 @@ class ApplicationQSettings(QtCore.QSettings):
             splitter.setSizes(map(int, str(sizes).split()))
 
 
-# create _the_ singleton object
 settings = ApplicationQSettings(__settings_orgName__, __package_name__)
-
-
-# def main():
-#     ss = settings
-#     print(f"{ss=}")
-
-#     print(f"{ss.fileName()=}")
-#     print(f"{ss.applicationName()=}")
-#     print(f"{ss.organizationName()=}")
-#     print(f"{ss.status()=}")
-#     ss.setKey("billy/goat", "gruff")
-#     for key in ss.allKeys():
-#         print(f"{key=} {ss.getKey(key)=} {ss._keySplit_(key)=}")
-#     print(f"{ss.getKey(None)=}")
-#     ss.resetDefaults()
-
-
-# if __name__ == "__main__":
-#     main()
-
-# -----------------------------------------------------------------------------
-# :copyright: (c) 2023-2024, UChicago Argonne, LLC
-#
-# Distributed under the terms of the Argonne National Laboratory Open Source License.
-#
-# The full license is in the file LICENSE.txt, distributed with this software.
-# -----------------------------------------------------------------------------
+"""Application settings object (a singleton)."""

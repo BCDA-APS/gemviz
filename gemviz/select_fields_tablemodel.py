@@ -25,7 +25,7 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
 
     ~SelectFieldsTableModel
     ~ColumnDataType
-    ~FieldSelectionRuleType
+    ~FieldRuleType
     ~TableColumn
     ~TableField
 """
@@ -90,30 +90,12 @@ XY_COLUMNS = [
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
 ]
-MDAVIZ_COLUMNS = XY_COLUMNS + [
-    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Description", ColumnDataType.text),
-    TableColumn("PV", ColumnDataType.text),
-]
 XY_FIELDS = [
     TableField("motor", "X", description="some motor"),
     TableField("I", "Y"),
     TableField("I00", "Y"),
     TableField("scint"),
     TableField("diode"),
-]
-MDAVIZ_FIELDS = [
-    TableField("time", description="epoch"),
-    TableField("motor", "X", pv="ioc:m1"),
-    TableField("I", "Y"),
-    TableField("I0", "Mon", description="use as monitor", pv="ioc:I0"),
-    TableField("I00", "Y"),
-    TableField("I000"),
-    TableField("scint"),
-    TableField("diode"),
-    TableField("ROI1"),
-    TableField("ROI2"),
-    TableField("ROI3"),
 ]
 # fmt: on
 
