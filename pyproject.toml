@@ -19,7 +19,7 @@ maintainers = [
 ]
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.8, <3.12"
+requires-python = ">=3.9"
 keywords = ["bluesky", "databroker", "tiled", "catalog"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "gemviz/LICENSE"}
@@ -31,10 +31,6 @@ classifiers = [
     "License :: Freely Distributable",
     "License :: Public Domain",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Astronomy",

@@ -50,11 +50,10 @@ jobs:
     strategy:
       matrix:
         python-version:
-          # - "3.12"  # not yet
+          - "3.12"  # not yet
           - "3.11"
           - "3.10"
           - "3.9"
-          - "3.8"
       max-parallel: 5
     env:
       DISPLAY: ":99.0"
@@ -84,7 +83,7 @@ jobs:
             xvfb
 
       - name: Create Python ${{ matrix.python-version }} environment
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v2
         with:
           cache-environment: true
           cache-environment-key: env-key-${{ matrix.python-version }}
