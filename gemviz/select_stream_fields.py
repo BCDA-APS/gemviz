@@ -167,9 +167,12 @@ def to_datasets(run, stream_name, selections, scan_id=None):
                 f" {y_axis} shape is {y_shape}"
             )
 
-        run_uid = run.get_run_md("start", "uid")
         # keys used here must match the plotting back-end (matplotlib)
-        ds_options["label"] = f"{y_axis} ({run.summary()} {run_uid[:7]})"
+        scan_id = run.get_run_md("start", "scan_id")
+        # verbose labels
+        # ds_options["label"] = f"{y_axis} ({run.summary()} {run.uid[:7]})"
+        # terse labels
+        ds_options["label"] = f"{scan_id} ({run.uid[:7]})"
         ds_options["color"] = color  # line color
         ds_options["marker"] = symbol
         ds_options["markersize"] = 5  # default: 10
