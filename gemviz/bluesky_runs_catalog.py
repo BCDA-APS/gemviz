@@ -30,6 +30,7 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def __init__(self, parent):
         self.parent = parent
+        self._title_keys = []  # for the plot title
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -90,6 +91,8 @@ class BRC_MVC(QtWidgets.QWidget):
 
         # TODO: make the plots configurable
         scan_id = run.get_run_md("start", "scan_id")
+        # key = f"{scan_id}:{run.uid[:5]}"
+        key = f"{scan_id}"
 
         # setup datasets
         try:
@@ -107,6 +110,7 @@ class BRC_MVC(QtWidgets.QWidget):
         widget = layout.itemAt(0).widget()
         if not isinstance(widget, ChartView) or action == "replace":
             widget = ChartView(self, **options)  # Make a blank chart.
+            self._title_keys = []
             if action == "add":
                 action = "replace"
 
@@ -114,8 +118,11 @@ class BRC_MVC(QtWidgets.QWidget):
             raise ValueError(f"Unsupported action: {action=}")
 
         if action in ("replace", "add"):
+            if key not in self._title_keys:
+                self._title_keys.append(key)
+            title = f"scan(s): {', '.join(sorted(self._title_keys))}"
             for ds, ds_options in datasets:
-                widget.plot(*ds, **ds_options)
+                widget.plot(*ds, title=title, **ds_options)
             self.brc_run_viz.setPlot(widget)
 
     def doRunSelectedSlot(self, run):

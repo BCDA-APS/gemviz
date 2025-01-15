@@ -140,10 +140,10 @@ class ChartView(QtWidgets.QWidget):
 
         self.curves = {}  # all the curves on the graph, key = label
 
-    def addCurve(self, *args, **kwargs):
+    def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
         plot_obj = self.main_axes.plot(*args, **kwargs)
-        self.updatePlot()
+        self.updatePlot(title)
         # Add to the dictionary
         label = kwargs.get("label")
         if label is None:
@@ -153,7 +153,7 @@ class ChartView(QtWidgets.QWidget):
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
 
-    def plot(self, *args, **kwargs):
+    def plot(self, *args, title="plot title", **kwargs):
         """
         Plot from the supplied (x, y) or (y) data.
 
@@ -171,7 +171,7 @@ class ChartView(QtWidgets.QWidget):
         if label is None:
             raise KeyError("This curve has no label.")
         if label not in self.curves:
-            self.addCurve(*args, **ds_options)
+            self.addCurve(*args, title=title, **ds_options)
 
     def plotOptions(self):
         return self._plot_options
@@ -249,10 +249,9 @@ class ChartView(QtWidgets.QWidget):
         if valid_labels:
             self.main_axes.legend()
 
-    def updatePlot(self):
+    def updatePlot(self, title):
         """Update annotations (titles & axis labels)."""
-        # TODO: title -- first and last start dates of all curves
-        self.setPlotTitle("data from ... (TODO)")
+        self.setPlotTitle(title)
 
         iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
         subtitle = f"plotted: {iso8601}"
