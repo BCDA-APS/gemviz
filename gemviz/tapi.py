@@ -352,7 +352,7 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
 
 
 # -----------------------------------------------------------------------------
-# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+# :copyright: (c) 2023-2025, UChicago Argonne, LLC
 #
 # Distributed under the terms of the Argonne National Laboratory Open Source License.
 #

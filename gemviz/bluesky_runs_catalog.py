@@ -230,7 +230,7 @@ class BRC_MVC(QtWidgets.QWidget):
 
 
 # -----------------------------------------------------------------------------
-# :copyright: (c) 2023-2024, UChicago Argonne, LLC
+# :copyright: (c) 2023-2025, UChicago Argonne, LLC
 #
 # Distributed under the terms of the Argonne National Laboratory Open Source License.
 #
