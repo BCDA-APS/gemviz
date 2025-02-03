@@ -39,7 +39,8 @@ def command_line_interface():
             "Provide logging level. "
             "Example '--log debug'. "
             "Default level: 'warning'"),
-        choices=[k.lower() for k in logging.getLevelNamesMapping()],
+        # choices=[k.lower() for k in logging.getLevelNamesMapping()],  # py3.11+
+        choices="critical fatal error warning info debug".split(),
     )
     # fmt: on
 
