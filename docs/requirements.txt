@@ -1,9 +1,0 @@
-coverage
-coveralls
-pydata-sphinx-theme
-pytz
-setuptools-scm
-sphinx
-sphinx-design
-sphinx-tabs
-tzdata

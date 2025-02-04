@@ -51,6 +51,30 @@ dependencies = [
   "tiled",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pydata-sphinx-theme",
+  "pytest",
+  "pytest-cov",
+  "pytest-qt",
+  "sphinx",
+  "sphinx-tabs",
+]
+
+doc = [
+  "coverage",
+  "coveralls",
+  "pydata-sphinx-theme",
+  "pytz",
+  "setuptools-scm",
+  "sphinx",
+  "sphinx-design",
+  "sphinx-tabs",
+  "tzdata",
+]
+
+all = ["gemviz[dev]"]
+
 [project.urls]
 "Homepage" = "https://github.com/BCDA-APS/gemviz"
 "Bug Tracker" = "https://github.com/BCDA-APS/gemviz/issues"
