@@ -75,7 +75,9 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             action = self.actions_library[label]
             run = list(self.runs.values())[row]
             result = action(run)
-            logger.debug("Display role: (%d, %d) %s", row, column, result)
+            # Disable noisy debug logging for display role
+            # if row < 2 and column < 3:
+            #     logger.debug("Display role: (%d, %d) %s", row, column, result)
             # print(f"{__name__}: ({row}, {column}) {result}")
             return result
 
