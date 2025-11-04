@@ -21,12 +21,16 @@ Qt widget that shows the plot.
 """
 
 import datetime
+import logging
 from itertools import cycle
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+
+logger = logging.getLogger(__name__)
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 """Earliest date for a run in any Bluesky catalog (1990-01-01)."""
@@ -139,6 +143,14 @@ class ChartView(QtWidgets.QWidget):
         size.setHorizontalStretch(4)
 
         self.curves = {}  # all the curves on the graph, key = label
+
+        # Live plotting support
+        self.live_mode = False
+        self.live_timer = None
+        self.live_run = None
+        self.live_stream_name = None
+        self.live_data_fields = {}  # Maps label -> (x_field, y_field)
+        self.update_interval = 2000  # milliseconds (2 seconds)
 
     def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
@@ -275,6 +287,144 @@ class ChartView(QtWidgets.QWidget):
 
     def ylabel(self):
         return self.option("ylabel")
+
+    # ========== Live Plotting Methods ==========
+
+    def enableLiveMode(self, run, stream_name, data_fields):
+        """
+        Enable live plotting for an active run.
+
+        Parameters
+        ----------
+        run : RunMetadata
+            The active run to monitor
+        stream_name : str
+            Name of the data stream to plot
+        data_fields : dict
+            Maps curve label -> (x_field_name, y_field_name)
+        """
+        # Use is_active property for reliable check
+        if not run.is_active:
+            logger.info(
+                f"Run {run.uid[:7]} is not active (is_active={run.is_active}), live mode not enabled"
+            )
+            return
+
+        self.live_run = run
+        self.live_stream_name = stream_name
+        self.live_data_fields = data_fields
+        self.live_mode = True
+
+        logger.info(f"Live mode enabled for run {run.uid[:7]}")
+        logger.info(f"Live data fields: {data_fields}")
+        logger.info(f"Starting live updates with interval {self.update_interval}ms")
+        self.startLiveUpdates()
+
+    def startLiveUpdates(self):
+        """Start the timer for periodic updates."""
+        logger.info(f"startLiveUpdates called with interval: {self.update_interval}ms")
+
+        if self.live_timer is None:
+            logger.info("Creating new QTimer for live updates")
+            self.live_timer = QtCore.QTimer(self)
+            self.live_timer.timeout.connect(self.refreshPlot)
+        else:
+            logger.info("Reusing existing QTimer")
+
+        self.live_timer.start(self.update_interval)
+        logger.info(f"Live updates started (interval: {self.update_interval}ms)")
+        logger.info(f"Timer active: {self.live_timer.isActive()}")
+
+    def stopLiveUpdates(self):
+        """Stop the live update timer."""
+        if self.live_timer:
+            self.live_timer.stop()
+
+        self.live_mode = False
+        logger.info("Live updates stopped")
+
+    def refreshPlot(self):
+        """Refresh the plot with latest data from the active run."""
+        logger.debug(
+            f"refreshPlot called: live_run={self.live_run is not None}, live_mode={self.live_mode}"
+        )
+
+        if not self.live_run or not self.live_mode:
+            logger.debug(
+                "refreshPlot: returning early - no live_run or live_mode disabled"
+            )
+            return
+
+        try:
+            logger.info("Refreshing plot data...")
+            # Re-fetch metadata to check if still active
+            self.live_run.request_from_tiled_server()
+
+            if not self.live_run.is_active:
+                logger.info("Run completed, stopping live updates")
+                self.stopLiveUpdates()
+                self.setPlotSubtitle("Run completed")
+                return
+
+            # Force refresh stream data to get latest
+            stream_data = self.live_run.force_refresh_stream_data(self.live_stream_name)
+            logger.info(
+                f"Got fresh stream data with shape: {stream_data.shape if hasattr(stream_data, 'shape') else 'unknown'}"
+            )
+
+            # Also refresh field selection data if it exists
+            if hasattr(self, "field_widget") and self.field_widget:
+                self.field_widget.refreshFieldData()
+
+            # Update each curve
+            for label, (x_field, y_field) in self.live_data_fields.items():
+                if label not in self.curves:
+                    continue
+
+                plot_obj = self.curves[label][0]
+
+                # Get new data
+                x_data = stream_data["data"][x_field]
+                y_data = stream_data["data"][y_field]
+
+                # Check if data shapes have changed
+                try:
+                    # Try to update the existing plot object
+                    plot_obj.set_data(x_data, y_data)
+                except ValueError as e:
+                    if "shape" in str(e).lower():
+                        logger.info(f"Data shape changed for {label}, recreating plot")
+                        # Data shape changed, need to recreate the plot
+                        # Clear the old plot
+                        plot_obj.remove()
+
+                        # Create new plot with same style
+                        style = self.curves[label][1]  # Get the original style
+                        new_plot = self.main_axes.plot(x_data, y_data, **style)[0]
+                        self.curves[label] = (new_plot, style)
+                    else:
+                        raise
+
+            # Refresh display
+            self.main_axes.relim()
+            self.main_axes.autoscale_view()
+            self.updateLegend()
+            self.canvas.draw()
+
+            # Update timestamp with LIVE indicator
+            iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+            subtitle = f"🔴 LIVE - updated: {iso8601}"
+            if self.parent is not None:
+                cat_name = self.parent.catalogName() or ""
+                subtitle = f"catalog={cat_name!r}  {subtitle}"
+            self.setPlotSubtitle(subtitle)
+
+            logger.debug(f"Plot refreshed: {len(x_data)} points")
+
+        except Exception as exc:
+            logger.error(f"Live update failed: {exc}", exc_info=True)
+            self.stopLiveUpdates()
+            self.setPlotSubtitle(f"Live update error: {exc}")
 
 
 # -----------------------------------------------------------------------------
