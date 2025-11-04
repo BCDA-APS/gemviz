@@ -41,6 +41,15 @@ class SelectFieldsWidget(QtWidgets.QWidget):
     def __init__(self, parent, run):
         self.parent = parent
         self.run = run  # tapi.RunMetadata object
+
+        # Force refresh of run data to get latest shapes
+        if run.is_active:
+            logger.info(f"Refreshing active run {run.uid[:7]} for field selection")
+            run.request_from_tiled_server()
+            # Clear cached stream data to force fresh fetch
+            run.streams_data = None
+            run.streams_md = None
+
         self.analysis = run.plottable_signals()
         self.stream_name = self.analysis.get("stream", DEFAULT_STREAM)
 
@@ -109,17 +118,56 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(view)
 
+        # Add a "Clear Plot" button
+        clear_button = QtWidgets.QPushButton("Clear Plot")
+        clear_button.setToolTip("Clear the current plot")
+        clear_button.clicked.connect(self.clearPlot)
+        layout.addWidget(clear_button)
+
     def relayPlotSelections(self, stream_name, action, selections):
         """Receive selections from the dialog and relay to the caller."""
         # selections["stream_name"] = self.stream_name
         self.selected.emit(stream_name, action, selections)
+
+    def clearPlot(self):
+        """Clear the current plot."""
+        logger.info("Clear plot button clicked")
+        # Emit a special "clear" action with the current stream name
+        self.selected.emit(self.stream_name, "clear", {})
+
+    def refreshFieldData(self):
+        """Refresh the field data to get latest shapes."""
+        if self.run.is_active:
+            logger.info(f"Refreshing field data for active run {self.run.uid[:7]}")
+            # Force refresh run data
+            self.run.request_from_tiled_server()
+            self.run.streams_data = None
+            self.run.streams_md = None
+
+            # Refresh the field table model
+            if hasattr(self, "table_model"):
+                self.table_model.refresh()
 
 
 def to_datasets(run, stream_name, selections, scan_id=None):
     """Prepare datasets and options for plotting."""
     from . import chartview
 
-    stream = run.stream_data(stream_name)
+    # Handle clear action - no need to access stream data
+    if not stream_name or stream_name == "":
+        return [], {}
+
+    try:
+        # For active runs, force refresh to get latest data
+        if run.is_active:
+            logger.info(f"Force refreshing stream data for active run {run.uid[:7]}")
+            stream_data = run.force_refresh_stream_data(stream_name)
+            stream = stream_data
+        else:
+            stream = run.stream_data(stream_name)
+    except KeyError as exc:
+        logger.error(f"Stream {stream_name} not found in run data: {exc}")
+        raise ValueError(f"Stream {stream_name} not found in run data")
 
     x_axis = selections.get("X")
     x_datetime = False  # special scaling using datetime
@@ -128,15 +176,39 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         x_units = ""
         x_axis = "data point number"
     else:
-        x_data = stream[x_axis].compute()
-        x_shape = x_data.shape
-        x_units = run.stream_data_field_units(stream_name, x_axis)
-        if len(x_shape) != 1:
-            # fmt: off
-            raise ValueError(
-                "Can only plot 1-D data now."
-                f" {x_axis} shape is {x_shape}"
+        try:
+            x_data = stream[x_axis].compute()
+            x_shape = x_data.shape
+            x_units = run.stream_data_field_units(stream_name, x_axis)
+            if len(x_shape) != 1:
+                # fmt: off
+                raise ValueError(
+                    "Can only plot 1-D data now."
+                    f" {x_axis} shape is {x_shape}"
+                )
+        except Exception as exc:
+            logger.error(f"Error computing x_data for {x_axis}: {exc}")
+            logger.error(
+                f"Stream data keys: {list(stream.keys()) if hasattr(stream, 'keys') else 'No keys method'}"
             )
+            # Try to get fresh data
+            logger.info("Attempting to refresh stream data for x_data...")
+            try:
+                # Force refresh the run data
+                run.request_from_tiled_server()
+                run.streams_data = None
+                run.streams_md = None
+                # Get fresh stream data
+                stream = run.stream_data(stream_name)
+                x_data = stream[x_axis].compute()
+                x_shape = x_data.shape
+                x_units = run.stream_data_field_units(stream_name, x_axis)
+                logger.info(
+                    f"Successfully refreshed x_data: {x_axis} shape is now {x_shape}"
+                )
+            except Exception as refresh_exc:
+                logger.error(f"Failed to refresh x_data: {refresh_exc}")
+                raise ValueError(f"Failed to get fresh data for {x_axis}: {exc}")
             # fmt: on
         if x_axis == "time" and min(x_data) > chartview.TIMESTAMP_LIMIT:
             x_units = ""
@@ -157,15 +229,39 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         color = chartview.auto_color()
         symbol = chartview.auto_symbol()
 
-        y_data = stream[y_axis].compute()
-        y_units = run.stream_data_field_units(stream_name, y_axis)
-        y_shape = y_data.shape
-        if len(y_shape) != 1:
-            # fmt: off
-            raise ValueError(
-                "Can only plot 1-D data now."
-                f" {y_axis} shape is {y_shape}"
+        try:
+            y_data = stream[y_axis].compute()
+            y_units = run.stream_data_field_units(stream_name, y_axis)
+            y_shape = y_data.shape
+            if len(y_shape) != 1:
+                # fmt: off
+                raise ValueError(
+                    "Can only plot 1-D data now."
+                    f" {y_axis} shape is {y_shape}"
+                )
+        except Exception as exc:
+            logger.error(f"Error computing y_data for {y_axis}: {exc}")
+            logger.error(
+                f"Stream data keys: {list(stream.keys()) if hasattr(stream, 'keys') else 'No keys method'}"
             )
+            # Try to get fresh data
+            logger.info("Attempting to refresh stream data...")
+            try:
+                # Force refresh the run data
+                run.request_from_tiled_server()
+                run.streams_data = None
+                run.streams_md = None
+                # Get fresh stream data
+                stream = run.stream_data(stream_name)
+                y_data = stream[y_axis].compute()
+                y_units = run.stream_data_field_units(stream_name, y_axis)
+                y_shape = y_data.shape
+                logger.info(
+                    f"Successfully refreshed data: {y_axis} shape is now {y_shape}"
+                )
+            except Exception as refresh_exc:
+                logger.error(f"Failed to refresh data: {refresh_exc}")
+                raise ValueError(f"Failed to get fresh data for {y_axis}: {exc}")
 
         # keys used here must match the plotting back-end (matplotlib)
         scan_id = run.get_run_md("start", "scan_id")
