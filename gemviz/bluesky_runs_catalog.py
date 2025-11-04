@@ -17,7 +17,7 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
-PAGE_START = -1
+PAGE_START = 0
 PAGE_SIZE = 10
 
 
@@ -88,6 +88,9 @@ class BRC_MVC(QtWidgets.QWidget):
         """Slot: data field selected (for plotting) button is clicked."""
         from .chartview import ChartView
         from .select_stream_fields import to_datasets
+        import logging
+
+        logger = logging.getLogger(__name__)
 
         # TODO: make the plots configurable
         scan_id = run.get_run_md("start", "scan_id")
@@ -96,6 +99,13 @@ class BRC_MVC(QtWidgets.QWidget):
 
         # setup datasets
         try:
+            # Force refresh of run data before plotting to avoid shape mismatches
+            if run.is_active:
+                logger.info(f"Refreshing active run {run.uid[:7]} before plotting")
+                run.request_from_tiled_server()
+                run.streams_data = None  # Clear cached data
+                run.streams_md = None
+
             datasets, options = to_datasets(
                 run, stream_name, selections, scan_id=scan_id
             )
@@ -114,8 +124,38 @@ class BRC_MVC(QtWidgets.QWidget):
             if action == "add":
                 action = "replace"
 
-        if action in ("remove"):  # TODO: implement "remove"
-            raise ValueError(f"Unsupported action: {action=}")
+        if action in ("remove"):
+            # Remove this run from the plot
+            if key in self._title_keys:
+                self._title_keys.remove(key)
+                logger.info(f"Removed run {key} from plot")
+
+            # If no runs left, clear the plot completely
+            if not self._title_keys:
+                logger.info("All runs removed, clearing plot")
+                self.setStatus("Plot cleared")
+                # Create an empty plot
+                widget = ChartView(self, **options)
+                self.brc_run_viz.setPlot(widget)
+                return
+
+            # For now, just clear the plot when removing runs
+            # A more sophisticated implementation would re-plot remaining runs
+            logger.info("Plot cleared after removing run")
+            self.setStatus(f"Removed run {key} from plot")
+            widget = ChartView(self, **options)
+            self.brc_run_viz.setPlot(widget)
+            return
+
+        if action in ("clear"):
+            # Clear the entire plot
+            logger.info("Clearing plot")
+            self._title_keys = []
+            self.setStatus("Plot cleared")
+            # Create an empty plot
+            widget = ChartView(self, **options)
+            self.brc_run_viz.setPlot(widget)
+            return
 
         if action in ("replace", "add"):
             if key not in self._title_keys:
@@ -124,6 +164,54 @@ class BRC_MVC(QtWidgets.QWidget):
             for ds, ds_options in datasets:
                 widget.plot(*ds, title=title, **ds_options)
             self.brc_run_viz.setPlot(widget)
+
+            # Enable live plotting for active runs
+            is_active = run.is_active
+            logger.info(
+                f"Checking live plot eligibility: run={run.uid[:7]}, is_active={is_active}, action={action}"
+            )
+            if is_active and action == "replace":
+                # Build mapping of curve labels to field names for live updates
+                x_field = selections.get("X")
+                y_fields = selections.get("Y", [])
+                logger.info(
+                    f"Live plotting setup: x_field={x_field}, y_fields={y_fields}"
+                )
+
+                live_data_fields = {}
+                for i, (ds, ds_options) in enumerate(datasets):
+                    label = ds_options.get("label")
+                    # Map each dataset to its corresponding y_field
+                    if len(y_fields) > 0 and i < len(y_fields):
+                        y_field = y_fields[i]
+                        live_data_fields[label] = (x_field, y_field)
+                        logger.info(
+                            f"Live field mapping: {label} -> ({x_field}, {y_field})"
+                        )
+
+                if live_data_fields:
+                    logger.info(f"Calling enableLiveMode for run {run.uid[:7]}")
+                    logger.info(
+                        f"Widget type: {type(widget)}, live_data_fields: {live_data_fields}"
+                    )
+                    self.setStatus(f"🔴 Live plotting enabled for scan {scan_id}")
+                    widget.enableLiveMode(run, stream_name, live_data_fields)
+                    logger.info(
+                        f"enableLiveMode returned, widget.live_mode={widget.live_mode}"
+                    )
+                else:
+                    logger.warning("Could not set up live mode: no data fields mapped")
+            else:
+                logger.debug(
+                    f"Run {run.uid[:7]} is not active or action is not 'replace'"
+                )
+
+            if not is_active:
+                logger.debug(f"Run {run.uid[:7]} is not active, live mode not enabled")
+            elif action != "replace":
+                logger.debug(
+                    f"Action is {action}, not 'replace', live mode not enabled"
+                )
 
     def doRunSelectedSlot(self, run):
         """
@@ -135,6 +223,14 @@ class BRC_MVC(QtWidgets.QWidget):
         from functools import partial
 
         from .select_stream_fields import SelectFieldsWidget
+
+        # Force refresh of run metadata to get latest data
+        if run.is_active:
+            logger.info(f"Refreshing active run {run.uid[:7]} to get latest data")
+            run.request_from_tiled_server()
+            # Clear cached stream data to force fresh fetch
+            run.streams_data = None
+            run.streams_md = None
 
         run_md = run.run_md
         self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
