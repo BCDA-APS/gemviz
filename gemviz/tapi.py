@@ -43,11 +43,37 @@ class RunMetadata:
         """Get run details from server."""
         self.run = self.catalog[self.uid]
         self.run_md = self.run.metadata
+        # Update active status - run is active if it's the last run and has no stop document
         self.active = (
             self.uid == self.catalog.keys().last() and "stop" not in self.run_md
         )
         self.streams_md = None
         self.streams_data = None
+        logger.debug(f"Run {self.uid[:7]} active status: {self.active}")
+
+    @property
+    def is_active(self):
+        """Check if this run is currently active (most recent and not stopped).
+
+        Note: The catalog might be sorted, so we check both first and last
+        to find the most recent run by time.
+        """
+        has_stop = "stop" in self.run_md
+
+        # Check if this is the first or last run in the catalog
+        # (catalog might be sorted newest-first or oldest-first)
+        catalog_keys = list(self.catalog.keys())
+        is_first = self.uid == catalog_keys[0] if catalog_keys else False
+        is_last = self.uid == catalog_keys[-1] if catalog_keys else False
+
+        # A run is active if it has no stop document AND is either first or last
+        # (depending on sort order, the most recent run could be either)
+        is_active = not has_stop and (is_first or is_last)
+
+        logger.debug(
+            f"Run {self.uid[:7]}: has_stop={has_stop}, is_first={is_first}, is_last={is_last}, is_active={is_active}"
+        )
+        return is_active
 
     def get_run_md(self, doc, key, default=None):
         """Get metadata by key from run document."""
@@ -185,6 +211,31 @@ class RunMetadata:
             }
 
         return self.streams_data[stream_name]
+
+    def force_refresh_stream_data(self, stream_name):
+        """Force refresh of stream data from server."""
+        logger.info(f"Force refreshing stream data for {stream_name}")
+
+        # First, refresh the run metadata to get latest run info
+        self.request_from_tiled_server()
+
+        # Clear the cache completely
+        self.streams_data = None
+        self.streams_md = None
+
+        # Force fresh data read from server
+        try:
+            logger.info(f"Reading fresh data from run[{stream_name}][data]")
+            fresh_data = self.run[stream_name]["data"].read()
+
+            # Don't cache this data - return it directly
+            logger.info(
+                f"Successfully refreshed {stream_name} data, shape: {fresh_data.shape if hasattr(fresh_data, 'shape') else 'unknown'}"
+            )
+            return fresh_data
+        except Exception as exc:
+            logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
+            raise
 
     def stream_data_field_shape(self, stream_name, field_name):
         """Shape of this data field."""
