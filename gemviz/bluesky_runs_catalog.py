@@ -117,12 +117,20 @@ class BRC_MVC(QtWidgets.QWidget):
         layout = self.brc_run_viz.plotPage.layout()
         if layout.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
-        widget = layout.itemAt(0).widget()
-        if not isinstance(widget, ChartView) or action == "replace":
+        old_widget = layout.itemAt(0).widget()
+
+        # Stop any live updates on old widget before replacing
+        if isinstance(old_widget, ChartView) and old_widget.live_mode:
+            logger.info("Stopping live updates on old widget before replacement")
+            old_widget.stopLiveUpdates()
+
+        if not isinstance(old_widget, ChartView) or action == "replace":
             widget = ChartView(self, **options)  # Make a blank chart.
             self._title_keys = []
             if action == "add":
                 action = "replace"
+        else:
+            widget = old_widget
 
         if action in ("remove"):
             # Remove this run from the plot
@@ -197,7 +205,8 @@ class BRC_MVC(QtWidgets.QWidget):
                     self.setStatus(f"🔴 Live plotting enabled for scan {scan_id}")
                     widget.enableLiveMode(run, stream_name, live_data_fields)
                     logger.info(
-                        f"enableLiveMode returned, widget.live_mode={widget.live_mode}"
+                        f"enableLiveMode returned, widget.live_mode={widget.live_mode}, "
+                        f"timer_active={widget.live_timer.isActive() if widget.live_timer else False}"
                     )
                 else:
                     logger.warning("Could not set up live mode: no data fields mapped")
@@ -221,8 +230,11 @@ class BRC_MVC(QtWidgets.QWidget):
             Instance of ``tapi.RunMetadata``
         """
         from functools import partial
+        import logging
 
         from .select_stream_fields import SelectFieldsWidget
+
+        logger = logging.getLogger(__name__)
 
         # Force refresh of run metadata to get latest data
         if run.is_active:
