@@ -24,6 +24,7 @@ import datetime
 import logging
 from itertools import cycle
 
+import numpy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -160,7 +161,9 @@ class ChartView(QtWidgets.QWidget):
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        self.curves[label] = plot_obj[0], *args
+        # Store: (plot_obj, style_kwargs) for live plotting
+        style_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
+        self.curves[label] = (plot_obj[0], style_kwargs)
 
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
@@ -327,13 +330,19 @@ class ChartView(QtWidgets.QWidget):
         if self.live_timer is None:
             logger.info("Creating new QTimer for live updates")
             self.live_timer = QtCore.QTimer(self)
+            self.live_timer.setSingleShot(False)  # Make it repeating
             self.live_timer.timeout.connect(self.refreshPlot)
         else:
             logger.info("Reusing existing QTimer")
+            if self.live_timer.isActive():
+                logger.info("Stopping existing timer before restarting")
+                self.live_timer.stop()
 
         self.live_timer.start(self.update_interval)
         logger.info(f"Live updates started (interval: {self.update_interval}ms)")
-        logger.info(f"Timer active: {self.live_timer.isActive()}")
+        logger.info(
+            f"Timer active: {self.live_timer.isActive()}, singleShot: {self.live_timer.isSingleShot()}"
+        )
 
     def stopLiveUpdates(self):
         """Stop the live update timer."""
@@ -345,12 +354,12 @@ class ChartView(QtWidgets.QWidget):
 
     def refreshPlot(self):
         """Refresh the plot with latest data from the active run."""
-        logger.debug(
+        logger.info(
             f"refreshPlot called: live_run={self.live_run is not None}, live_mode={self.live_mode}"
         )
 
         if not self.live_run or not self.live_mode:
-            logger.debug(
+            logger.info(
                 "refreshPlot: returning early - no live_run or live_mode disabled"
             )
             return
@@ -367,7 +376,20 @@ class ChartView(QtWidgets.QWidget):
                 return
 
             # Force refresh stream data to get latest
-            stream_data = self.live_run.force_refresh_stream_data(self.live_stream_name)
+            try:
+                stream_data = self.live_run.force_refresh_stream_data(
+                    self.live_stream_name
+                )
+            except ValueError as e:
+                if "conflicting sizes" in str(e).lower():
+                    # This happens when data is being acquired and fields have different lengths
+                    # Just skip this update - the next one should work when data is consistent
+                    logger.warning(
+                        f"Data fields have inconsistent sizes during acquisition, skipping this update: {e}"
+                    )
+                    return
+                else:
+                    raise
             logger.info(
                 f"Got fresh stream data with shape: {stream_data.shape if hasattr(stream_data, 'shape') else 'unknown'}"
             )
@@ -379,30 +401,64 @@ class ChartView(QtWidgets.QWidget):
             # Update each curve
             for label, (x_field, y_field) in self.live_data_fields.items():
                 if label not in self.curves:
+                    logger.warning(f"Label {label} not found in curves dict")
                     continue
 
-                plot_obj = self.curves[label][0]
+                plot_obj, style_kwargs = self.curves[label]
 
-                # Get new data
-                x_data = stream_data["data"][x_field]
-                y_data = stream_data["data"][y_field]
+                # Get new data - stream_data is already the data dict (not wrapped in "data")
+                try:
+                    x_data_array = stream_data[x_field]
+                    y_data_array = stream_data[y_field]
+
+                    # Convert xarray DataArrays to numpy arrays if needed
+                    if hasattr(x_data_array, "compute"):
+                        x_data = x_data_array.compute()
+                    elif hasattr(x_data_array, "data"):
+                        x_data = x_data_array.data
+                    else:
+                        x_data = x_data_array
+
+                    if hasattr(y_data_array, "compute"):
+                        y_data = y_data_array.compute()
+                    elif hasattr(y_data_array, "data"):
+                        y_data = y_data_array.data
+                    else:
+                        y_data = y_data_array
+
+                    # Ensure we have numpy arrays
+                    if not isinstance(x_data, numpy.ndarray):
+                        x_data = numpy.array(x_data)
+                    if not isinstance(y_data, numpy.ndarray):
+                        y_data = numpy.array(y_data)
+
+                except KeyError as e:
+                    logger.error(
+                        f"Field {e} not found in stream data. Available keys: {list(stream_data.keys()) if hasattr(stream_data, 'keys') else 'unknown'}"
+                    )
+                    continue
 
                 # Check if data shapes have changed
                 try:
                     # Try to update the existing plot object
+                    # set_data expects (x, y) as two separate arguments
                     plot_obj.set_data(x_data, y_data)
-                except ValueError as e:
-                    if "shape" in str(e).lower():
-                        logger.info(f"Data shape changed for {label}, recreating plot")
+                except (ValueError, TypeError) as e:
+                    if "shape" in str(e).lower() or "dimension" in str(e).lower():
+                        logger.info(
+                            f"Data shape changed for {label}, recreating plot: {e}"
+                        )
                         # Data shape changed, need to recreate the plot
                         # Clear the old plot
                         plot_obj.remove()
 
                         # Create new plot with same style
-                        style = self.curves[label][1]  # Get the original style
-                        new_plot = self.main_axes.plot(x_data, y_data, **style)[0]
-                        self.curves[label] = (new_plot, style)
+                        new_plot = self.main_axes.plot(
+                            x_data, y_data, label=label, **style_kwargs
+                        )[0]
+                        self.curves[label] = (new_plot, style_kwargs)
                     else:
+                        logger.error(f"Error updating plot data for {label}: {e}")
                         raise
 
             # Refresh display
@@ -419,9 +475,17 @@ class ChartView(QtWidgets.QWidget):
                 subtitle = f"catalog={cat_name!r}  {subtitle}"
             self.setPlotSubtitle(subtitle)
 
-            logger.debug(f"Plot refreshed: {len(x_data)} points")
+            logger.info(f"Plot refreshed: {len(x_data)} points")
 
         except Exception as exc:
+            # Check if this is a transient error (data inconsistency during acquisition)
+            if "conflicting sizes" in str(exc).lower():
+                logger.warning(
+                    f"Data inconsistency during live update (will retry next cycle): {exc}"
+                )
+                # Don't stop live updates for this - it's a transient issue
+                return
+            # For other errors, log and stop
             logger.error(f"Live update failed: {exc}", exc_info=True)
             self.stopLiveUpdates()
             self.setPlotSubtitle(f"Live update error: {exc}")
