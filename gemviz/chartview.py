@@ -493,7 +493,7 @@ class ChartView(QtWidgets.QWidget):
 
             # Update timestamp with LIVE indicator
             iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
-            subtitle = f"🔴 LIVE - updated: {iso8601}"
+            subtitle = f"LIVE - updated: {iso8601}"
             if self.parent is not None:
                 cat_name = self.parent.catalogName() or ""
                 subtitle = f"catalog={cat_name!r}  {subtitle}"
