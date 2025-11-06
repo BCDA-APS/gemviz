@@ -153,16 +153,6 @@ class BRC_MVC(QtWidgets.QWidget):
             self.brc_run_viz.setPlot(widget)
             return
 
-        if action in ("clear"):
-            # Clear the entire plot
-            logger.info("Clearing plot")
-            self._title_keys = []
-            self.setStatus("Plot cleared")
-            # Create an empty plot
-            widget = ChartView(self, **options)
-            self.brc_run_viz.setPlot(widget)
-            return
-
         if action in ("replace", "add"):
             if key not in self._title_keys:
                 self._title_keys.append(key)

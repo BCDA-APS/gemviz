@@ -115,22 +115,10 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(view)
 
-        # Add a "Clear Plot" button
-        clear_button = QtWidgets.QPushButton("Clear Plot")
-        clear_button.setToolTip("Clear the current plot")
-        clear_button.clicked.connect(self.clearPlot)
-        layout.addWidget(clear_button)
-
     def relayPlotSelections(self, stream_name, action, selections):
         """Receive selections from the dialog and relay to the caller."""
         # selections["stream_name"] = self.stream_name
         self.selected.emit(stream_name, action, selections)
-
-    def clearPlot(self):
-        """Clear the current plot."""
-        logger.info("Clear plot button clicked")
-        # Emit a special "clear" action with the current stream name
-        self.selected.emit(self.stream_name, "clear", {})
 
     def refreshFieldData(self):
         """Refresh the field data to get latest shapes."""
@@ -147,7 +135,7 @@ def to_datasets(run, stream_name, selections, scan_id=None):
     """Prepare datasets and options for plotting."""
     from . import chartview
 
-    # Handle clear action - no need to access stream data
+    # Return empty datasets if stream_name is not provided
     if not stream_name or stream_name == "":
         return [], {}
 
