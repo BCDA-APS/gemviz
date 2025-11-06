@@ -67,9 +67,6 @@ class BRCTableView(QtWidgets.QWidget):
         self.setPagerStatus()
         self.tableView.clicked.connect(self.doRunSelectedSlot)
 
-        # Add manual refresh button
-        self.addRefreshButton()
-
         # Auto-refresh for new runs
         self.refresh_timer = QtCore.QTimer(self)
         self.refresh_timer.timeout.connect(self.checkForNewRuns)
@@ -217,52 +214,6 @@ class BRCTableView(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
-
-    def addRefreshButton(self):
-        """Add a manual refresh button to the toolbar."""
-        # Find the horizontal layout with the navigation buttons
-        h_layout = self.findChild(QtWidgets.QHBoxLayout, "horizontalLayout")
-        if h_layout:
-            # Create refresh button
-            refresh_btn = QtWidgets.QPushButton()
-            refresh_btn.setToolTip("Manually refresh the catalog to check for new runs")
-            refresh_btn.setText("🔄")  # Refresh icon
-            refresh_btn.setMaximumWidth(40)
-            refresh_btn.released.connect(self.manualRefresh)
-
-            # Insert at the beginning of the layout (before "first" button)
-            h_layout.insertWidget(1, refresh_btn)
-            logger.info("Manual refresh button added")
-        else:
-            logger.warning("Could not find horizontalLayout for refresh button")
-            # Try alternative approach - find the first button and insert before it
-            first_btn = self.findChild(QtWidgets.QPushButton, "first")
-            if first_btn:
-                refresh_btn = QtWidgets.QPushButton()
-                refresh_btn.setToolTip(
-                    "Manually refresh the catalog to check for new runs"
-                )
-                refresh_btn.setText("🔄")
-                refresh_btn.setMaximumWidth(40)
-                refresh_btn.released.connect(self.manualRefresh)
-
-                # Insert before the first button
-                parent_layout = first_btn.parent().layout()
-                if parent_layout:
-                    parent_layout.insertWidget(0, refresh_btn)
-                    logger.info("Manual refresh button added (alternative method)")
-                else:
-                    logger.error("Could not find parent layout for refresh button")
-            else:
-                logger.error("Could not find first button for refresh button placement")
-
-    def manualRefresh(self):
-        """Manually triggered refresh."""
-        logger.info("Manual refresh triggered")
-        # Force refresh the model data
-        self.updateModelData()
-        # Also check for new runs
-        self.checkForNewRuns()
 
     def checkForNewRuns(self):
         """Check if new runs have been added to the catalog."""
