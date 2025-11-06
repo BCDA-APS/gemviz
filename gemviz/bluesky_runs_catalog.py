@@ -102,9 +102,7 @@ class BRC_MVC(QtWidgets.QWidget):
             # Force refresh of run data before plotting to avoid shape mismatches
             if run.is_active:
                 logger.info(f"Refreshing active run {run.uid[:7]} before plotting")
-                run.request_from_tiled_server()
-                run.streams_data = None  # Clear cached data
-                run.streams_md = None
+                # Note: is_active refreshes metadata
 
             datasets, options = to_datasets(
                 run, stream_name, selections, scan_id=scan_id
@@ -239,10 +237,7 @@ class BRC_MVC(QtWidgets.QWidget):
         # Force refresh of run metadata to get latest data
         if run.is_active:
             logger.info(f"Refreshing active run {run.uid[:7]} to get latest data")
-            run.request_from_tiled_server()
-            # Clear cached stream data to force fresh fetch
-            run.streams_data = None
-            run.streams_md = None
+            # Note: is_active refreshes metadata
 
         run_md = run.run_md
         self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))

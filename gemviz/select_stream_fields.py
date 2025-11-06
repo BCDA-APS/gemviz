@@ -45,10 +45,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         # Force refresh of run data to get latest shapes
         if run.is_active:
             logger.info(f"Refreshing active run {run.uid[:7]} for field selection")
-            run.request_from_tiled_server()
-            # Clear cached stream data to force fresh fetch
-            run.streams_data = None
-            run.streams_md = None
+            # Note: is_active force refresh the run metadata
 
         self.analysis = run.plottable_signals()
         self.stream_name = self.analysis.get("stream", DEFAULT_STREAM)
@@ -139,10 +136,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         """Refresh the field data to get latest shapes."""
         if self.run.is_active:
             logger.info(f"Refreshing field data for active run {self.run.uid[:7]}")
-            # Force refresh run data
-            self.run.request_from_tiled_server()
-            self.run.streams_data = None
-            self.run.streams_md = None
+            # Note: is_active force refresh the run metadata
 
             # Refresh the field table model
             if hasattr(self, "table_model"):
@@ -196,8 +190,6 @@ def to_datasets(run, stream_name, selections, scan_id=None):
             try:
                 # Force refresh the run data
                 run.request_from_tiled_server()
-                run.streams_data = None
-                run.streams_md = None
                 # Get fresh stream data
                 stream = run.stream_data(stream_name)
                 x_data = stream[x_axis].compute()
@@ -249,8 +241,6 @@ def to_datasets(run, stream_name, selections, scan_id=None):
             try:
                 # Force refresh the run data
                 run.request_from_tiled_server()
-                run.streams_data = None
-                run.streams_md = None
                 # Get fresh stream data
                 stream = run.stream_data(stream_name)
                 y_data = stream[y_axis].compute()

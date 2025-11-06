@@ -367,8 +367,6 @@ class ChartView(QtWidgets.QWidget):
         try:
             logger.info("Refreshing plot data...")
             # Re-fetch metadata to check if still active
-            self.live_run.request_from_tiled_server()
-
             if not self.live_run.is_active:
                 logger.info("Run completed, stopping live updates")
                 self.stopLiveUpdates()
