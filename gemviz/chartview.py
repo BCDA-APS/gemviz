@@ -412,19 +412,43 @@ class ChartView(QtWidgets.QWidget):
                     y_data_array = stream_data[y_field]
 
                     # Convert xarray DataArrays to numpy arrays if needed
-                    if hasattr(x_data_array, "compute"):
-                        x_data = x_data_array.compute()
-                    elif hasattr(x_data_array, "data"):
-                        x_data = x_data_array.data
-                    else:
-                        x_data = x_data_array
+                    try:
+                        if hasattr(x_data_array, "compute"):
+                            x_data = x_data_array.compute()
+                        elif hasattr(x_data_array, "data"):
+                            x_data = x_data_array.data
+                        else:
+                            x_data = x_data_array
+                    except ValueError as e:
+                        if (
+                            "replacement data" in str(e).lower()
+                            and "shape" in str(e).lower()
+                        ):
+                            # Data shape mismatch during live acquisition - skip this update
+                            logger.warning(
+                                f"Data shape mismatch for {x_field} during live update (will retry): {e}"
+                            )
+                            return
+                        raise
 
-                    if hasattr(y_data_array, "compute"):
-                        y_data = y_data_array.compute()
-                    elif hasattr(y_data_array, "data"):
-                        y_data = y_data_array.data
-                    else:
-                        y_data = y_data_array
+                    try:
+                        if hasattr(y_data_array, "compute"):
+                            y_data = y_data_array.compute()
+                        elif hasattr(y_data_array, "data"):
+                            y_data = y_data_array.data
+                        else:
+                            y_data = y_data_array
+                    except ValueError as e:
+                        if (
+                            "replacement data" in str(e).lower()
+                            and "shape" in str(e).lower()
+                        ):
+                            # Data shape mismatch during live acquisition - skip this update
+                            logger.warning(
+                                f"Data shape mismatch for {y_field} during live update (will retry): {e}"
+                            )
+                            return
+                        raise
 
                     # Ensure we have numpy arrays
                     if not isinstance(x_data, numpy.ndarray):
@@ -479,7 +503,10 @@ class ChartView(QtWidgets.QWidget):
 
         except Exception as exc:
             # Check if this is a transient error (data inconsistency during acquisition)
-            if "conflicting sizes" in str(exc).lower():
+            error_str = str(exc).lower()
+            if "conflicting sizes" in error_str or (
+                "replacement data" in error_str and "shape" in error_str
+            ):
                 logger.warning(
                     f"Data inconsistency during live update (will retry next cycle): {exc}"
                 )
