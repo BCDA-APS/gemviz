@@ -151,6 +151,7 @@ class ChartView(QtWidgets.QWidget):
         self.live_run = None
         self.live_stream_name = None
         self.live_data_fields = {}  # Maps label -> (x_field, y_field)
+        self.field_widget = None
         self.update_interval = 2000  # milliseconds (2 seconds)
 
     def addCurve(self, *args, title="plot title", **kwargs):
@@ -293,7 +294,7 @@ class ChartView(QtWidgets.QWidget):
 
     # ========== Live Plotting Methods ==========
 
-    def enableLiveMode(self, run, stream_name, data_fields):
+    def enableLiveMode(self, run, stream_name, data_fields, field_widget=None):
         """
         Enable live plotting for an active run.
 
@@ -317,6 +318,7 @@ class ChartView(QtWidgets.QWidget):
         self.live_stream_name = stream_name
         self.live_data_fields = data_fields
         self.live_mode = True
+        self.field_widget = field_widget
 
         logger.info(f"Live mode enabled for run {run.uid[:7]}")
         logger.info(f"Live data fields: {data_fields}")

@@ -43,6 +43,7 @@ class BRC_MVC(QtWidgets.QWidget):
         from .user_settings import settings
 
         self.selected_run_uid = None
+        self.current_field_widget = None
 
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.tab_filter.layout()
@@ -191,7 +192,12 @@ class BRC_MVC(QtWidgets.QWidget):
                         f"Widget type: {type(widget)}, live_data_fields: {live_data_fields}"
                     )
                     self.setStatus(f"🔴 Live plotting enabled for scan {scan_id}")
-                    widget.enableLiveMode(run, stream_name, live_data_fields)
+                    widget.enableLiveMode(
+                        run,
+                        stream_name,
+                        live_data_fields,
+                        field_widget=self.current_field_widget,
+                    )
                     logger.info(
                         f"enableLiveMode returned, widget.live_mode={widget.live_mode}, "
                         f"timer_active={widget.live_timer.isActive() if widget.live_timer else False}"
@@ -242,6 +248,7 @@ class BRC_MVC(QtWidgets.QWidget):
         self.selected_run_uid = run.get_run_md("start", "uid")
 
         widget = SelectFieldsWidget(self, run)
+        self.current_field_widget = widget
         widget.selected.connect(partial(self.doPlotSlot, run))
         layout = self.fields_groupbox.layout()
         utils.removeAllLayoutWidgets(layout)

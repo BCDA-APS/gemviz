@@ -41,6 +41,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
     def __init__(self, parent, run):
         self.parent = parent
         self.run = run  # tapi.RunMetadata object
+        self.table_view = None
 
         # Force refresh of run data to get latest shapes
         if run.is_active:
@@ -108,6 +109,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
 
         # build the view of this stream
         view = SelectFieldsTableView(self)
+        self.table_view = view
         view.displayTable(STREAM_COLUMNS, fields)
         view.selected.connect(partial(self.relayPlotSelections, stream_name))
 
@@ -126,9 +128,33 @@ class SelectFieldsWidget(QtWidgets.QWidget):
             logger.info(f"Refreshing field data for active run {self.run.uid[:7]}")
             # Note: is_active force refresh the run metadata
 
-            # Refresh the field table model
-            if hasattr(self, "table_model"):
-                self.table_model.refresh()
+            # Remember which fields are currently selected (if we have a table).
+            saved = {}
+            if self.table_view is not None:
+                model = self.table_view.tableView.model()
+                if model is not None:
+                    saved = model.plotFields()
+
+            # Rebuild the table for the current stream using fresh data.
+            current_stream = self.stream_name
+            self.setStream(current_stream)
+
+            # Restore the previous selections on the new model.
+            if self.table_view is not None and saved:
+                model = self.table_view.tableView.model()
+                if model is not None:
+                    fields = model.fields()
+                    x_field = saved.get("X")
+                    if x_field and x_field in fields:
+                        model.setSelectionsItem(fields.index(x_field), "X")
+                    for y_field in saved.get("Y", []):
+                        if y_field in fields:
+                            model.setSelectionsItem(fields.index(y_field), "Y")
+                    model.updateCheckboxes()
+        else:
+            logger.info(
+                f"Skipping field refresh: run {self.run.uid[:7]} is no longer active"
+            )
 
 
 def to_datasets(run, stream_name, selections, scan_id=None):
