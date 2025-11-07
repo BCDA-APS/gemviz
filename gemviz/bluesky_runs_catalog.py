@@ -87,9 +87,10 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def doPlotSlot(self, run, stream_name, action, selections):
         """Slot: data field selected (for plotting) button is clicked."""
+        import logging
+
         from .chartview import ChartView
         from .select_stream_fields import to_datasets
-        import logging
 
         logger = logging.getLogger(__name__)
 
