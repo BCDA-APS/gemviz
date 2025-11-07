@@ -224,8 +224,8 @@ class BRC_MVC(QtWidgets.QWidget):
         run *object*:
             Instance of ``tapi.RunMetadata``
         """
-        from functools import partial
         import logging
+        from functools import partial
 
         from .select_stream_fields import SelectFieldsWidget
 
