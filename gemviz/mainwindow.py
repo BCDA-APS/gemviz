@@ -46,31 +46,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
 
-        # Add sort preference toggle
-        self.actionSortNewestFirst = QtWidgets.QAction("Show newest runs first", self)
-        self.actionSortNewestFirst.setCheckable(True)
-        # Get the setting and ensure it's a boolean
-        newest_first_setting = settings.getKey("catalog_sort_newest_first")
-        if newest_first_setting is None:
-            newest_first_setting = True  # Default to newest first
-        elif isinstance(newest_first_setting, str):
-            newest_first_setting = newest_first_setting.lower() in ("true", "1", "yes")
-        self.actionSortNewestFirst.setChecked(newest_first_setting)
-        self.actionSortNewestFirst.setShortcut("Ctrl+T")  # T for "Time" sort
+        # Sort preference: load the setting and set checked state
+        newest_first = self._getSortPreference()
+        self.actionSortNewestFirst.setChecked(newest_first)
         self.actionSortNewestFirst.triggered.connect(self.toggleSortOrder)
-
-        # Add the sort action to the View menu if it exists
-        try:
-            view_menu = self.menuBar().findChild(QtWidgets.QMenu, "menuView")
-            if view_menu:
-                view_menu.addAction(self.actionSortNewestFirst)
-            else:
-                # Create a View menu if it doesn't exist
-                view_menu = self.menuBar().addMenu("&View")
-                view_menu.addAction(self.actionSortNewestFirst)
-        except Exception:
-            # If menuBar doesn't exist or fails, add to a default location
-            pass
 
         self.server_uri.currentTextChanged.connect(self.connectServer)
         self.catalogs.currentTextChanged.connect(self.setCatalog)
@@ -94,6 +73,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         about = AboutDialog(self)
         about.open()
+
+    def _getSortPreference(self):
+        """Get the sort preference setting as a boolean."""
+        newest_first = settings.getKey("catalog_sort_newest_first")
+        if newest_first is None:
+            return True  # Default to newest first
+        elif isinstance(newest_first, str):
+            return newest_first.lower() in ("true", "1", "yes")
+        return bool(newest_first)
 
     def toggleSortOrder(self):
         """Toggle the sort order preference and refresh the catalog."""
@@ -164,11 +152,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         self._catalogName = catalog_name
         # Sort by time - use user preference for sort order
-        newest_first = settings.getKey("catalog_sort_newest_first")
-        if newest_first is None:
-            newest_first = True  # Default to newest first
-        elif isinstance(newest_first, str):
-            newest_first = newest_first.lower() in ("true", "1", "yes")
+        newest_first = self._getSortPreference()
         sort_direction = -1 if newest_first else 1
         logger.debug(
             f"Sort preference: newest_first={newest_first}, sort_direction={sort_direction}"
