@@ -144,6 +144,7 @@ class ChartView(QtWidgets.QWidget):
         size.setHorizontalStretch(4)
 
         self.curves = {}  # all the curves on the graph, key = label
+        self.curve_styles = {}  # original style kwargs, keyed by label
 
         # Live plotting support
         self.live_mode = False
@@ -162,9 +163,17 @@ class ChartView(QtWidgets.QWidget):
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        # Store: (plot_obj, style_kwargs) for live plotting
+        # Capture the style kwargs separately and cache the plotted data by label
         style_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
-        self.curves[label] = (plot_obj[0], style_kwargs)
+        self.curve_styles[label] = style_kwargs
+
+        # Store the Matplotlib line together with the data arrays for reuse
+        if len(args) == 1:
+            self.curves[label] = (plot_obj[0], args[0])
+        elif len(args) >= 2:
+            self.curves[label] = (plot_obj[0], args[0], args[1])
+        else:
+            self.curves[label] = (plot_obj[0],)
 
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
@@ -404,7 +413,9 @@ class ChartView(QtWidgets.QWidget):
                     logger.warning(f"Label {label} not found in curves dict")
                     continue
 
-                plot_obj, style_kwargs = self.curves[label]
+                curve_entry = self.curves[label]
+                plot_obj = curve_entry[0]
+                style_kwargs = self.curve_styles.get(label, {})
 
                 # Get new data - stream_data is already the data dict (not wrapped in "data")
                 try:
@@ -480,7 +491,14 @@ class ChartView(QtWidgets.QWidget):
                         new_plot = self.main_axes.plot(
                             x_data, y_data, label=label, **style_kwargs
                         )[0]
-                        self.curves[label] = (new_plot, style_kwargs)
+
+                        # Store the Matplotlib line together with the data arrays for reuse
+                        if len(curve_entry) == 2:
+                            self.curves[label] = (new_plot, y_data)
+                        elif len(curve_entry) >= 3:
+                            self.curves[label] = (new_plot, x_data, y_data)
+                        else:
+                            self.curves[label] = (new_plot,)
                     else:
                         logger.error(f"Error updating plot data for {label}: {e}")
                         raise
