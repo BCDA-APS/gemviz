@@ -46,6 +46,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
 
+        # Sort preference: load the setting and set checked state
+        newest_first = self._getSortPreference()
+        self.actionSortNewestFirst.setChecked(newest_first)
+        self.actionSortNewestFirst.triggered.connect(self.toggleSortOrder)
+
         self.server_uri.currentTextChanged.connect(self.connectServer)
         self.catalogs.currentTextChanged.connect(self.setCatalog)
 
@@ -68,6 +73,27 @@ class MainWindow(QtWidgets.QMainWindow):
 
         about = AboutDialog(self)
         about.open()
+
+    def _getSortPreference(self):
+        """Get the sort preference setting as a boolean."""
+        newest_first = settings.getKey("catalog_sort_newest_first")
+        if newest_first is None:
+            return True  # Default to newest first
+        elif isinstance(newest_first, str):
+            return newest_first.lower() in ("true", "1", "yes")
+        return bool(newest_first)
+
+    def toggleSortOrder(self):
+        """Toggle the sort order preference and refresh the catalog."""
+        newest_first = self.actionSortNewestFirst.isChecked()
+        settings.setKey("catalog_sort_newest_first", newest_first)
+
+        # Refresh the current catalog with new sort order
+        if self._catalogName:
+            self.setStatus(
+                f"Sort order changed to {'newest first' if newest_first else 'oldest first'}"
+            )
+            self.setCatalog(self._catalogName)
 
     def closeEvent(self, event):
         """
@@ -125,6 +151,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
             return
         self._catalogName = catalog_name
+        # Sort by time - use user preference for sort order
+        newest_first = self._getSortPreference()
+        sort_direction = -1 if newest_first else 1
+        logger.debug(
+            f"Sort preference: newest_first={newest_first}, sort_direction={sort_direction}"
+        )
         self._catalog = self.server()[catalog_name].sort(("time", sort_direction))
 
         spec_name = self.catalogType()

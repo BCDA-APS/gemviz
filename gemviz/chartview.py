@@ -21,12 +21,17 @@ Qt widget that shows the plot.
 """
 
 import datetime
+import logging
 from itertools import cycle
 
+import numpy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+
+logger = logging.getLogger(__name__)
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 """Earliest date for a run in any Bluesky catalog (1990-01-01)."""
@@ -139,6 +144,16 @@ class ChartView(QtWidgets.QWidget):
         size.setHorizontalStretch(4)
 
         self.curves = {}  # all the curves on the graph, key = label
+        self.curve_styles = {}  # original style kwargs, keyed by label
+
+        # Live plotting support
+        self.live_mode = False
+        self.live_timer = None
+        self.live_run = None
+        self.live_stream_name = None
+        self.live_data_fields = {}  # Maps label -> (x_field, y_field)
+        self.field_widget = None
+        self.update_interval = 2000  # milliseconds (2 seconds)
 
     def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
@@ -148,7 +163,17 @@ class ChartView(QtWidgets.QWidget):
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        self.curves[label] = plot_obj[0], *args
+        # Capture the style kwargs separately and cache the plotted data by label
+        style_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
+        self.curve_styles[label] = style_kwargs
+
+        # Store the Matplotlib line together with the data arrays for reuse
+        if len(args) == 1:
+            self.curves[label] = (plot_obj[0], args[0])
+        elif len(args) >= 2:
+            self.curves[label] = (plot_obj[0], args[0], args[1])
+        else:
+            self.curves[label] = (plot_obj[0],)
 
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
@@ -275,6 +300,240 @@ class ChartView(QtWidgets.QWidget):
 
     def ylabel(self):
         return self.option("ylabel")
+
+    # ========== Live Plotting Methods ==========
+
+    def enableLiveMode(self, run, stream_name, data_fields, field_widget=None):
+        """
+        Enable live plotting for an active run.
+
+        Parameters
+        ----------
+        run : RunMetadata
+            The active run to monitor
+        stream_name : str
+            Name of the data stream to plot
+        data_fields : dict
+            Maps curve label -> (x_field_name, y_field_name)
+        """
+        # Use is_active property for reliable check
+        if not run.is_active:
+            logger.info(
+                f"Run {run.uid[:7]} is not active (is_active={run.is_active}), live mode not enabled"
+            )
+            return
+
+        self.live_run = run
+        self.live_stream_name = stream_name
+        self.live_data_fields = data_fields
+        self.live_mode = True
+        self.field_widget = field_widget
+
+        logger.info(f"Live mode enabled for run {run.uid[:7]}")
+        logger.info(f"Live data fields: {data_fields}")
+        logger.info(f"Starting live updates with interval {self.update_interval}ms")
+        self.startLiveUpdates()
+
+    def startLiveUpdates(self):
+        """Start the timer for periodic updates."""
+        logger.info(f"startLiveUpdates called with interval: {self.update_interval}ms")
+
+        if self.live_timer is None:
+            logger.info("Creating new QTimer for live updates")
+            self.live_timer = QtCore.QTimer(self)
+            self.live_timer.setSingleShot(False)  # Make it repeating
+            self.live_timer.timeout.connect(self.refreshPlot)
+        else:
+            logger.info("Reusing existing QTimer")
+            if self.live_timer.isActive():
+                logger.info("Stopping existing timer before restarting")
+                self.live_timer.stop()
+
+        self.live_timer.start(self.update_interval)
+        logger.info(f"Live updates started (interval: {self.update_interval}ms)")
+        logger.info(
+            f"Timer active: {self.live_timer.isActive()}, singleShot: {self.live_timer.isSingleShot()}"
+        )
+
+    def stopLiveUpdates(self):
+        """Stop the live update timer."""
+        if self.live_timer:
+            self.live_timer.stop()
+
+        self.live_mode = False
+        logger.info("Live updates stopped")
+
+    def refreshPlot(self):
+        """Refresh the plot with latest data from the active run."""
+        logger.info(
+            f"refreshPlot called: live_run={self.live_run is not None}, live_mode={self.live_mode}"
+        )
+
+        if not self.live_run or not self.live_mode:
+            logger.info(
+                "refreshPlot: returning early - no live_run or live_mode disabled"
+            )
+            return
+
+        try:
+            logger.info("Refreshing plot data...")
+            # Re-fetch metadata to check if still active
+            if not self.live_run.is_active:
+                logger.info("Run completed, stopping live updates")
+                self.stopLiveUpdates()
+                self.setPlotSubtitle("Run completed")
+                return
+
+            # Force refresh stream data to get latest
+            try:
+                stream_data = self.live_run.force_refresh_stream_data(
+                    self.live_stream_name
+                )
+            except ValueError as e:
+                if "conflicting sizes" in str(e).lower():
+                    # This happens when data is being acquired and fields have different lengths
+                    # Just skip this update - the next one should work when data is consistent
+                    logger.warning(
+                        f"Data fields have inconsistent sizes during acquisition, skipping this update: {e}"
+                    )
+                    return
+                else:
+                    raise
+            logger.info(
+                f"Got fresh stream data with shape: {stream_data.shape if hasattr(stream_data, 'shape') else 'unknown'}"
+            )
+
+            # Also refresh field selection data if it exists
+            if hasattr(self, "field_widget") and self.field_widget:
+                self.field_widget.refreshFieldData()
+
+            # Update each curve
+            for label, (x_field, y_field) in self.live_data_fields.items():
+                if label not in self.curves:
+                    logger.warning(f"Label {label} not found in curves dict")
+                    continue
+
+                curve_entry = self.curves[label]
+                plot_obj = curve_entry[0]
+                style_kwargs = self.curve_styles.get(label, {})
+
+                # Get new data - stream_data is already the data dict (not wrapped in "data")
+                try:
+                    x_data_array = stream_data[x_field]
+                    y_data_array = stream_data[y_field]
+
+                    # Convert xarray DataArrays to numpy arrays if needed
+                    try:
+                        if hasattr(x_data_array, "compute"):
+                            x_data = x_data_array.compute()
+                        elif hasattr(x_data_array, "data"):
+                            x_data = x_data_array.data
+                        else:
+                            x_data = x_data_array
+                    except ValueError as e:
+                        if (
+                            "replacement data" in str(e).lower()
+                            and "shape" in str(e).lower()
+                        ):
+                            # Data shape mismatch during live acquisition - skip this update
+                            logger.warning(
+                                f"Data shape mismatch for {x_field} during live update (will retry): {e}"
+                            )
+                            return
+                        raise
+
+                    try:
+                        if hasattr(y_data_array, "compute"):
+                            y_data = y_data_array.compute()
+                        elif hasattr(y_data_array, "data"):
+                            y_data = y_data_array.data
+                        else:
+                            y_data = y_data_array
+                    except ValueError as e:
+                        if (
+                            "replacement data" in str(e).lower()
+                            and "shape" in str(e).lower()
+                        ):
+                            # Data shape mismatch during live acquisition - skip this update
+                            logger.warning(
+                                f"Data shape mismatch for {y_field} during live update (will retry): {e}"
+                            )
+                            return
+                        raise
+
+                    # Ensure we have numpy arrays
+                    if not isinstance(x_data, numpy.ndarray):
+                        x_data = numpy.array(x_data)
+                    if not isinstance(y_data, numpy.ndarray):
+                        y_data = numpy.array(y_data)
+
+                except KeyError as e:
+                    logger.error(
+                        f"Field {e} not found in stream data. Available keys: {list(stream_data.keys()) if hasattr(stream_data, 'keys') else 'unknown'}"
+                    )
+                    continue
+
+                # Check if data shapes have changed
+                try:
+                    # Try to update the existing plot object
+                    # set_data expects (x, y) as two separate arguments
+                    plot_obj.set_data(x_data, y_data)
+                except (ValueError, TypeError) as e:
+                    if "shape" in str(e).lower() or "dimension" in str(e).lower():
+                        logger.info(
+                            f"Data shape changed for {label}, recreating plot: {e}"
+                        )
+                        # Data shape changed, need to recreate the plot
+                        # Clear the old plot
+                        plot_obj.remove()
+
+                        # Create new plot with same style
+                        new_plot = self.main_axes.plot(
+                            x_data, y_data, label=label, **style_kwargs
+                        )[0]
+
+                        # Store the Matplotlib line together with the data arrays for reuse
+                        if len(curve_entry) == 2:
+                            self.curves[label] = (new_plot, y_data)
+                        elif len(curve_entry) >= 3:
+                            self.curves[label] = (new_plot, x_data, y_data)
+                        else:
+                            self.curves[label] = (new_plot,)
+                    else:
+                        logger.error(f"Error updating plot data for {label}: {e}")
+                        raise
+
+            # Refresh display
+            self.main_axes.relim()
+            self.main_axes.autoscale_view()
+            self.updateLegend()
+            self.canvas.draw()
+
+            # Update timestamp with LIVE indicator
+            iso8601 = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+            subtitle = f"LIVE - updated: {iso8601}"
+            if self.parent is not None:
+                cat_name = self.parent.catalogName() or ""
+                subtitle = f"catalog={cat_name!r}  {subtitle}"
+            self.setPlotSubtitle(subtitle)
+
+            logger.info(f"Plot refreshed: {len(x_data)} points")
+
+        except Exception as exc:
+            # Check if this is a transient error (data inconsistency during acquisition)
+            error_str = str(exc).lower()
+            if "conflicting sizes" in error_str or (
+                "replacement data" in error_str and "shape" in error_str
+            ):
+                logger.warning(
+                    f"Data inconsistency during live update (will retry next cycle): {exc}"
+                )
+                # Don't stop live updates for this - it's a transient issue
+                return
+            # For other errors, log and stop
+            logger.error(f"Live update failed: {exc}", exc_info=True)
+            self.stopLiveUpdates()
+            self.setPlotSubtitle(f"Live update error: {exc}")
 
 
 # -----------------------------------------------------------------------------

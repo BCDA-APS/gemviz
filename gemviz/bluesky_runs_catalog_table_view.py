@@ -67,6 +67,13 @@ class BRCTableView(QtWidgets.QWidget):
         self.setPagerStatus()
         self.tableView.clicked.connect(self.doRunSelectedSlot)
 
+        # Auto-refresh for new runs
+        self.refresh_timer = QtCore.QTimer(self)
+        self.refresh_timer.timeout.connect(self.checkForNewRuns)
+        self.refresh_interval = 5000  # milliseconds (5 seconds)
+        self.refresh_timer.start(self.refresh_interval)
+        logger.info(f"Table auto-refresh enabled (interval: {self.refresh_interval}ms)")
+
     def doPagerButtons(self, action, **kwargs):
         """User clicked a button to change the page."""
         logger.debug("action=%s", action)
@@ -149,6 +156,18 @@ class BRCTableView(QtWidgets.QWidget):
                 # Get new information from the server about this run.
                 run_md = tapi.RunMetadata(self.catalog(), uid)
                 self.run_cache[uid] = run_md  # update the cache
+            else:
+                # For non-active runs, still refresh occasionally to catch completed runs
+                # Check if this run might have completed (refresh every 30 seconds)
+                import time
+
+                if (
+                    not hasattr(run_md, "_last_refresh")
+                    or time.time() - run_md._last_refresh > 30
+                ):
+                    run_md = tapi.RunMetadata(self.catalog(), uid)
+                    run_md._last_refresh = time.time()
+                    self.run_cache[uid] = run_md
             page[uid] = run_md
 
         # Send the page of runs to the model now.
@@ -195,6 +214,56 @@ class BRCTableView(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
+
+    def checkForNewRuns(self):
+        """Check if new runs have been added to the catalog."""
+        try:
+            # Get the current catalog length
+            current_length = len(self._catalog)
+
+            # Only log when there's a change or every 10th check
+            if not hasattr(self, "_check_count"):
+                self._check_count = 0
+            self._check_count += 1
+
+            if current_length != self._catalog_length or self._check_count % 10 == 0:
+                logger.debug(
+                    f"Checking for new runs: current={current_length}, cached={self._catalog_length}"
+                )
+
+            if current_length != self._catalog_length:
+                logger.info(
+                    f"New runs detected: {self._catalog_length} -> {current_length}"
+                )
+                self._catalog_length = current_length
+
+                # Always refresh the model to get new runs
+                logger.info("Refreshing model with new runs")
+                self.updateModelData()
+
+                # If we're on the last page, go to the new last page
+                if self.pagerAtEnd:
+                    logger.info("Going to new last page to show new runs")
+                    self.setPage(-1, self.page_size)  # Go to last page
+                    self.setButtonPermissions()
+                    self.setPagerStatus()
+
+                    # Update status to show new runs available
+                    self.setStatus(f"✨ New runs detected! Total: {current_length}")
+                else:
+                    # Just update the counter
+                    self.setPagerStatus()
+            else:
+                # Even if no new runs, refresh the current page to update active runs
+                # Only log every 5th refresh to reduce noise
+                if self._check_count % 5 == 0:
+                    logger.debug(
+                        "No new runs, but refreshing current page for active run updates"
+                    )
+                self.updateModelData()
+
+        except Exception as exc:
+            logger.error(f"Error checking for new runs: {exc}", exc_info=True)
 
 
 # -----------------------------------------------------------------------------

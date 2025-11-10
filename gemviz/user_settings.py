@@ -101,6 +101,7 @@ class ApplicationQSettings(QtCore.QSettings):
             this_file=self.fileName(),  # the .ini file, that is
             version=1.0,  #
             timestamp=str(datetime.datetime.now()),
+            catalog_sort_newest_first=True,  # Show newest runs first by default
         )
         for k, v in d.items():
             key = f"{GLOBAL_GROUP}/{k}"

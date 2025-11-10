@@ -43,11 +43,53 @@ class RunMetadata:
         """Get run details from server."""
         self.run = self.catalog[self.uid]
         self.run_md = self.run.metadata
-        self.active = (
-            self.uid == self.catalog.keys().last() and "stop" not in self.run_md
-        )
+        # Update active status - run is active if it has no stop document or stop is None
+        # (Note: use is_active property instead of this attribute for accurate status)
+        stop_doc = self.run_md.get("stop")
+        self.active = stop_doc is None or stop_doc == {}
         self.streams_md = None
         self.streams_data = None
+        logger.debug(f"Run {self.uid[:7]} active status: {self.active}")
+
+    @property
+    def is_active(self):
+        """Check if this run is currently active (not stopped).
+
+        A run is active if it has no stop document. This is the definitive
+        indicator that a run is still acquiring data, regardless of its
+        position in the catalog (which may change as new runs are added).
+
+        Note: This property refreshes metadata from the server to ensure
+        accurate status.
+        """
+        # Refresh metadata to get latest status
+        self.request_from_tiled_server()
+
+        # A run is active if there's no stop document OR if stop is None
+        # (stop key existing with None value means the run is still active)
+        stop_doc = self.run_md.get("stop")
+        has_stop = stop_doc is not None and stop_doc != {}
+        is_active = not has_stop
+
+        # Log additional context for debugging
+        catalog_keys = list(self.catalog.keys())
+        is_first = self.uid == catalog_keys[0] if catalog_keys else False
+        is_last = self.uid == catalog_keys[-1] if catalog_keys else False
+
+        logger.info(
+            f"Run {self.uid[:7]}: has_stop={has_stop}, is_first={is_first}, is_last={is_last}, is_active={is_active}"
+        )
+        if has_stop:
+            stop_doc = self.run_md.get("stop")
+            if stop_doc and isinstance(stop_doc, dict):
+                logger.info(
+                    f"Run {self.uid[:7]} has stop document with keys: {list(stop_doc.keys())}"
+                )
+            else:
+                logger.info(
+                    f"Run {self.uid[:7]} has 'stop' key in metadata but value is: {stop_doc} (type: {type(stop_doc)})"
+                )
+        return is_active
 
     def get_run_md(self, doc, key, default=None):
         """Get metadata by key from run document."""
@@ -185,6 +227,31 @@ class RunMetadata:
             }
 
         return self.streams_data[stream_name]
+
+    def force_refresh_stream_data(self, stream_name):
+        """Force refresh of stream data from server."""
+        logger.info(f"Force refreshing stream data for {stream_name}")
+
+        # First, refresh the run metadata to get latest run info
+        self.request_from_tiled_server()
+
+        # Clear the cache completely
+        self.streams_data = None
+        self.streams_md = None
+
+        # Force fresh data read from server
+        try:
+            logger.info(f"Reading fresh data from run[{stream_name}][data]")
+            fresh_data = self.run[stream_name]["data"].read()
+
+            # Don't cache this data - return it directly
+            logger.info(
+                f"Successfully refreshed {stream_name} data, shape: {fresh_data.shape if hasattr(fresh_data, 'shape') else 'unknown'}"
+            )
+            return fresh_data
+        except Exception as exc:
+            logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
+            raise
 
     def stream_data_field_shape(self, stream_name, field_name):
         """Shape of this data field."""

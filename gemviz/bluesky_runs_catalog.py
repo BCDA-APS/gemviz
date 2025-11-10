@@ -17,7 +17,7 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
-PAGE_START = -1
+PAGE_START = 0
 PAGE_SIZE = 10
 
 
@@ -43,6 +43,7 @@ class BRC_MVC(QtWidgets.QWidget):
         from .user_settings import settings
 
         self.selected_run_uid = None
+        self.current_field_widget = None
 
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.tab_filter.layout()
@@ -86,8 +87,12 @@ class BRC_MVC(QtWidgets.QWidget):
 
     def doPlotSlot(self, run, stream_name, action, selections):
         """Slot: data field selected (for plotting) button is clicked."""
+        import logging
+
         from .chartview import ChartView
         from .select_stream_fields import to_datasets
+
+        logger = logging.getLogger(__name__)
 
         # TODO: make the plots configurable
         scan_id = run.get_run_md("start", "scan_id")
@@ -96,6 +101,11 @@ class BRC_MVC(QtWidgets.QWidget):
 
         # setup datasets
         try:
+            # Force refresh of run data before plotting to avoid shape mismatches
+            if run.is_active:
+                logger.info(f"Refreshing active run {run.uid[:7]} before plotting")
+                # Note: is_active refreshes metadata
+
             datasets, options = to_datasets(
                 run, stream_name, selections, scan_id=scan_id
             )
@@ -107,15 +117,43 @@ class BRC_MVC(QtWidgets.QWidget):
         layout = self.brc_run_viz.plotPage.layout()
         if layout.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
-        widget = layout.itemAt(0).widget()
-        if not isinstance(widget, ChartView) or action == "replace":
+        old_widget = layout.itemAt(0).widget()
+
+        # Stop any live updates on old widget before replacing
+        if isinstance(old_widget, ChartView) and old_widget.live_mode:
+            logger.info("Stopping live updates on old widget before replacement")
+            old_widget.stopLiveUpdates()
+
+        if not isinstance(old_widget, ChartView) or action == "replace":
             widget = ChartView(self, **options)  # Make a blank chart.
             self._title_keys = []
             if action == "add":
                 action = "replace"
+        else:
+            widget = old_widget
 
-        if action in ("remove"):  # TODO: implement "remove"
-            raise ValueError(f"Unsupported action: {action=}")
+        if action in ("remove"):
+            # Remove this run from the plot
+            if key in self._title_keys:
+                self._title_keys.remove(key)
+                logger.info(f"Removed run {key} from plot")
+
+            # If no runs left, clear the plot completely
+            if not self._title_keys:
+                logger.info("All runs removed, clearing plot")
+                self.setStatus("Plot cleared")
+                # Create an empty plot
+                widget = ChartView(self, **options)
+                self.brc_run_viz.setPlot(widget)
+                return
+
+            # For now, just clear the plot when removing runs
+            # A more sophisticated implementation would re-plot remaining runs
+            logger.info("Plot cleared after removing run")
+            self.setStatus(f"Removed run {key} from plot")
+            widget = ChartView(self, **options)
+            self.brc_run_viz.setPlot(widget)
+            return
 
         if action in ("replace", "add"):
             if key not in self._title_keys:
@@ -125,6 +163,60 @@ class BRC_MVC(QtWidgets.QWidget):
                 widget.plot(*ds, title=title, **ds_options)
             self.brc_run_viz.setPlot(widget)
 
+            # Enable live plotting for active runs
+            is_active = run.is_active
+            logger.info(
+                f"Checking live plot eligibility: run={run.uid[:7]}, is_active={is_active}, action={action}"
+            )
+            if is_active and action == "replace":
+                # Build mapping of curve labels to field names for live updates
+                x_field = selections.get("X")
+                y_fields = selections.get("Y", [])
+                logger.info(
+                    f"Live plotting setup: x_field={x_field}, y_fields={y_fields}"
+                )
+
+                live_data_fields = {}
+                for i, (ds, ds_options) in enumerate(datasets):
+                    label = ds_options.get("label")
+                    # Map each dataset to its corresponding y_field
+                    if len(y_fields) > 0 and i < len(y_fields):
+                        y_field = y_fields[i]
+                        live_data_fields[label] = (x_field, y_field)
+                        logger.info(
+                            f"Live field mapping: {label} -> ({x_field}, {y_field})"
+                        )
+
+                if live_data_fields:
+                    logger.info(f"Calling enableLiveMode for run {run.uid[:7]}")
+                    logger.info(
+                        f"Widget type: {type(widget)}, live_data_fields: {live_data_fields}"
+                    )
+                    self.setStatus(f"🔴 Live plotting enabled for scan {scan_id}")
+                    widget.enableLiveMode(
+                        run,
+                        stream_name,
+                        live_data_fields,
+                        field_widget=self.current_field_widget,
+                    )
+                    logger.info(
+                        f"enableLiveMode returned, widget.live_mode={widget.live_mode}, "
+                        f"timer_active={widget.live_timer.isActive() if widget.live_timer else False}"
+                    )
+                else:
+                    logger.warning("Could not set up live mode: no data fields mapped")
+            else:
+                logger.debug(
+                    f"Run {run.uid[:7]} is not active or action is not 'replace'"
+                )
+
+            if not is_active:
+                logger.debug(f"Run {run.uid[:7]} is not active, live mode not enabled")
+            elif action != "replace":
+                logger.debug(
+                    f"Action is {action}, not 'replace', live mode not enabled"
+                )
+
     def doRunSelectedSlot(self, run):
         """
         Slot: run is clicked in the table view.
@@ -132,9 +224,17 @@ class BRC_MVC(QtWidgets.QWidget):
         run *object*:
             Instance of ``tapi.RunMetadata``
         """
+        import logging
         from functools import partial
 
         from .select_stream_fields import SelectFieldsWidget
+
+        logger = logging.getLogger(__name__)
+
+        # Force refresh of run metadata to get latest data
+        if run.is_active:
+            logger.info(f"Refreshing active run {run.uid[:7]} to get latest data")
+            # Note: is_active refreshes metadata
 
         run_md = run.run_md
         self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
@@ -149,6 +249,7 @@ class BRC_MVC(QtWidgets.QWidget):
         self.selected_run_uid = run.get_run_md("start", "uid")
 
         widget = SelectFieldsWidget(self, run)
+        self.current_field_widget = widget
         widget.selected.connect(partial(self.doPlotSlot, run))
         layout = self.fields_groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
