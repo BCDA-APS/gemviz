@@ -71,14 +71,7 @@ class RunMetadata:
         has_stop = stop_doc is not None and stop_doc != {}
         is_active = not has_stop
 
-        # Log additional context for debugging
-        catalog_keys = list(self.catalog.keys())
-        is_first = self.uid == catalog_keys[0] if catalog_keys else False
-        is_last = self.uid == catalog_keys[-1] if catalog_keys else False
-
-        logger.info(
-            f"Run {self.uid[:7]}: has_stop={has_stop}, is_first={is_first}, is_last={is_last}, is_active={is_active}"
-        )
+        logger.info(f"Run {self.uid[:7]}: has_stop={has_stop}, is_active={is_active}")
         if has_stop:
             stop_doc = self.run_md.get("stop")
             if stop_doc and isinstance(stop_doc, dict):
