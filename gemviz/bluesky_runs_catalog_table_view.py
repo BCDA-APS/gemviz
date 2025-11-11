@@ -68,6 +68,7 @@ class BRCTableView(QtWidgets.QWidget):
         self.tableView.clicked.connect(self.doRunSelectedSlot)
 
         # Auto-refresh for new runs
+        self._len_glitch_detected = False
         self.refresh_timer = QtCore.QTimer(self)
         self.refresh_timer.timeout.connect(self.checkForNewRuns)
         self.refresh_interval = 5000  # milliseconds (5 seconds)
@@ -220,6 +221,18 @@ class BRCTableView(QtWidgets.QWidget):
         try:
             # Get the current catalog length
             current_length = len(self._catalog)
+
+            # Work around a tiled client bug where len(...) occasionally returns 1.
+            if current_length == 1 and self._catalog_length > 1:
+                if not self._len_glitch_detected:
+                    logger.debug(
+                        "Ignoring transient len(catalog)==1 result (cached length=%s)",
+                        self._catalog_length,
+                    )
+                    self._len_glitch_detected = True
+                return
+
+            self._len_glitch_detected = False
 
             # Only log when there's a change or every 10th check
             if not hasattr(self, "_check_count"):
