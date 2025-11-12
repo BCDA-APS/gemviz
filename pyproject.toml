@@ -53,6 +53,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "black",
+  "flake8",
+  "isort",
   "pydata-sphinx-theme",
   "pytest",
   "pytest-cov",
@@ -73,7 +76,7 @@ doc = [
   "tzdata",
 ]
 
-all = ["gemviz[dev]"]
+all = ["gemviz[dev,doc]"]
 
 [project.urls]
 "Homepage" = "https://github.com/BCDA-APS/gemviz"
