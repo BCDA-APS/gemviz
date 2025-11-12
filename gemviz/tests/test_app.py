@@ -21,7 +21,7 @@ def argv():
     [
         [["-h"], "usage: pytest [-h]"],
         [["--help"], "usage: pytest [-h]"],
-        [["-h"], "--log {critical,fatal,error,warn,warning,info,debug,notset}"],
+        [["-h"], "--log {critical,fatal,error,warn"],
         # Exact version string will change.
         # Delimiter is the only text available in any version.
         [["-v"], "."],
