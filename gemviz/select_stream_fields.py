@@ -10,7 +10,7 @@ QWidget to select stream data fields for plotting.
 import datetime
 import logging
 
-
+import numpy
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
