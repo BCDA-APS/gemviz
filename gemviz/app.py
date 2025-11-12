@@ -32,6 +32,11 @@ def command_line_interface():
     parser = argparse.ArgumentParser(description=doc)
 
     # fmt: off
+    choices=[k.lower() for k in logging.getLevelNamesMapping()]
+    # try:
+    #     choices=[k.lower() for k in logging.getLevelNamesMapping()]
+    # except AttributeError:
+    #     choices="critical fatal error warning info debug".split()  # Py < 3.11
     parser.add_argument(
         "--log",
         default="warning",
@@ -39,8 +44,7 @@ def command_line_interface():
             "Provide logging level. "
             "Example '--log debug'. "
             "Default level: 'warning'"),
-        # choices=[k.lower() for k in logging.getLevelNamesMapping()],  # py3.11+
-        choices="critical fatal error warning info debug".split(),
+        choices=choices,
     )
     # fmt: on
 
