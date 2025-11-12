@@ -387,8 +387,13 @@ class ChartView(QtWidgets.QWidget):
             # Force refresh stream data to get latest
             try:
                 stream_data = self.live_run.force_refresh_stream_data(
-                    self.live_stream_name
+                    self.live_stream_name, raw=True
                 )
+                if stream_data is None:
+                    logger.debug(
+                        "Live stream data not yet aligned; skipping this refresh cycle"
+                    )
+                    return
             except ValueError as e:
                 if "conflicting sizes" in str(e).lower():
                     # This happens when data is being acquired and fields have different lengths
@@ -399,9 +404,6 @@ class ChartView(QtWidgets.QWidget):
                     return
                 else:
                     raise
-            logger.info(
-                f"Got fresh stream data with shape: {stream_data.shape if hasattr(stream_data, 'shape') else 'unknown'}"
-            )
 
             # Also refresh field selection data if it exists
             if hasattr(self, "field_widget") and self.field_widget:
@@ -419,53 +421,26 @@ class ChartView(QtWidgets.QWidget):
 
                 # Get new data - stream_data is already the data dict (not wrapped in "data")
                 try:
-                    x_data_array = stream_data[x_field]
-                    y_data_array = stream_data[y_field]
+                    if x_field not in stream_data or y_field not in stream_data:
+                        logger.debug(
+                            f"Missing fields for live update: {x_field=} {y_field=}"
+                        )
+                        continue
 
-                    # Convert xarray DataArrays to numpy arrays if needed
-                    try:
-                        if hasattr(x_data_array, "compute"):
-                            x_data = x_data_array.compute()
-                        elif hasattr(x_data_array, "data"):
-                            x_data = x_data_array.data
-                        else:
-                            x_data = x_data_array
-                    except ValueError as e:
-                        if (
-                            "replacement data" in str(e).lower()
-                            and "shape" in str(e).lower()
-                        ):
-                            # Data shape mismatch during live acquisition - skip this update
-                            logger.warning(
-                                f"Data shape mismatch for {x_field} during live update (will retry): {e}"
-                            )
-                            return
-                        raise
+                    x_data = numpy.asarray(stream_data[x_field])
+                    y_data = numpy.asarray(stream_data[y_field])
 
-                    try:
-                        if hasattr(y_data_array, "compute"):
-                            y_data = y_data_array.compute()
-                        elif hasattr(y_data_array, "data"):
-                            y_data = y_data_array.data
-                        else:
-                            y_data = y_data_array
-                    except ValueError as e:
-                        if (
-                            "replacement data" in str(e).lower()
-                            and "shape" in str(e).lower()
-                        ):
-                            # Data shape mismatch during live acquisition - skip this update
-                            logger.warning(
-                                f"Data shape mismatch for {y_field} during live update (will retry): {e}"
-                            )
-                            return
-                        raise
-
-                    # Ensure we have numpy arrays
-                    if not isinstance(x_data, numpy.ndarray):
-                        x_data = numpy.array(x_data)
-                    if not isinstance(y_data, numpy.ndarray):
-                        y_data = numpy.array(y_data)
+                    if (
+                        x_data.ndim != 0
+                        and y_data.ndim != 0
+                        and len(x_data) != len(y_data)
+                    ):
+                        min_len = min(len(x_data), len(y_data))
+                        logger.debug(
+                            f"Trimming live data for {label}: x={len(x_data)} points, y={len(y_data)} points -> {min_len}"
+                        )
+                        x_data = x_data[:min_len]
+                        y_data = y_data[:min_len]
 
                 except KeyError as e:
                     logger.error(
@@ -478,6 +453,10 @@ class ChartView(QtWidgets.QWidget):
                     # Try to update the existing plot object
                     # set_data expects (x, y) as two separate arguments
                     plot_obj.set_data(x_data, y_data)
+                    if len(curve_entry) == 2:
+                        self.curves[label] = (plot_obj, y_data)
+                    elif len(curve_entry) >= 3:
+                        self.curves[label] = (plot_obj, x_data, y_data)
                 except (ValueError, TypeError) as e:
                     if "shape" in str(e).lower() or "dimension" in str(e).lower():
                         logger.info(
@@ -525,7 +504,7 @@ class ChartView(QtWidgets.QWidget):
             if "conflicting sizes" in error_str or (
                 "replacement data" in error_str and "shape" in error_str
             ):
-                logger.warning(
+                logger.debug(
                     f"Data inconsistency during live update (will retry next cycle): {exc}"
                 )
                 # Don't stop live updates for this - it's a transient issue
