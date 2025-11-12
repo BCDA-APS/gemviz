@@ -1,9 +1,9 @@
 .. _changes:
 
 ..
-	CHANGES
-	=======
+  CHANGES
+  =======
 
-	title provided in CHANGES.rst file
+  title provided in CHANGES.rst file
 
 .. include:: ../../CHANGES.rst
