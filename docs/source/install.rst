@@ -22,4 +22,3 @@ should run ``gemviz`` as would a developer by following these (Linux) instructio
 5. ``conda activate gemviz``
 6. ``pip install -e .``
 7. ``gemviz &``
-

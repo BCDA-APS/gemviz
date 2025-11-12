@@ -68,7 +68,7 @@ jobs:
         name: gemviz-docs
         path: docs/build/html
         # ${{ steps.deployment.outputs.artifact }}
-    
+
     - name: Publish (push gh-pages branch) only on demand
       uses: peaceiris/actions-gh-pages@v4
       if: ${{ github.event.inputs.deploy }}
