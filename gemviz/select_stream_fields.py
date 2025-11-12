@@ -10,7 +10,7 @@ QWidget to select stream data fields for plotting.
 import datetime
 import logging
 
-import xarray
+import numpy
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
@@ -166,16 +166,36 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         return [], {}
 
     try:
-        # For active runs, force refresh to get latest data
+        # For active runs, read raw arrays to avoid shape mismatches
         if run.is_active:
             logger.info(f"Force refreshing stream data for active run {run.uid[:7]}")
-            stream_data = run.force_refresh_stream_data(stream_name)
-            stream = stream_data
+            stream = run.force_refresh_stream_data(stream_name, raw=True)
         else:
             stream = run.stream_data(stream_name)
     except KeyError as exc:
         logger.error(f"Stream {stream_name} not found in run data: {exc}")
         raise ValueError(f"Stream {stream_name} not found in run data")
+
+    raw_stream = isinstance(stream, dict)
+    if stream is None or (raw_stream and not stream):
+        raise ValueError("Stream data not yet available for live run.")
+
+    def get_field_array(field_name):
+        try:
+            if raw_stream:
+                data = numpy.asarray(stream[field_name])
+            else:
+                data_obj = stream[field_name]
+                if hasattr(data_obj, "compute"):
+                    data_obj = data_obj.compute()
+                data = numpy.asarray(getattr(data_obj, "data", data_obj))
+        except Exception as exc:
+            logger.error(f"Error reading data for {field_name}: {exc}")
+            available = list(stream.keys()) if hasattr(stream, "keys") else "unknown"
+            logger.error(f"Stream data keys: {available}")
+            raise
+
+        return data
 
     x_axis = selections.get("X")
     x_datetime = False  # special scaling using datetime
@@ -184,46 +204,18 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         x_units = ""
         x_axis = "data point number"
     else:
-        try:
-            x_data = stream[x_axis].compute()
-            x_shape = x_data.shape
-            x_units = run.stream_data_field_units(stream_name, x_axis)
-            if len(x_shape) != 1:
-                # fmt: off
-                raise ValueError(
-                    "Can only plot 1-D data now."
-                    f" {x_axis} shape is {x_shape}"
-                )
-        except Exception as exc:
-            logger.error(f"Error computing x_data for {x_axis}: {exc}")
-            logger.error(
-                f"Stream data keys: {list(stream.keys()) if hasattr(stream, 'keys') else 'No keys method'}"
+        x_data = get_field_array(x_axis)
+        x_shape = x_data.shape
+        x_units = run.stream_data_field_units(stream_name, x_axis)
+        if len(x_shape) != 1:
+            raise ValueError(
+                "Can only plot 1-D data now." f" {x_axis} shape is {x_shape}"
             )
-            # Try to get fresh data
-            logger.info("Attempting to refresh stream data for x_data...")
-            try:
-                # Force refresh the run data
-                run.request_from_tiled_server()
-                # Get fresh stream data
-                stream = run.stream_data(stream_name)
-                x_data = stream[x_axis].compute()
-                x_shape = x_data.shape
-                x_units = run.stream_data_field_units(stream_name, x_axis)
-                logger.info(
-                    f"Successfully refreshed x_data: {x_axis} shape is now {x_shape}"
-                )
-            except Exception as refresh_exc:
-                logger.error(f"Failed to refresh x_data: {refresh_exc}")
-                raise ValueError(f"Failed to get fresh data for {x_axis}: {exc}")
-            # fmt: on
-        if x_axis == "time" and min(x_data) > chartview.TIMESTAMP_LIMIT:
+        if x_axis == "time" and numpy.min(x_data) > chartview.TIMESTAMP_LIMIT:
             x_units = ""
             x_datetime = True
-            x_data = xarray.DataArray(
-                data=list(map(datetime.datetime.fromtimestamp, x_data[x_axis].data)),
-                name=x_axis,
-                # dims=x_axis,
-                # coords=?,
+            x_data = numpy.array(
+                list(map(datetime.datetime.fromtimestamp, numpy.asarray(x_data)))
             )
 
     datasets = []
@@ -236,7 +228,7 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         symbol = chartview.auto_symbol()
 
         try:
-            y_data = stream[y_axis].compute()
+            y_data = get_field_array(y_axis)
             y_units = run.stream_data_field_units(stream_name, y_axis)
             y_shape = y_data.shape
             if len(y_shape) != 1:
@@ -246,26 +238,7 @@ def to_datasets(run, stream_name, selections, scan_id=None):
                     f" {y_axis} shape is {y_shape}"
                 )
         except Exception as exc:
-            logger.error(f"Error computing y_data for {y_axis}: {exc}")
-            logger.error(
-                f"Stream data keys: {list(stream.keys()) if hasattr(stream, 'keys') else 'No keys method'}"
-            )
-            # Try to get fresh data
-            logger.info("Attempting to refresh stream data...")
-            try:
-                # Force refresh the run data
-                run.request_from_tiled_server()
-                # Get fresh stream data
-                stream = run.stream_data(stream_name)
-                y_data = stream[y_axis].compute()
-                y_units = run.stream_data_field_units(stream_name, y_axis)
-                y_shape = y_data.shape
-                logger.info(
-                    f"Successfully refreshed data: {y_axis} shape is now {y_shape}"
-                )
-            except Exception as refresh_exc:
-                logger.error(f"Failed to refresh data: {refresh_exc}")
-                raise ValueError(f"Failed to get fresh data for {y_axis}: {exc}")
+            raise ValueError(f"Failed to get fresh data for {y_axis}: {exc}")
 
         # keys used here must match the plotting back-end (matplotlib)
         scan_id = run.get_run_md("start", "scan_id")

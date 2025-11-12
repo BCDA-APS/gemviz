@@ -13,6 +13,7 @@ TAPI: Local support for the tiled API & data structures.
 
 import logging
 
+import numpy
 import tiled
 import tiled.queries
 from httpx import HTTPStatusError
@@ -71,14 +72,7 @@ class RunMetadata:
         has_stop = stop_doc is not None and stop_doc != {}
         is_active = not has_stop
 
-        # Log additional context for debugging
-        catalog_keys = list(self.catalog.keys())
-        is_first = self.uid == catalog_keys[0] if catalog_keys else False
-        is_last = self.uid == catalog_keys[-1] if catalog_keys else False
-
-        logger.info(
-            f"Run {self.uid[:7]}: has_stop={has_stop}, is_first={is_first}, is_last={is_last}, is_active={is_active}"
-        )
+        logger.info(f"Run {self.uid[:7]}: has_stop={has_stop}, is_active={is_active}")
         if has_stop:
             stop_doc = self.run_md.get("stop")
             if stop_doc and isinstance(stop_doc, dict):
@@ -221,14 +215,26 @@ class RunMetadata:
     def stream_data(self, stream_name):
         """Return the data structure for this stream."""
         if self.streams_data is None:
-            # Optimize with a cache.
-            self.streams_data = {
-                sname: self.run[sname]["data"].read() for sname in self.run
-            }
+            self.streams_data = {}
+
+        if stream_name not in self.streams_data:
+            try:
+                self.streams_data[stream_name] = self.run[stream_name]["data"].read()
+            except ValueError as exc:
+                if "conflicting sizes" in str(exc).lower():
+                    logger.debug(
+                        f"Stream {stream_name} not aligned during read; returning raw arrays"
+                    )
+                    self.streams_data[stream_name] = self._read_stream_arrays(
+                        stream_name
+                    )
+                else:
+                    logger.error(f"Failed to read stream data for {stream_name}: {exc}")
+                    raise
 
         return self.streams_data[stream_name]
 
-    def force_refresh_stream_data(self, stream_name):
+    def force_refresh_stream_data(self, stream_name, raw=False):
         """Force refresh of stream data from server."""
         logger.info(f"Force refreshing stream data for {stream_name}")
 
@@ -244,14 +250,93 @@ class RunMetadata:
             logger.info(f"Reading fresh data from run[{stream_name}][data]")
             fresh_data = self.run[stream_name]["data"].read()
 
+            if raw:
+                arrays = self._dataset_to_arrays(fresh_data)
+                logger.debug(
+                    f"Returning {stream_name} data as arrays with fields {list(arrays)}"
+                )
+                return arrays
+
             # Don't cache this data - return it directly
             logger.info(
                 f"Successfully refreshed {stream_name} data, shape: {fresh_data.shape if hasattr(fresh_data, 'shape') else 'unknown'}"
             )
             return fresh_data
+        except ValueError as exc:
+            if raw and "conflicting sizes" in str(exc).lower():
+                logger.debug(
+                    f"Stream {stream_name} data not aligned yet (conflicting sizes); reading fields individually"
+                )
+                return self._read_stream_arrays(stream_name)
+
+            logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
+            raise
         except Exception as exc:
             logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
             raise
+
+    def _dataset_to_arrays(self, dataset):
+        """Convert xarray Dataset to dict of numpy arrays trimmed to shared length."""
+        if dataset is None:
+            return {}
+
+        arrays = {}
+        min_len = None
+        for name, data_array in dataset.data_vars.items():
+            values = numpy.asarray(getattr(data_array, "data", data_array))
+            arrays[name] = values
+            length = values.shape[0] if values.ndim != 0 else 1
+            min_len = length if min_len is None else min(min_len, length)
+
+        for name, coord in dataset.coords.items():
+            if name in arrays:
+                continue
+            values = numpy.asarray(getattr(coord, "data", coord))
+            arrays[name] = values
+            length = values.shape[0] if values.ndim != 0 else 1
+            min_len = length if min_len is None else min(min_len, length)
+
+        if min_len is None:
+            return arrays
+
+        for name, values in list(arrays.items()):
+            if values.ndim != 0 and values.shape[0] > min_len:
+                arrays[name] = values[:min_len]
+        return arrays
+
+    def _read_stream_arrays(self, stream_name):
+        """Read each stream field individually and trim to shared length."""
+        arrays = {}
+        min_len = None
+
+        data_node = self.run[stream_name]["data"]
+        for field in data_node:
+            try:
+                data = data_node[field].read()
+            except Exception as exc:
+                logger.error(
+                    f"Failed to refresh field {field} for {stream_name}: {exc}"
+                )
+                raise
+
+            values = getattr(data, "values", getattr(data, "data", data))
+            values = numpy.asarray(values)
+            arrays[field] = values
+
+            length = values.shape[0] if values.ndim != 0 else 1
+            min_len = length if min_len is None else min(min_len, length)
+
+        if min_len is None:
+            return arrays
+
+        for field, values in list(arrays.items()):
+            if values.ndim != 0 and values.shape[0] > min_len:
+                arrays[field] = values[:min_len]
+
+        logger.debug(
+            f"Read {len(arrays)} fields from {stream_name} trimmed to length {min_len}"
+        )
+        return arrays
 
     def stream_data_field_shape(self, stream_name, field_name):
         """Shape of this data field."""
