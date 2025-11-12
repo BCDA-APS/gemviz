@@ -33,9 +33,9 @@ def command_line_interface():
 
     # fmt: off
     try:
-        choices=[k.lower() for k in logging.getLevelNamesMapping()]
+        choices = [k.lower() for k in logging.getLevelNamesMapping()]
     except AttributeError:
-        choices="critical fatal error warning info debug".split()  # Py < 3.11
+        choices = "critical fatal error warning info debug".split()  # Py < 3.11
     parser.add_argument(
         "--log",
         default="warning",
