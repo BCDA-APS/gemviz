@@ -25,7 +25,7 @@ jobs:
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.12"
 
       - name: Install Dependencies
         run: |
@@ -52,7 +52,7 @@ jobs:
         python-version:
           # https://devguide.python.org/versions/
           # - "3.14"
-          - "3.13"
+          # - "3.13"
           - "3.12"
           - "3.11"
           - "3.10"
