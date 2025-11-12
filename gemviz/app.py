@@ -32,11 +32,10 @@ def command_line_interface():
     parser = argparse.ArgumentParser(description=doc)
 
     # fmt: off
-    choices = [k.lower() for k in logging.getLevelNamesMapping()]
-    # try:
-    #     choices=[k.lower() for k in logging.getLevelNamesMapping()]
-    # except AttributeError:
-    #     choices="critical fatal error warning info debug".split()  # Py < 3.11
+    try:
+        choices=[k.lower() for k in logging.getLevelNamesMapping()]
+    except AttributeError:
+        choices="critical fatal error warning info debug".split()  # Py < 3.11
     parser.add_argument(
         "--log",
         default="warning",
