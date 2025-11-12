@@ -25,7 +25,7 @@ jobs:
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install Dependencies
         run: |
@@ -50,10 +50,12 @@ jobs:
     strategy:
       matrix:
         python-version:
+          # https://devguide.python.org/versions/
+          # - "3.14"
+          # - "3.13"
           - "3.12"
           - "3.11"
           - "3.10"
-          - "3.9"
       max-parallel: 5
     env:
       DISPLAY: ":99.0"
