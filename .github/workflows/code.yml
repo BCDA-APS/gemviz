@@ -27,21 +27,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Dependencies
+      - name: Upgrade pip & test with pre-commit
         run: |
+          set -vxeuo pipefail
           python -m pip install --upgrade pip
-          pip install flake8
-
-      - name: Run flake8
-        run: flake8
-
-      - name: Run black
-        uses: rickstaa/action-black@v1
-        with:
-          black_args: ". --check"
-
-      - name: Run isort
-        uses: isort/isort-action@master
+          python -m pip install pre-commit
+          pre-commit run --all-files
 
   tests:
     name: Python ${{ matrix.python-version }}
