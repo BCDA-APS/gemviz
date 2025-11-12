@@ -1,6 +1,7 @@
 """Unit tests of the gemviz.app module."""
 
 import sys
+
 import pytest
 
 from ..app import command_line_interface
@@ -23,7 +24,7 @@ def argv():
         [["-h"], "--log {critical,fatal,error,warn,warning,info,debug,notset}"],
         # Exact version string will change.
         # Delimiter is the only text available in any version.
-        [["-v"], "."],  
+        [["-v"], "."],
         [["--version"], "."],
     ],
 )

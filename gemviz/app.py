@@ -32,7 +32,7 @@ def command_line_interface():
     parser = argparse.ArgumentParser(description=doc)
 
     # fmt: off
-    choices=[k.lower() for k in logging.getLevelNamesMapping()]
+    choices = [k.lower() for k in logging.getLevelNamesMapping()]
     # try:
     #     choices=[k.lower() for k in logging.getLevelNamesMapping()]
     # except AttributeError:

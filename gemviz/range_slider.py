@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 class RangeSlider(QtWidgets.QSlider):
-
     """A slider for ranges.
 
     This class provides a dual-slider for ranges, where there is a defined
