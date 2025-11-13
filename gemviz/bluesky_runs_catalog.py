@@ -249,11 +249,21 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setStatus(run.summary())
         self.selected_run_uid = run.get_run_md("start", "uid")
 
+        # Clean up existing widget before creating a new one
+        if self.current_field_widget is not None:
+            old_widget = self.current_field_widget
+            self.current_field_widget = None
+            old_widget.setParent(None)
+            old_widget.deleteLater()
+
+        # Get layout and remove any remaining widgets (safety net)
+        layout = self.fields_groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+
+        # Now create the new widget
         widget = SelectFieldsWidget(self, run)
         self.current_field_widget = widget
         widget.selected.connect(partial(self.doPlotSlot, run))
-        layout = self.fields_groupbox.layout()
-        utils.removeAllLayoutWidgets(layout)
         layout.addWidget(widget)
 
     def doRunDoubleClickSlot(self, run):
@@ -287,12 +297,23 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setStatus(run.summary())
         self.selected_run_uid = run.get_run_md("start", "uid")
 
+        # Clean up existing widget before creating a new one
+        if self.current_field_widget is not None:
+            old_widget = self.current_field_widget
+            self.current_field_widget = None
+            old_widget.setParent(None)
+            old_widget.deleteLater()
+
+        # Get layout and remove any remaining widgets (safety net)
+        layout = self.fields_groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+
+        # Now create the new widget
         widget = SelectFieldsWidget(self, run)
         self.current_field_widget = widget
         widget.selected.connect(partial(self.doPlotSlot, run))
-        layout = self.fields_groupbox.layout()
-        utils.removeAllLayoutWidgets(layout)
         layout.addWidget(widget)
+
         # After widget is created, get current selections and trigger plot
         # (equivalent to clicking the replace button)
         if widget.table_view is not None:
