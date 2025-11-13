@@ -78,8 +78,12 @@ def removeAllLayoutWidgets(layout):
     for i in reversed(range(layout.count())):
         widget = layout.itemAt(i).widget()
         if widget is not None:
+            # Hide first to prevent widget becoming an orphaned window.
+            # When setParent(None) is called on a visible widget, Qt makes it
+            # a top-level window, causing orphaned popup windows.
+            # Hiding first prevents this, and Python GC will handle cleanup.
+            widget.hide()
             widget.setParent(None)
-            widget.deleteLater()
 
 
 def myLoadUi(ui_file, baseinstance=None, **kw):
