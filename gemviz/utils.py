@@ -76,7 +76,10 @@ def run_in_thread(func):
 def removeAllLayoutWidgets(layout):
     """Remove all existing widgets from QLayout."""
     for i in reversed(range(layout.count())):
-        layout.itemAt(i).widget().setParent(None)
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.setParent(None)
+            widget.deleteLater()
 
 
 def myLoadUi(ui_file, baseinstance=None, **kw):

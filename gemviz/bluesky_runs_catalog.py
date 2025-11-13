@@ -249,12 +249,8 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setStatus(run.summary())
         self.selected_run_uid = run.get_run_md("start", "uid")
 
-        # Clean up existing widget before creating a new one
-        if self.current_field_widget is not None:
-            old_widget = self.current_field_widget
-            self.current_field_widget = None
-            old_widget.setParent(None)
-            old_widget.deleteLater()
+        # Clear reference to old widget (if any)
+        self.current_field_widget = None
 
         # Get layout and remove any remaining widgets (safety net)
         layout = self.fields_groupbox.layout()
@@ -297,12 +293,8 @@ class BRC_MVC(QtWidgets.QWidget):
         self.setStatus(run.summary())
         self.selected_run_uid = run.get_run_md("start", "uid")
 
-        # Clean up existing widget before creating a new one
-        if self.current_field_widget is not None:
-            old_widget = self.current_field_widget
-            self.current_field_widget = None
-            old_widget.setParent(None)
-            old_widget.deleteLater()
+        # Clear reference to old widget (if any)
+        self.current_field_widget = None
 
         # Get layout and remove any remaining widgets (safety net)
         layout = self.fields_groupbox.layout()
