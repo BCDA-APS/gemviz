@@ -184,7 +184,7 @@ class RunMetadata:
 
         status = self.get_run_md("stop", "exit_status")
         plot_signal = None
-        if status in "abort success".split():
+        if status != "fail":
             # These runs probably have plottable data fields.
 
             # Do not choose any of these fields as the default

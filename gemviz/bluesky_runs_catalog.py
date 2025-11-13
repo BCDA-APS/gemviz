@@ -71,6 +71,7 @@ class BRC_MVC(QtWidgets.QWidget):
             getattr(widget, signal).connect(self.refreshFilteredCatalogView)
 
         self.brc_tableview.run_selected.connect(self.doRunSelectedSlot)
+        self.brc_tableview.run_double_selected.connect(self.doRunDoubleClickSlot)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -254,6 +255,53 @@ class BRC_MVC(QtWidgets.QWidget):
         layout = self.fields_groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(widget)
+
+    def doRunDoubleClickSlot(self, run):
+        """
+        Slot: run is double clicked in the table view.
+
+        run *object*:
+            Instance of ``tapi.RunMetadata``
+        """
+        import logging
+        from functools import partial
+
+        from .select_stream_fields import SelectFieldsWidget
+
+        logger = logging.getLogger(__name__)
+
+        # Force refresh of run metadata to get latest data
+        if run.is_active:
+            logger.info(f"Refreshing active run {run.uid[:7]} to get latest data")
+            # Note: is_active refreshes metadata
+
+        run_md = run.run_md
+        self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
+        try:
+            self.brc_run_viz.setData(self.getDataDescription(run))
+        except (KeyError, ValueError) as exinfo:
+            self.setStatus(
+                f"Can't select that run: ({exinfo.__class__.__name__}) {exinfo}"
+            )
+            return
+        self.setStatus(run.summary())
+        self.selected_run_uid = run.get_run_md("start", "uid")
+
+        widget = SelectFieldsWidget(self, run)
+        self.current_field_widget = widget
+        widget.selected.connect(partial(self.doPlotSlot, run))
+        layout = self.fields_groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+        layout.addWidget(widget)
+        # After widget is created, get current selections and trigger plot
+        # (equivalent to clicking the replace button)
+        if widget.table_view is not None:
+            model = widget.table_view.tableView.model()
+            if model is not None:
+                selections = model.plotFields()
+                stream_name = widget.stream_name
+                # Trigger plot with "replace" action
+                self.doPlotSlot(run, stream_name, "replace", selections)
 
     def getDataDescription(self, run):
         """Provide text description of the data streams in the run."""
