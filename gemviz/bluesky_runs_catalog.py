@@ -254,7 +254,11 @@ class BRC_MVC(QtWidgets.QWidget):
 
         # Get layout and remove any remaining widgets (safety net)
         layout = self.fields_groupbox.layout()
-        utils.removeAllLayoutWidgets(layout)
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget is not None:
+                widget.hide()
+                widget.setParent(None)
 
         # Now create the new widget
         widget = SelectFieldsWidget(self, run)
@@ -298,7 +302,11 @@ class BRC_MVC(QtWidgets.QWidget):
 
         # Get layout and remove any remaining widgets (safety net)
         layout = self.fields_groupbox.layout()
-        utils.removeAllLayoutWidgets(layout)
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget is not None:
+                widget.hide()
+                widget.setParent(None)
 
         # Now create the new widget
         widget = SelectFieldsWidget(self, run)
