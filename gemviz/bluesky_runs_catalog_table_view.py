@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 class BRCTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     run_selected = QtCore.pyqtSignal(object)
+    run_double_selected = QtCore.pyqtSignal(object)
 
     def __init__(self, parent, catalog, page_offset, page_size):
         self.parent = parent
@@ -66,6 +67,7 @@ class BRCTableView(QtWidgets.QWidget):
         self.setButtonPermissions()
         self.setPagerStatus()
         self.tableView.clicked.connect(self.doRunSelectedSlot)
+        self.tableView.doubleClicked.connect(self.doRunDoubleClickSlot)
 
         # Auto-refresh for new runs
         self._len_glitch_detected = False
@@ -190,6 +192,10 @@ class BRCTableView(QtWidgets.QWidget):
     def doRunSelectedSlot(self, index):
         run_md = list(self.model.runs.values())[index.row()]
         self.run_selected.emit(run_md)
+
+    def doRunDoubleClickSlot(self, index):
+        run_md = list(self.model.runs.values())[index.row()]
+        self.run_double_selected.emit(run_md)
 
     def setCatalog(self, catalog):
         self._catalog = catalog  # filtered catalog

@@ -407,7 +407,12 @@ class ChartView(QtWidgets.QWidget):
 
             # Also refresh field selection data if it exists
             if hasattr(self, "field_widget") and self.field_widget:
-                self.field_widget.refreshFieldData()
+                try:
+                    self.field_widget.refreshFieldData()
+                except RuntimeError:
+                    # Widget was deleted, clear reference
+                    logger.debug("field_widget was deleted, clearing reference")
+                    self.field_widget = None
 
             # Update each curve
             for label, (x_field, y_field) in self.live_data_fields.items():
@@ -508,6 +513,19 @@ class ChartView(QtWidgets.QWidget):
                     f"Data inconsistency during live update (will retry next cycle): {exc}"
                 )
                 # Don't stop live updates for this - it's a transient issue
+                return
+            # Check if this is a deleted widget error - treat as transient
+            if "wrapped c/c++ object" in error_str and "has been deleted" in error_str:
+                logger.warning(
+                    f"Widget was deleted during live update (will retry next cycle): {exc}"
+                )
+                # Clear invalid references but don't stop - it might be recreated
+                if hasattr(self, "field_widget") and self.field_widget:
+                    try:
+                        # Try to access to see if it's deleted
+                        _ = self.field_widget.objectName()
+                    except RuntimeError:
+                        self.field_widget = None
                 return
             # For other errors, log and stop
             logger.error(f"Live update failed: {exc}", exc_info=True)
