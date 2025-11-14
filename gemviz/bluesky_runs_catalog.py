@@ -259,6 +259,7 @@ class BRC_MVC(QtWidgets.QWidget):
             if widget is not None:
                 widget.hide()
                 widget.setParent(None)
+                widget.deleteLater()
 
         # Now create the new widget
         widget = SelectFieldsWidget(self, run)
@@ -307,6 +308,7 @@ class BRC_MVC(QtWidgets.QWidget):
             if widget is not None:
                 widget.hide()
                 widget.setParent(None)
+                widget.deleteLater()
 
         # Now create the new widget
         widget = SelectFieldsWidget(self, run)

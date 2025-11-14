@@ -131,9 +131,15 @@ class SelectFieldsWidget(QtWidgets.QWidget):
             # Remember which fields are currently selected (if we have a table).
             saved = {}
             if self.table_view is not None:
-                model = self.table_view.tableView.model()
-                if model is not None:
-                    saved = model.plotFields()
+                try:
+                    model = self.table_view.tableView.model()
+                    if model is not None:
+                        saved = model.plotFields()
+                except RuntimeError:
+                    # Widget was deleted, skip saving selections
+                    logger.debug("table_view widget was deleted, skipping save")
+                    self.table_view = None
+                    saved = {}
 
             # Rebuild the table for the current stream using fresh data.
             current_stream = self.stream_name
@@ -141,16 +147,22 @@ class SelectFieldsWidget(QtWidgets.QWidget):
 
             # Restore the previous selections on the new model.
             if self.table_view is not None and saved:
-                model = self.table_view.tableView.model()
-                if model is not None:
-                    fields = model.fields()
-                    x_field = saved.get("X")
-                    if x_field and x_field in fields:
-                        model.setSelectionsItem(fields.index(x_field), "X")
-                    for y_field in saved.get("Y", []):
-                        if y_field in fields:
-                            model.setSelectionsItem(fields.index(y_field), "Y")
-                    model.updateCheckboxes()
+                try:
+                    model = self.table_view.tableView.model()
+                    if model is not None:
+                        fields = model.fields()
+                        x_field = saved.get("X")
+                        if x_field and x_field in fields:
+                            model.setSelectionsItem(fields.index(x_field), "X")
+                        for y_field in saved.get("Y", []):
+                            if y_field in fields:
+                                model.setSelectionsItem(fields.index(y_field), "Y")
+                        model.updateCheckboxes()
+                except RuntimeError:
+                    logger.debug(
+                        "table_view widget was deleted during restore, skipping"
+                    )
+                    self.table_view = None
         else:
             logger.info(
                 f"Skipping field refresh: run {self.run.uid[:7]} is no longer active"
