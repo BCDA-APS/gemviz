@@ -490,13 +490,19 @@ class ChartView(QtWidgets.QWidget):
 
             # Update each curve
             for label, (x_field, y_field) in self.live_data_fields.items():
-                if label not in self.curves:
-                    logger.warning(f"Label {label} not found in curves dict")
+                # Get curveID from label
+                curveID = self._getCurveIDFromLabel(label)
+                if not curveID:
+                    logger.warning(f"Label {label} not found in CurveManager")
                     continue
 
-                curve_entry = self.curves[label]
-                plot_obj = curve_entry[0]
-                plot_kwargs = self._legacy_curve_styles.get(label, {})
+                curve_info = self.curveManager.getCurveData(curveID)
+                if not curve_info:
+                    logger.warning(f"Curve {curveID} not found in CurveManager")
+                    continue
+
+                plot_obj = self.curveManager.getCurvePlotObj(curveID)
+                style_kwargs = curve_info.get("style_kwargs", {})
 
                 # Get new data - stream_data is already the data dict (not wrapped in "data")
                 try:
@@ -532,11 +538,11 @@ class ChartView(QtWidgets.QWidget):
                     # Try to update the existing plot object
                     # set_data expects (x, y) as two separate arguments
                     plot_obj.set_data(x_data, y_data)
-                    if len(curve_entry) == 2:
-                        self.curves[label] = (plot_obj, y_data)
-                    elif len(curve_entry) >= 3:
-                        self.curves[label] = (plot_obj, x_data, y_data)
-                    self.updateBasicMathInfo(label)
+                    # Update CurveManager with new data
+                    self.curveManager.updateCurve(
+                        curveID=curveID, plot_obj=plot_obj, x_data=x_data, y_data=y_data
+                    )
+                    self.updateBasicMathInfo(curveID)
                 except (ValueError, TypeError) as e:
                     if "shape" in str(e).lower() or "dimension" in str(e).lower():
                         logger.info(
@@ -548,17 +554,17 @@ class ChartView(QtWidgets.QWidget):
 
                         # Create new plot with same style
                         new_plot = self.main_axes.plot(
-                            x_data, y_data, label=label, **plot_kwargs
+                            x_data, y_data, label=label, **style_kwargs
                         )[0]
 
-                        # Store the Matplotlib line together with the data arrays for reuse
-                        if len(curve_entry) == 2:
-                            self.curves[label] = (new_plot, y_data)
-                        elif len(curve_entry) >= 3:
-                            self.curves[label] = (new_plot, x_data, y_data)
-                        else:
-                            self.curves[label] = (new_plot,)
-                        self.updateBasicMathInfo(label)
+                        # Update CurveManager with new plot object and data
+                        self.curveManager.updateCurve(
+                            curveID=curveID,
+                            plot_obj=new_plot,
+                            x_data=x_data,
+                            y_data=y_data,
+                        )
+                        self.updateBasicMathInfo(curveID)
                     else:
                         logger.error(f"Error updating plot data for {label}: {e}")
                         raise
