@@ -30,6 +30,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from . import utils
 
 logger = logging.getLogger(__name__)
 
@@ -145,6 +146,7 @@ class ChartView(QtWidgets.QWidget):
 
         self.curves = {}  # all the curves on the graph, key = label
         self.curve_styles = {}  # original style kwargs, keyed by label
+        self.clearBasicMath()
 
         # Live plotting support
         self.live_mode = False
@@ -197,6 +199,7 @@ class ChartView(QtWidgets.QWidget):
             raise KeyError("This curve has no label.")
         if label not in self.curves:
             self.addCurve(*args, title=title, **ds_options)
+            self.updateBasicMathInfo(label)
 
     def plotOptions(self):
         return self._plot_options
@@ -301,7 +304,9 @@ class ChartView(QtWidgets.QWidget):
     def ylabel(self):
         return self.option("ylabel")
 
-    # ========== Live Plotting Methods ==========
+    # ==========================================
+    #   Live Plotting Methods
+    # ==========================================
 
     def enableLiveMode(self, run, stream_name, data_fields, field_widget=None):
         """
@@ -462,6 +467,7 @@ class ChartView(QtWidgets.QWidget):
                         self.curves[label] = (plot_obj, y_data)
                     elif len(curve_entry) >= 3:
                         self.curves[label] = (plot_obj, x_data, y_data)
+                    self.updateBasicMathInfo(label)
                 except (ValueError, TypeError) as e:
                     if "shape" in str(e).lower() or "dimension" in str(e).lower():
                         logger.info(
@@ -483,6 +489,7 @@ class ChartView(QtWidgets.QWidget):
                             self.curves[label] = (new_plot, x_data, y_data)
                         else:
                             self.curves[label] = (new_plot,)
+                        self.updateBasicMathInfo(label)
                     else:
                         logger.error(f"Error updating plot data for {label}: {e}")
                         raise
@@ -531,6 +538,240 @@ class ChartView(QtWidgets.QWidget):
             logger.error(f"Live update failed: {exc}", exc_info=True)
             self.stopLiveUpdates()
             self.setPlotSubtitle(f"Live update error: {exc}")
+
+    # ==========================================
+    #   Basic maths methods
+    # ==========================================
+
+    def updateBasicMathInfo(self, curveID):
+        if curveID and curveID in self.curves:
+            try:
+                curve_data = self.curves[curveID]
+                if len(curve_data) == 2:
+                    y = curve_data[1]
+                    x = numpy.arange(len(y))  # More efficient than range()
+                elif len(curve_data) == 3:
+                    x = curve_data[1]
+                    y = curve_data[2]
+                stats = self.calculateBasicMath(x, y)
+                for i, txt in zip(
+                    stats, ["min_text", "max_text", "com_text", "mean_text"]
+                ):
+                    label = self.parent.findChild(QtWidgets.QLabel, txt)
+                    if label is not None:  # Check for None
+                        if isinstance(i, tuple):
+                            result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
+                        else:
+                            result = f"{utils.num2fstr(i)}" if i else "n/a"
+                        label.setText(result)
+            except Exception as exc:
+                logger.error(str(exc))
+                self.clearBasicMath()
+        else:
+            self.clearBasicMath()
+
+    def clearBasicMath(self):
+        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+            label = self.parent.findChild(QtWidgets.QLabel, txt)
+            if label is not None:  # Check for None
+                label.setText("n/a")
+
+    def calculateBasicMath(self, x_data, y_data):
+        x_array = numpy.array(x_data, dtype=float)
+        y_array = numpy.array(y_data, dtype=float)
+        # Find y_min and y_max
+        y_min = numpy.min(y_array)
+        y_max = numpy.max(y_array)
+        # Find the indices of the min and max y value
+        y_min_index = numpy.argmin(y_array)
+        y_max_index = numpy.argmax(y_array)
+        # Find the corresponding x values for y_min and y_max
+        x_at_y_min = x_array[y_min_index]
+        x_at_y_max = x_array[y_max_index]
+        # Calculate x_com and y_mean
+        x_com = (
+            numpy.sum(x_array * y_array) / numpy.sum(y_array)
+            if numpy.sum(y_array) != 0
+            else None
+        )
+        y_mean = numpy.mean(y_array)
+        return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
+
+    # ==========================================
+    #   Cursors methods
+    # ==========================================
+
+    # def onRemoveCursor(self, cursor_num):
+    #     cross = self.cursors.get(cursor_num)
+    #     if cross is not None:
+    #         try:
+    #             cross.remove()
+    #         except (NotImplementedError, AttributeError):
+    #             # Handle case where artist cannot be removed
+    #             pass
+    #         self.cursors[cursor_num] = None
+    #         self.cursors[f"pos{cursor_num}"] = None
+    #         self.cursors[f"text{cursor_num}"] = (
+    #             "middle click or alt+right click" if cursor_num == 1 else "right click"
+    #         )
+    #     self.cursors["diff"] = "n/a"
+    #     self.cursors["midpoint"] = "n/a"
+    #     self.updateCursorInfo()
+    #     # Recompute the axes limits and autoscale:
+    #     self.main_axes.relim()
+    #     self.main_axes.autoscale_view()
+    #     self.canvas.draw()
+
+    # def clearCursors(self):
+    #     self.onRemoveCursor(1)
+    #     self.onRemoveCursor(2)
+
+    # def onSnapCursorsToggled(self, checked):
+    #     """Handle snap cursors checkbox toggle.
+
+    #     Parameters:
+    #         checked (bool): True if checkbox is checked (snap enabled), False if unchecked (snap disabled)
+    #     """
+    #     self._snap_to_curve = checked
+
+    # def findNearestPoint(
+    #     self, x_click: float, y_click: float
+    # ) -> Optional[tuple[float, float]]:
+    #     """
+    #     Find the nearest data point in the selected curve to the given click position.
+
+    #     Parameters:
+    #     - x_click: X coordinate of the click
+    #     - y_click: Y coordinate of the click
+
+    #     Returns:
+    #     - Tuple of (x_nearest, y_nearest) if a curve is selected and has data, None otherwise
+    #     """
+    #     curveID = self.getSelectedCurveID()
+    #     if not curveID or curveID not in self.curveManager.curves():
+    #         return None
+
+    #     curve_data = self.curveManager.getCurveData(curveID)
+    #     if not curve_data:
+    #         return None
+
+    #     ds = curve_data.get("ds")
+    #     if not ds or len(ds) < 2:
+    #         return None
+
+    #     x_data = ds[0]
+    #     y_data = ds[1]
+
+    #     # Ensure data are numpy arrays
+    #     if not isinstance(x_data, numpy.ndarray):
+    #         x_data = numpy.array(x_data, dtype=float)
+    #     if not isinstance(y_data, numpy.ndarray):
+    #         y_data = numpy.array(y_data, dtype=float)
+
+    #     # Apply offset and factor to y_data to match what's displayed
+    #     factor = curve_data.get("factor", 1)
+    #     offset = curve_data.get("offset", 0)
+    #     y_data = numpy.multiply(y_data, factor) + offset
+
+    #     # Calculate distances to all points
+    #     distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
+
+    #     # Find the index of the nearest point
+    #     nearest_index = numpy.argmin(distances)
+
+    #     return (float(x_data[nearest_index]), float(y_data[nearest_index]))
+
+    # def onclick(self, event):
+    #     # Check if the click was in the main_axes
+    #     if event.inaxes is self.main_axes:
+    #         # Determine cursor position based on snap setting
+    #         if self._snap_to_curve:
+    #             # Find the nearest point in the selected curve
+    #             nearest_point = self.findNearestPoint(event.xdata, event.ydata)
+
+    #             if nearest_point is None:
+    #                 # No curve selected or no data available
+    #                 return
+
+    #             x_cursor, y_cursor = nearest_point
+    #         else:
+    #             # Use exact click position
+    #             x_cursor, y_cursor = event.xdata, event.ydata
+
+    #         # Middle click or Alt+right click for red cursor (cursor 1)
+    #         if event.button == MIDDLE_BUTTON or (
+    #             event.button == RIGHT_BUTTON and self.alt_pressed
+    #         ):
+    #             if self.cursors[1] is not None:
+    #                 try:
+    #                     self.cursors[1].remove()  # Remove existing red cursor
+    #                 except (NotImplementedError, AttributeError):
+    #                     # Handle case where artist cannot be removed
+    #                     pass
+    #             (self.cursors[1],) = self.main_axes.plot(
+    #                 x_cursor, y_cursor, "r+", markersize=15, linewidth=2
+    #             )
+    #             # Update cursor position
+    #             self.cursors["pos1"] = (x_cursor, y_cursor)
+
+    #         # Right click (without Alt) for blue cursor (cursor 2)
+    #         elif event.button == RIGHT_BUTTON and not self.alt_pressed:
+    #             if self.cursors[2] is not None:
+    #                 try:
+    #                     self.cursors[2].remove()  # Remove existing blue cursor
+    #                 except (NotImplementedError, AttributeError):
+    #                     # Handle case where artist cannot be removed
+    #                     pass
+    #             (self.cursors[2],) = self.main_axes.plot(
+    #                 x_cursor, y_cursor, "b+", markersize=15, linewidth=2
+    #             )
+
+    #             # Update cursor position
+    #             self.cursors["pos2"] = (x_cursor, y_cursor)
+
+    #         # Update the info panel with cursor positions
+    #         self.calculateCursors()
+
+    #         # Redraw the canvas to display the new markers
+    #         self.canvas.draw()
+
+    # def calculateCursors(self):
+    #     """
+    #     Update cursor information in info panel widget.
+    #     """
+    #     # Check for the first cursor and update text accordingly
+    #     if self.cursors[1]:
+    #         x1, y1 = self.cursors["pos1"]
+    #         self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
+    #     # Check for the second cursor and update text accordingly
+    #     if self.cursors[2]:
+    #         x2, y2 = self.cursors["pos2"]
+    #         self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
+    #     # Calculate differences and midpoints only if both cursors are present
+    #     if self.cursors[1] and self.cursors[2]:
+    #         delta_x = x2 - x1
+    #         delta_y = y2 - y1
+    #         midpoint_x = (x1 + x2) / 2
+    #         midpoint_y = (y1 + y2) / 2
+    #         self.cursors["diff"] = (
+    #             f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
+    #         )
+    #         self.cursors["midpoint"] = (
+    #             f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+    #         )
+    #     self.updateCursorInfo()
+
+    # def updateCursorInfo(self):
+    #     self.mda_mvc.mda_file_viz.pos1_text.setText(self.cursors["text1"])
+    #     self.mda_mvc.mda_file_viz.pos2_text.setText(self.cursors["text2"])
+    #     self.mda_mvc.mda_file_viz.diff_text.setText(self.cursors["diff"])
+    #     self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
+
+    # def clearCursorInfo(self):
+    #     self.mda_mvc.mda_file_viz.pos1_text.setText("middle click or alt+right click")
+    #     self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
+    #     self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
+    #     self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
 
 
 # -----------------------------------------------------------------------------
