@@ -31,6 +31,7 @@ from matplotlib.figure import Figure
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from . import utils
+from .curve_manager import CurveManager
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +146,8 @@ class ChartView(QtWidgets.QWidget):
         size.setHorizontalStretch(4)
 
         self.curves = {}  # all the curves on the graph, key = label
-        self.curve_styles = {}  # original style kwargs, keyed by label
+        self._legacy_curve_styles = {}  # original style kwargs, keyed by label
+        self.curveManager = CurveManager(self)
         self.clearBasicMath()
 
         # Live plotting support
@@ -157,17 +159,26 @@ class ChartView(QtWidgets.QWidget):
         self.field_widget = None
         self.update_interval = 2000  # milliseconds (2 seconds)
 
+    # ==========================================
+    #   Curves management
+    # ==========================================
+
     def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
-        plot_obj = self.main_axes.plot(*args, **kwargs)
+        # Filter out metadata kwargs before passing to matplotlib
+        # matplotlib doesn't recognize run_uid, y_field, stream_name
+        metadata_keys = {"run_uid", "y_field", "stream_name"}
+        matplotlib_kwargs = {k: v for k, v in kwargs.items() if k not in metadata_keys}
+
+        plot_obj = self.main_axes.plot(*args, **matplotlib_kwargs)
         self.updatePlot(title)
         # Add to the dictionary
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
         # Capture the style kwargs separately and cache the plotted data by label
-        style_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
-        self.curve_styles[label] = style_kwargs
+        plot_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
+        self._legacy_curve_styles[label] = plot_kwargs
 
         # Store the Matplotlib line together with the data arrays for reuse
         if len(args) == 1:
@@ -176,6 +187,64 @@ class ChartView(QtWidgets.QWidget):
             self.curves[label] = (plot_obj[0], args[0], args[1])
         else:
             self.curves[label] = (plot_obj[0],)
+
+        # Also add to CurveManager if we have the required info
+        run_uid = kwargs.get("run_uid")
+        y_field = kwargs.get("y_field")
+        stream_name = kwargs.get("stream_name")
+
+        if run_uid is not None and y_field is not None:
+            # Generate curveID and add to CurveManager
+            curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
+
+            # Prepare data for CurveManager
+            x_data = args[0] if len(args) >= 2 else None
+            y_data = args[1] if len(args) >= 2 else args[0] if len(args) >= 1 else None
+
+            # Extract only style kwargs (exclude metadata that's passed separately)
+            style_kwargs = {
+                k: v
+                for k, v in plot_kwargs.items()
+                if k not in ["run_uid", "y_field", "stream_name"]
+            }
+
+            self.curveManager.addCurve(
+                curveID=curveID,
+                plot_obj=plot_obj[0],
+                x_data=x_data,
+                y_data=y_data,
+                label=label,
+                style_kwargs=style_kwargs,
+                run_uid=run_uid,
+                y_field=y_field,
+                stream_name=stream_name,
+            )
+            logger.debug(
+                f"Added curve to CurveManager: curveID={curveID}, curves_count={len(self.curveManager.curves())}"
+            )
+
+    def _getCurveIDFromLabel(self, label):
+        """
+        Find the curveID for a given display label.
+
+        Parameters:
+            label (str): The display label (e.g., "scan_id (uid[:7]) - y_field")
+
+        Returns:
+            str or None: The curveID if found, None otherwise
+        """
+        if not hasattr(self, "curveManager"):
+            return None
+
+        # Search through CurveManager curves to find matching label
+        for curveID, curve_info in self.curveManager.curves().items():
+            if curve_info.get("label") == label:
+                return curveID
+        return None
+
+    # ==========================================
+    #   Plot management
+    # ==========================================
 
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
@@ -427,7 +496,7 @@ class ChartView(QtWidgets.QWidget):
 
                 curve_entry = self.curves[label]
                 plot_obj = curve_entry[0]
-                style_kwargs = self.curve_styles.get(label, {})
+                plot_kwargs = self._legacy_curve_styles.get(label, {})
 
                 # Get new data - stream_data is already the data dict (not wrapped in "data")
                 try:
@@ -479,7 +548,7 @@ class ChartView(QtWidgets.QWidget):
 
                         # Create new plot with same style
                         new_plot = self.main_axes.plot(
-                            x_data, y_data, label=label, **style_kwargs
+                            x_data, y_data, label=label, **plot_kwargs
                         )[0]
 
                         # Store the Matplotlib line together with the data arrays for reuse
@@ -544,30 +613,25 @@ class ChartView(QtWidgets.QWidget):
     # ==========================================
 
     def updateBasicMathInfo(self, curveID):
-        if curveID and curveID in self.curves:
-            try:
-                curve_data = self.curves[curveID]
-                if len(curve_data) == 2:
-                    y = curve_data[1]
-                    x = numpy.arange(len(y))  # More efficient than range()
-                elif len(curve_data) == 3:
-                    x = curve_data[1]
-                    y = curve_data[2]
-                stats = self.calculateBasicMath(x, y)
-                for i, txt in zip(
-                    stats, ["min_text", "max_text", "com_text", "mean_text"]
-                ):
-                    label = self.parent.findChild(QtWidgets.QLabel, txt)
-                    if label is not None:  # Check for None
-                        if isinstance(i, tuple):
-                            result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
-                        else:
-                            result = f"{utils.num2fstr(i)}" if i else "n/a"
-                        label.setText(result)
-            except Exception as exc:
-                logger.error(str(exc))
+        if not curveID:
+            self.clearBasicMath()
+            return
+        try:
+            x, y = self.curveManager.getCurveXYData(curveID)
+            if x is None or y is None:
                 self.clearBasicMath()
-        else:
+                return
+            stats = self.calculateBasicMath(x, y)
+            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
+                label_widget = self.parent.findChild(QtWidgets.QLabel, txt)
+                if label_widget is not None:
+                    if isinstance(i, tuple):
+                        result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
+                    else:
+                        result = f"{utils.num2fstr(i)}" if i else "n/a"
+                    label_widget.setText(result)
+        except Exception as exc:
+            logger.error(f"Error updating basic math from CurveManager: {exc}")
             self.clearBasicMath()
 
     def clearBasicMath(self):
