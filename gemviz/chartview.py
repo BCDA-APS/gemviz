@@ -152,7 +152,22 @@ class ChartView(QtWidgets.QWidget):
         self.curveManager.curveRemoved.connect(self.onCurveRemoved)
         self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
 
-        # UI elements
+        # Access UI elements from parent BRCRunVisualization
+        if self.parent is not None:
+            # Access curve combobox
+            self.curveBox = self.parent.brc_run_viz.curveBox
+            self.curveBox.clear()  # Clear any old curves from previous ChartView
+            self.curveBox.currentIndexChanged.connect(self.onCurveSelected)
+            # clearAll
+            self.parent.brc_run_viz.clearAll.clicked.connect(self.onClearAllClicked)
+            # curveRemove
+            self.parent.brc_run_viz.curveRemove.clicked.connect(
+                self.onCurveRemoveClicked
+            )
+        else:
+            self.curveBox = None
+
+        # Maths & statistics
         self.clearBasicMath()
 
         # Live plotting support
@@ -170,7 +185,14 @@ class ChartView(QtWidgets.QWidget):
 
     def onCurveAdded(self, curveID):
         """Handle the addition of a new curve on the plot."""
-        pass
+        if self.curveBox is None:
+            return
+        curve_info = self.curveManager.getCurveData(curveID)
+        if curve_info:
+            label = curve_info.get("label", curveID)
+            self.curveBox.addItem(label, curveID)
+            # Always select the newly added curve
+            self.curveBox.setCurrentIndex(self.curveBox.count() - 1)
 
     def onCurveUpdated(self, curveID, recompute_y, update_x):
         """Handle updates to an existing curve on the plot."""
@@ -178,11 +200,74 @@ class ChartView(QtWidgets.QWidget):
 
     def onCurveRemoved(self, curveID, curve_data, count):
         """Handle the removal of an existing curve on the plot."""
-        pass
+        if self.curveBox is None:
+            return
+        print(f"DEBUG: removing curve {curveID}")
+        # Find and remove the item with this curveID
+        for i in range(self.curveBox.count()):
+            if self.curveBox.itemData(i) == curveID:
+                self.curveBox.removeItem(i)
+                break
+        # Select first remaining curve if one exists
+        if self.curveBox.count() > 0:
+            self.curveBox.setCurrentIndex(0)
 
     def onAllCurvesRemoved(self):
         """Handle the removal of all curves on the plot."""
+        if self.curveBox is not None:
+            self.curveBox.clear()
+
+    def onCurveSelectionChanged(self, label):
+        """Handle curve selection change in combobox."""
+        # This will be populated when we add curve interaction features
         pass
+
+    def onCurveSelected(self, index):
+        """Handle curve selection change in combobox."""
+        if self.curveBox is None or index < 0:
+            return
+        # Get curveID from combobox item data
+        curveID = self.curveBox.itemData(index)
+        if curveID:
+            # label = self.curveBox.itemText(index)
+            # This will be populated when we add curve interaction features
+            pass
+
+    def onCurveRemoveClicked(self):
+        """Handle Remove Curve button click."""
+        if self.curveBox is None or self.curveBox.count() == 0:
+            return
+
+        # Get the currently selected curve
+        current_index = self.curveBox.currentIndex()
+        if current_index < 0:  # if comboBox empty
+            return
+
+        curveID = self.curveBox.itemData(current_index)
+        if curveID is None:
+            return
+
+        # Remove plot object from axes
+        plot_obj = self.curveManager.getCurvePlotObj(curveID)
+        if plot_obj is not None:
+            plot_obj.remove()
+
+        # Remove from CurveManager (will emit curveRemoved signal)
+        self.curveManager.removeCurve(curveID)
+
+        # Generate title from remaining curves and update plot
+        scan_ids = set()
+        for curveID, curve_info in self.curveManager.curves().items():
+            label = curve_info.get("label", "")
+            if label:
+                scan_id = label.split()[0] if label.split() else ""
+                if scan_id:
+                    scan_ids.add(scan_id)
+        title = f"scan(s):{', '.join(sorted(scan_ids))}" if scan_ids else ""
+        self.updatePlot(title)
+
+        # Redraw canvas
+        self.canvas.draw()
 
     def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
@@ -399,6 +484,20 @@ class ChartView(QtWidgets.QWidget):
 
     def ylabel(self):
         return self.option("ylabel")
+
+    def onClearAllClicked(self):
+        """Handle Clear Graph button click."""
+        # Clear all plot lines, legend, axis labels, and axes title
+        self.main_axes.clear()
+
+        # Clear figure title (suptitle)
+        self.figure.suptitle("")
+
+        # Clear the curve manager (will emit allCurvesRemoved signal)
+        self.curveManager.removeAllCurves()
+
+        # Redraw the canvas
+        self.canvas.draw()
 
     # ==========================================
     #   Live Plotting Methods

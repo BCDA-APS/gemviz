@@ -129,7 +129,7 @@
            <number>5</number>
           </property>
           <item>
-           <widget class="QComboBox" name="curveBox_2">
+           <widget class="QComboBox" name="curveBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -142,7 +142,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="curveRemove_2">
+           <widget class="QPushButton" name="curveRemove">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -200,7 +200,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="curveStyle_2"/>
+           <widget class="QComboBox" name="curveStyle"/>
           </item>
           <item>
            <spacer name="horizontalSpacer_6">
@@ -216,7 +216,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QCheckBox" name="logXCheckBox_2">
+           <widget class="QCheckBox" name="logXCheckBox">
             <property name="maximumSize">
              <size>
               <width>57</width>
@@ -245,7 +245,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QCheckBox" name="logYCheckBox_2">
+           <widget class="QCheckBox" name="logYCheckBox">
             <property name="toolTip">
              <string>Use logarithmic scale for Y-axis</string>
             </property>
@@ -268,7 +268,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="clearAll_2">
+           <widget class="QPushButton" name="clearAll">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
