@@ -36,8 +36,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>673</width>
-        <height>739</height>
+        <width>687</width>
+        <height>724</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -112,7 +112,7 @@
            <height>35</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,0,0,0,1,0,1,0,0,0,0">
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,0,0,0,0,1,0,0,0,0">
           <property name="spacing">
            <number>7</number>
           </property>
@@ -193,14 +193,11 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label_2">
+           <widget class="QCheckBox" name="derivativeCheckBox">
             <property name="text">
-             <string>Style</string>
+             <string>Derivative</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="curveStyle"/>
           </item>
           <item>
            <spacer name="horizontalSpacer_6">
@@ -318,7 +315,7 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tab">
+            <widget class="QWidget" name="Stats">
              <attribute name="title">
               <string>Stats</string>
              </attribute>
@@ -515,7 +512,7 @@
                  <item row="1" column="2">
                   <widget class="QLineEdit" name="factor_value">
                    <property name="toolTip">
-                    <string>offset + (factor *y)</string>
+                    <string>new_y = offset + (factor *y)</string>
                    </property>
                    <property name="text">
                     <string>1</string>
@@ -567,7 +564,7 @@
                  <item row="3" column="2">
                   <widget class="QLineEdit" name="offset_value">
                    <property name="toolTip">
-                    <string>offset + (factor *y)</string>
+                    <string>new_y = offset + (factor *y)</string>
                    </property>
                    <property name="text">
                     <string>0</string>
@@ -615,10 +612,154 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_2">
+            <widget class="QWidget" name="Fit">
              <attribute name="title">
               <string>Fit</string>
              </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QGroupBox" name="fitControls">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string/>
+                </property>
+                <layout class="QGridLayout" name="fitControlsLayout">
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>7</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>5</number>
+                 </property>
+                 <item row="1" column="2">
+                  <widget class="QPushButton" name="clearFitsButton">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>1</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>Remove fit from current curve</string>
+                   </property>
+                   <property name="text">
+                    <string>Clear Fit</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="fitModelCombo">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>1</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>Select fit model to apply</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QCheckBox" name="useFitRangeCheck">
+                   <property name="toolTip">
+                    <string>Use cursor positions to define fit range</string>
+                   </property>
+                   <property name="text">
+                    <string>Use cursor range</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="fitRangeLabel">
+                   <property name="text">
+                    <string>Fit Range:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="fitModelLabel">
+                   <property name="text">
+                    <string>Fit Model:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QPushButton" name="fitButton">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>1</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>Perform fit on selected curve</string>
+                   </property>
+                   <property name="text">
+                    <string>Fit</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="fitResults">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>1</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Fit Result</string>
+                </property>
+                <layout class="QVBoxLayout" name="fitResultsLayout">
+                 <property name="spacing">
+                  <number>5</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>5</number>
+                 </property>
+                 <item>
+                  <widget class="QTextEdit" name="fitDetails">
+                   <property name="toolTip">
+                    <string>Detailed fit results and parameters</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>

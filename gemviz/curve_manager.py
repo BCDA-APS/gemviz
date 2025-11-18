@@ -7,6 +7,7 @@ Curve management for ChartView.
 
 from PyQt5 import QtCore
 import logging
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -73,13 +74,7 @@ class CurveManager(QtCore.QObject):
         if curve_info:
             data = curve_info.get("data")
             if data:
-                if len(data) == 3:
-                    return (data[1], data[2])  # (x_data, y_data)
-                elif len(data) == 2:
-                    import numpy
-
-                    x_data = numpy.arange(len(data[1]))
-                    return (x_data, data[1])  # (generated_x, y_data)
+                return (data[1], data[2])  # (x_data, y_data)
         return (None, None)
 
     def getCurveLabel(self, curveID):
@@ -163,27 +158,27 @@ class CurveManager(QtCore.QObject):
 
         # If x_data is None, generate it from y_data (single-argument plot)
         if x_data is None:
-            import numpy
-
             x_data = numpy.arange(len(y_data))
 
-        # Store curve data in the same format as current self.curves dict
-        # This keeps compatibility: (plot_obj, x_data, y_data)
         curve_data = (plot_obj, x_data, y_data)
 
         # Store additional metadata
         curve_info = {
             "data": curve_data,
+            "original_y_data": y_data.copy(),
+            "factor": 1.0,
+            "offset": 0.0,
             "label": label,
             "style_kwargs": style_kwargs or {},
             **kwargs,  # run_uid, y_field, stream_name, offset, factor, etc.
         }
 
+        # Add new curve to self._curves dict
         self._curves[curveID] = curve_info
-
         logger.debug(
             f"Added curve {curveID} to manager: label={label}, has_x={x_data is not None}"
         )
+        # Emit signal
         self.curveAdded.emit(curveID)
 
     def updateCurve(
@@ -225,14 +220,8 @@ class CurveManager(QtCore.QObject):
         new_plot_obj = plot_obj if plot_obj is not None else current_plot_obj
 
         # Get current x_data and y_data
-        if len(current_data) == 3:
-            current_x = current_data[1]
-            current_y = current_data[2]
-        else:  # len == 2 (only y_data)
-            import numpy
-
-            current_x = numpy.arange(len(current_data[1]))
-            current_y = current_data[1]
+        current_x = current_data[1]
+        current_y = current_data[2]
 
         # Update with provided data or keep existing
         new_x_data = x_data if x_data is not None else current_x
@@ -258,7 +247,67 @@ class CurveManager(QtCore.QObject):
         logger.debug(
             f"Updated curve {curveID}: recompute_y={recompute_y}, update_x={update_x}"
         )
+        # Emit signal
         self.curveUpdated.emit(curveID, recompute_y, update_x)
+        return True
+
+    def updateCurveOffsetFactor(self, curveID, offset=None, factor=None):
+        """
+        Update offset and/or factor for a curve and apply transformation.
+
+        Parameters:
+            curveID (str): Unique identifier of the curve
+            offset (float, optional): New offset value (None to keep current)
+            factor (float, optional): New factor value (None to keep current)
+
+        Returns:
+            bool: True if curve was found and updated, False otherwise
+        """
+        if curveID not in self._curves:
+            logger.debug(
+                f"Curve {curveID} not found in manager for offset/factor update"
+            )
+            return False
+
+        curve_info = self._curves[curveID]
+
+        # Get original y_data
+        original_y = curve_info.get("original_y_data")
+        if original_y is None:
+            logger.warning(
+                f"Curve {curveID} has no original_y_data, cannot apply transformation"
+            )
+            return False
+
+        # Update offset and/or factor (keep current if None)
+        if offset is not None:
+            curve_info["offset"] = offset
+        if factor is not None:
+            curve_info["factor"] = factor
+
+        # Get current values (may have been updated above)
+        current_offset = curve_info.get("offset", 0.0)
+        current_factor = curve_info.get("factor", 1.0)
+
+        # Apply transformation: new_y = offset + (factor * original_y)
+        original_y_array = numpy.array(original_y)
+        transformed_y = current_offset + (current_factor * original_y_array)
+
+        # Get the plot object and x_data
+        plot_obj = curve_info["data"][0]
+        x_data = curve_info["data"][1]
+
+        # Update plot object data
+        plot_obj.set_data(x_data, transformed_y)
+
+        # Update stored data
+        curve_info["data"] = (plot_obj, x_data, transformed_y)
+        logger.debug(
+            f"Updated curve {curveID}: offset={current_offset}, factor={current_factor}"
+        )
+
+        # Emit signal
+        self.curveUpdated.emit(curveID, True, False)  # recompute_y=True, update_x=False
         return True
 
     def removeCurve(self, curveID):
@@ -279,6 +328,8 @@ class CurveManager(QtCore.QObject):
         count = len(self._curves)
 
         logger.debug(f"Removed curve {curveID} from manager, {count} curves remaining")
+
+        # Emit signal
         self.curveRemoved.emit(curveID, curve_data, count)
         return True
 
@@ -293,4 +344,6 @@ class CurveManager(QtCore.QObject):
         self._curves.clear()
 
         logger.debug(f"Removed all {count} curves from manager")
+
+        # Emit signal
         self.allCurvesRemoved.emit()

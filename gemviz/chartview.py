@@ -145,7 +145,7 @@ class ChartView(QtWidgets.QWidget):
         # plot
         size.setHorizontalStretch(4)
 
-        # Curve Manager
+        # Initialize CurveManager
         self.curveManager = CurveManager(self)
         self.curveManager.curveAdded.connect(self.onCurveAdded)
         self.curveManager.curveUpdated.connect(self.onCurveUpdated)
@@ -154,16 +154,20 @@ class ChartView(QtWidgets.QWidget):
 
         # Access UI elements from parent BRCRunVisualization
         if self.parent is not None:
-            # Access curve combobox
+            # Connect curve combobox
             self.curveBox = self.parent.brc_run_viz.curveBox
             self.curveBox.clear()  # Clear any old curves from previous ChartView
             self.curveBox.currentIndexChanged.connect(self.onCurveSelected)
-            # clearAll
+            # Connect clear/remove buttons
             self.parent.brc_run_viz.clearAll.clicked.connect(self.onClearAllClicked)
-            # curveRemove
             self.parent.brc_run_viz.curveRemove.clicked.connect(
                 self.onCurveRemoveClicked
             )
+            # Connect offset & factor QLineEdit:
+            self.offset_value = self.parent.brc_run_viz.offset_value
+            self.factor_value = self.parent.brc_run_viz.factor_value
+            self.offset_value.editingFinished.connect(self.onOffsetFactorChanged)
+            self.factor_value.editingFinished.connect(self.onOffsetFactorChanged)
         else:
             self.curveBox = None
 
@@ -229,9 +233,15 @@ class ChartView(QtWidgets.QWidget):
         # Get curveID from combobox item data
         curveID = self.curveBox.itemData(index)
         if curveID:
-            # label = self.curveBox.itemText(index)
-            # This will be populated when we add curve interaction features
-            pass
+            # Update basic math stats for the selected curve
+            self.updateBasicMathInfo(curveID)
+            # Populate offset and factor values for the selected curve
+            curve_info = self.curveManager.getCurveData(curveID)
+            if curve_info:
+                offset = curve_info.get("offset", 0.0)
+                factor = curve_info.get("factor", 1.0)
+                self.offset_value.setText(str(offset))
+                self.factor_value.setText(str(factor))
 
     def onCurveRemoveClicked(self):
         """Handle Remove Curve button click."""
@@ -743,6 +753,51 @@ class ChartView(QtWidgets.QWidget):
     # ==========================================
     #   Basic maths methods
     # ==========================================
+
+    def onOffsetFactorChanged(self):
+        """Handle offset or factor value change."""
+        if self.curveBox is None:
+            return
+
+        current_index = self.curveBox.currentIndex()
+        if current_index < 0:
+            return
+
+        curveID = self.curveBox.itemData(current_index)
+        if curveID is None:
+            return
+
+        # Get offset and factor values from UI
+        try:
+            offset = (
+                float(self.offset_value.text()) if self.offset_value.text() else 0.0
+            )
+        except ValueError:
+            offset = 0.0
+            # Reset to default if conversion fails
+            self.offset_value.setText(str(offset))
+            return
+        try:
+            factor = (
+                float(self.factor_value.text()) if self.factor_value.text() else 1.0
+            )
+        except ValueError:
+            factor = 1.0
+            # Reset to default if conversion fails
+            self.factor_value.setText(str(factor))
+            return
+
+        # Update curve with new offset and factor
+        if self.curveManager.updateCurveOffsetFactor(
+            curveID, offset=offset, factor=factor
+        ):
+            # Update basic math info with transformed data
+            self.updateBasicMathInfo(curveID)
+
+            # Recompute axes limits and autoscale and redraw canvas
+            self.main_axes.relim()
+            self.main_axes.autoscale_view()
+            self.canvas.draw()
 
     def updateBasicMathInfo(self, curveID):
         if not curveID:
