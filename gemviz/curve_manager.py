@@ -32,7 +32,7 @@ class CurveManager(QtCore.QObject):
     curveUpdated = QtCore.pyqtSignal(
         str, bool, bool
     )  # Emit curveID, recompute_y, update_x
-    allCurvesRemoved = QtCore.pyqtSignal(bool)  # No parameters
+    allCurvesRemoved = QtCore.pyqtSignal()  # No parameters
 
     def __init__(self, parent=None):
         super().__init__(parent)

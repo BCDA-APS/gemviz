@@ -145,9 +145,14 @@ class ChartView(QtWidgets.QWidget):
         # plot
         size.setHorizontalStretch(4)
 
-        self.curves = {}  # all the curves on the graph, key = label
-        self._legacy_curve_styles = {}  # original style kwargs, keyed by label
+        # Curve Manager
         self.curveManager = CurveManager(self)
+        self.curveManager.curveAdded.connect(self.onCurveAdded)
+        self.curveManager.curveUpdated.connect(self.onCurveUpdated)
+        self.curveManager.curveRemoved.connect(self.onCurveRemoved)
+        self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
+
+        # UI elements
         self.clearBasicMath()
 
         # Live plotting support
@@ -163,6 +168,22 @@ class ChartView(QtWidgets.QWidget):
     #   Curves management
     # ==========================================
 
+    def onCurveAdded(self, curveID):
+        """Handle the addition of a new curve on the plot."""
+        pass
+
+    def onCurveUpdated(self, curveID, recompute_y, update_x):
+        """Handle updates to an existing curve on the plot."""
+        pass
+
+    def onCurveRemoved(self, curveID, curve_data, count):
+        """Handle the removal of an existing curve on the plot."""
+        pass
+
+    def onAllCurvesRemoved(self):
+        """Handle the removal of all curves on the plot."""
+        pass
+
     def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
         # Filter out metadata kwargs before passing to matplotlib
@@ -176,19 +197,8 @@ class ChartView(QtWidgets.QWidget):
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        # Capture the style kwargs separately and cache the plotted data by label
-        plot_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
-        self._legacy_curve_styles[label] = plot_kwargs
 
-        # Store the Matplotlib line together with the data arrays for reuse
-        if len(args) == 1:
-            self.curves[label] = (plot_obj[0], args[0])
-        elif len(args) >= 2:
-            self.curves[label] = (plot_obj[0], args[0], args[1])
-        else:
-            self.curves[label] = (plot_obj[0],)
-
-        # Also add to CurveManager if we have the required info
+        # Add to CurveManager if we have the required info
         run_uid = kwargs.get("run_uid")
         y_field = kwargs.get("y_field")
         stream_name = kwargs.get("stream_name")
@@ -204,8 +214,8 @@ class ChartView(QtWidgets.QWidget):
             # Extract only style kwargs (exclude metadata that's passed separately)
             style_kwargs = {
                 k: v
-                for k, v in plot_kwargs.items()
-                if k not in ["run_uid", "y_field", "stream_name"]
+                for k, v in kwargs.items()
+                if k not in ["label", "run_uid", "y_field", "stream_name"]
             }
 
             self.curveManager.addCurve(
@@ -266,9 +276,26 @@ class ChartView(QtWidgets.QWidget):
         label = ds_options.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        if label not in self.curves:
-            self.addCurve(*args, title=title, **ds_options)
-            self.updateBasicMathInfo(label)
+
+        # Check if curve already exists in CurveManager
+        run_uid = ds_options.get("run_uid")
+        y_field = ds_options.get("y_field")
+        stream_name = ds_options.get("stream_name")
+
+        if run_uid and y_field:
+            # Generate curveID and check if curve exists
+            curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
+            if curveID not in self.curveManager.curves():
+                self.addCurve(*args, title=title, **ds_options)
+        else:
+            # Check if curve already exists in CurveManager by label
+            curveID = self._getCurveIDFromLabel(label)
+            if not curveID:
+                # Curve doesn't exist yet, add it
+                self.addCurve(*args, title=title, **ds_options)
+                curveID = self._getCurveIDFromLabel(label)
+        if curveID:
+            self.updateBasicMathInfo(curveID)
 
     def plotOptions(self):
         return self._plot_options

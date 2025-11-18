@@ -76,32 +76,47 @@ def test_ChartView_annotations(title, subtitle, x, y, qtbot):
 def test_ChartView_data(x, y, qtbot):
     chart = chartview.ChartView(None)
     label = "testing"
+    # Add metadata so curve gets added to CurveManager
+    run_uid = "test-run-uid-12345"
+    y_field = "test_field"
+    stream_name = "primary"
+
     if x is None:
-        chart.plot(y, label=label)
+        chart.plot(
+            y, label=label, run_uid=run_uid, y_field=y_field, stream_name=stream_name
+        )
     else:
-        chart.plot(x, y, label=label)
+        chart.plot(
+            x, y, label=label, run_uid=run_uid, y_field=y_field, stream_name=stream_name
+        )
     qtbot.addWidget(chart)
     chart.show()
 
-    # Test for the plot data.
-    if len(chart.curves) > 0:
-        data = chart.curves[label]
-        if x is None:
-            assert len(data) == 2
-            line2d, yraw = data
-            # With only y data, Line2D fills x with index number, starting at 0.
-            assert len(line2d.get_data()) == 2
-            xarr, yarr = line2d.get_data()
-            assert isinstance(yarr, type(yraw))
-            assert len(yarr) == len(yraw)
-            assert xarr[-1] == len(yraw) - 1
-        else:
-            assert len(data) == 3
-            line2d, xraw, yraw = data
-            assert xraw.shape == yraw.shape
-            assert len(line2d.get_data()) == 2
-            xarr, yarr = line2d.get_data()
-            assert isinstance(xarr, type(xraw))
-            assert isinstance(yarr, type(yraw))
-            assert len(xarr) == len(xraw)
-            assert len(yarr) == len(yraw)
+    # Test for the plot data using CurveManager
+    curveID = chart._getCurveIDFromLabel(label)
+    assert curveID is not None, "Curve should be in CurveManager"
+
+    curve_info = chart.curveManager.getCurveData(curveID)
+    assert curve_info is not None, "Curve data should exist"
+
+    data = curve_info["data"]
+
+    # CurveManager always stores (plot_obj, x_data, y_data)
+    assert len(data) == 3
+    line2d, xraw, yraw = data
+
+    # Basic checks that apply to both cases
+    assert len(line2d.get_data()) == 2
+    xarr, yarr = line2d.get_data()
+    assert isinstance(yarr, type(yraw))
+    assert len(yarr) == len(yraw)
+
+    if x is None:
+        # When x was None, CurveManager generated x_data using numpy.arange
+        assert len(xarr) == len(yraw)
+        assert xarr[-1] == len(yraw) - 1
+    else:
+        # When x was provided, verify it matches
+        assert xraw.shape == yraw.shape
+        assert isinstance(xarr, type(xraw))
+        assert len(xarr) == len(xraw)
