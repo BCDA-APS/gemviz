@@ -93,7 +93,7 @@ def test_ChartView_data(x, y, qtbot):
     chart.show()
 
     # Test for the plot data using CurveManager
-    curveID = chart._getCurveIDFromLabel(label)
+    curveID = chart.getCurveIDFromLabel(label)
     assert curveID is not None, "Curve should be in CurveManager"
 
     curve_info = chart.curveManager.getCurveData(curveID)
