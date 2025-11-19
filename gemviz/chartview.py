@@ -336,7 +336,7 @@ class ChartView(QtWidgets.QWidget):
         y_field = kwargs.get("y_field")
         stream_name = kwargs.get("stream_name")
 
-        if run_uid is not None and y_field is not None:
+        if run_uid is not None and y_field is not None and stream_name is not None:
             # Generate curveID and add to CurveManager
             curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
 
@@ -365,6 +365,11 @@ class ChartView(QtWidgets.QWidget):
             logger.debug(
                 f"Added curve to CurveManager: curveID={curveID}, curves_count={len(self.curveManager.curves())}"
             )
+            return curveID
+        else:
+            # No metadata - curve is plotted but not added to CurveManager
+            # Return None since this curve isn't tracked in CurveManager
+            return None
 
     def getCurveIDFromLabel(self, label):
         """
@@ -437,15 +442,13 @@ class ChartView(QtWidgets.QWidget):
             # Generate curveID and check if curve exists
             curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
             if curveID not in self.curveManager.curves():
-                self.addCurve(*args, title=title, **ds_options)
+                curveID = self.addCurve(*args, title=title, **ds_options)
         else:
             # Check if curve already exists in CurveManager by label
             curveID = self.getCurveIDFromLabel(label)
             if not curveID:
                 # Curve doesn't exist yet, add it
-                self.addCurve(*args, title=title, **ds_options)
-                # We need the curveID for updateBasicMathInfo(curveID)
-                curveID = self.getCurveIDFromLabel(label)
+                curveID = self.addCurve(*args, title=title, **ds_options)
         if curveID:
             self.updateBasicMathInfo(curveID)
 
@@ -860,6 +863,8 @@ class ChartView(QtWidgets.QWidget):
         if not curveID:
             self.clearBasicMath()
             return
+        if self.parent is None:
+            return
         try:
             x, y = self.curveManager.getCurveXYData(curveID)
             if x is None or y is None:
@@ -879,6 +884,8 @@ class ChartView(QtWidgets.QWidget):
             self.clearBasicMath()
 
     def clearBasicMath(self):
+        if self.parent is None:
+            return
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
             label = self.parent.findChild(QtWidgets.QLabel, txt)
             if label is not None:  # Check for None
