@@ -569,6 +569,40 @@ class ChartView(QtWidgets.QWidget):
     def ylabel(self):
         return self.option("ylabel")
 
+    def setLogScales(self, log_x: bool, log_y: bool):
+        """
+        Set logarithmic scales for X and Y axes.
+
+        Parameters:
+        - log_x (bool): Whether to use logarithmic scale for X-axis
+        - log_y (bool): Whether to use logarithmic scale for Y-axis
+        """
+        try:
+            # Store the log scale state
+            self._log_x = log_x
+            self._log_y = log_y
+
+            if log_x:
+                self.main_axes.set_xscale("log")
+            else:
+                self.main_axes.set_xscale("linear")
+
+            if log_y:
+                self.main_axes.set_yscale("log")
+            else:
+                self.main_axes.set_yscale("linear")
+
+            # Redraw the canvas to apply changes
+            self.canvas.draw()
+        except Exception as exc:
+            logger.error(f"Error setting log scales: {exc}")
+            # If setting log scale fails (e.g., negative values), revert to linear
+            self._log_x = False
+            self._log_y = False
+            self.main_axes.set_xscale("linear")
+            self.main_axes.set_yscale("linear")
+            self.canvas.draw()
+
     def onClearAllClicked(self):
         """Handle Clear Graph button click."""
         # Clear all plot lines, legend, axis labels, and axes title

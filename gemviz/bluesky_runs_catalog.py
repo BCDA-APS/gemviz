@@ -126,7 +126,11 @@ class BRC_MVC(QtWidgets.QWidget):
             old_widget.stopLiveUpdates()
 
         if not isinstance(old_widget, ChartView) or action == "replace":
-            widget = ChartView(self, **options)  # Make a blank chart.
+            # Make a blank chart
+            widget = ChartView(self, **options)
+            # Apply stored log scale state to the new chart
+            stored_log_x, stored_log_y = self.brc_run_viz.getLogScaleState()
+            widget.setLogScales(stored_log_x, stored_log_y)
             self._title_keys = []
             if action == "add":
                 action = "replace"
