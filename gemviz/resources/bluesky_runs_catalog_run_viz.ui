@@ -761,6 +761,11 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="Style">
+             <attribute name="title">
+              <string>Style</string>
+             </attribute>
+            </widget>
            </widget>
           </item>
           <item>

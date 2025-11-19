@@ -33,6 +33,9 @@ from PyQt5 import QtWidgets
 from . import utils
 from .curve_manager import CurveManager
 
+MIDDLE_BUTTON = 2
+RIGHT_BUTTON = 3
+
 logger = logging.getLogger(__name__)
 
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
@@ -158,18 +161,53 @@ class ChartView(QtWidgets.QWidget):
             self.curveBox = self.parent.brc_run_viz.curveBox
             self.curveBox.clear()  # Clear any old curves from previous ChartView
             self.curveBox.currentIndexChanged.connect(self.onCurveSelected)
+
+            # Definition clear/remove buttons
+            self.clearAll = self.parent.brc_run_viz.clearAll
+            self.curveRemove = self.parent.brc_run_viz.curveRemove
+            self.removeCursor1 = self.parent.brc_run_viz.cursor1_remove
+            self.removeCursor2 = self.parent.brc_run_viz.cursor2_remove
+
             # Connect clear/remove buttons
-            self.parent.brc_run_viz.clearAll.clicked.connect(self.onClearAllClicked)
-            self.parent.brc_run_viz.curveRemove.clicked.connect(
-                self.onCurveRemoveClicked
-            )
+            self.clearAll.clicked.connect(self.onClearAllClicked)
+            self.curveRemove.clicked.connect(self.onCurveRemoveClicked)
+            self.removeCursor1.clicked.connect(lambda: self.onRemoveCursor(1))
+            self.removeCursor2.clicked.connect(lambda: self.onRemoveCursor(2))
+
             # Connect offset & factor QLineEdit:
             self.offset_value = self.parent.brc_run_viz.offset_value
             self.factor_value = self.parent.brc_run_viz.factor_value
             self.offset_value.editingFinished.connect(self.onOffsetFactorChanged)
             self.factor_value.editingFinished.connect(self.onOffsetFactorChanged)
+
+            # Connect snap cursor checkbox (default to free placement)
+            self._snap_to_curve = False
+            self.snapCursors = self.parent.brc_run_viz.snapCursors
+            self.snapCursors.setChecked(self._snap_to_curve)
+            self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
+
         else:
             self.curveBox = None
+
+        # Connect the click event to a handler
+        self.cid = self.canvas.mpl_connect("button_press_event", self.onclick)
+        self.alt_pressed = False
+        # Set up a timer to check modifier key state
+        self.key_check_timer = QtCore.QTimer()
+        self.key_check_timer.timeout.connect(self.check_modifier_keys)
+        self.key_check_timer.start(50)  # Check every 50ms
+
+        # Initialize cursor storage
+        self.cursors = {
+            1: None,
+            "pos1": None,
+            "text1": "middle click or alt+right click",
+            2: None,
+            "pos2": None,
+            "text2": "right click",
+            "diff": "n/a",
+            "midpoint": "n/a",
+        }
 
         # Maths & statistics
         self.clearBasicMath()
@@ -328,7 +366,7 @@ class ChartView(QtWidgets.QWidget):
                 f"Added curve to CurveManager: curveID={curveID}, curves_count={len(self.curveManager.curves())}"
             )
 
-    def _getCurveIDFromLabel(self, label):
+    def getCurveIDFromLabel(self, label):
         """
         Find the curveID for a given display label.
 
@@ -344,6 +382,24 @@ class ChartView(QtWidgets.QWidget):
         # Search through CurveManager curves to find matching label
         for curveID, curve_info in self.curveManager.curves().items():
             if curve_info.get("label") == label:
+                return curveID
+        return None
+
+    def getSelectedCurveID(self):
+        """
+        Get the ID of the currently selected curve from the combo box.
+
+        Returns:
+            str or None: The curve ID of the selected curve if valid, None otherwise.
+        """
+        if self.curveBox is None:
+            return None
+
+        current_index = self.curveBox.currentIndex()
+        if current_index >= 0:
+            curveID = self.curveBox.itemData(current_index)
+            # Validate that curve exists in manager
+            if curveID and curveID in self.curveManager.curves():
                 return curveID
         return None
 
@@ -377,18 +433,19 @@ class ChartView(QtWidgets.QWidget):
         y_field = ds_options.get("y_field")
         stream_name = ds_options.get("stream_name")
 
-        if run_uid and y_field:
+        if run_uid and y_field and stream_name:
             # Generate curveID and check if curve exists
             curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
             if curveID not in self.curveManager.curves():
                 self.addCurve(*args, title=title, **ds_options)
         else:
             # Check if curve already exists in CurveManager by label
-            curveID = self._getCurveIDFromLabel(label)
+            curveID = self.getCurveIDFromLabel(label)
             if not curveID:
                 # Curve doesn't exist yet, add it
                 self.addCurve(*args, title=title, **ds_options)
-                curveID = self._getCurveIDFromLabel(label)
+                # We need the curveID for updateBasicMathInfo(curveID)
+                curveID = self.getCurveIDFromLabel(label)
         if curveID:
             self.updateBasicMathInfo(curveID)
 
@@ -627,7 +684,7 @@ class ChartView(QtWidgets.QWidget):
             # Update each curve
             for label, (x_field, y_field) in self.live_data_fields.items():
                 # Get curveID from label
-                curveID = self._getCurveIDFromLabel(label)
+                curveID = self.getCurveIDFromLabel(label)
                 if not curveID:
                     logger.warning(f"Label {label} not found in CurveManager")
                     continue
@@ -852,177 +909,198 @@ class ChartView(QtWidgets.QWidget):
     #   Cursors methods
     # ==========================================
 
-    # def onRemoveCursor(self, cursor_num):
-    #     cross = self.cursors.get(cursor_num)
-    #     if cross is not None:
-    #         try:
-    #             cross.remove()
-    #         except (NotImplementedError, AttributeError):
-    #             # Handle case where artist cannot be removed
-    #             pass
-    #         self.cursors[cursor_num] = None
-    #         self.cursors[f"pos{cursor_num}"] = None
-    #         self.cursors[f"text{cursor_num}"] = (
-    #             "middle click or alt+right click" if cursor_num == 1 else "right click"
-    #         )
-    #     self.cursors["diff"] = "n/a"
-    #     self.cursors["midpoint"] = "n/a"
-    #     self.updateCursorInfo()
-    #     # Recompute the axes limits and autoscale:
-    #     self.main_axes.relim()
-    #     self.main_axes.autoscale_view()
-    #     self.canvas.draw()
+    def onRemoveCursor(self, cursor_num):
+        """Remove a cursor from the plot.
 
-    # def clearCursors(self):
-    #     self.onRemoveCursor(1)
-    #     self.onRemoveCursor(2)
+        Parameters:
+            cursor_num (int): Cursor number to remove (1 or 2)
+        """
+        cross = self.cursors.get(cursor_num)
+        if cross is not None:
+            try:
+                cross.remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
+            self.cursors[cursor_num] = None
+            self.cursors[f"pos{cursor_num}"] = None
+            self.cursors[f"text{cursor_num}"] = (
+                "middle click or alt+right click" if cursor_num == 1 else "right click"
+            )
+        self.cursors["diff"] = "n/a"
+        self.cursors["midpoint"] = "n/a"
+        self.updateCursorInfo()
+        # Recompute the axes limits and autoscale:
+        self.main_axes.relim()
+        self.main_axes.autoscale_view()
+        self.canvas.draw()
 
-    # def onSnapCursorsToggled(self, checked):
-    #     """Handle snap cursors checkbox toggle.
+    def clearCursors(self):
+        """Clear both cursors from the plot."""
+        self.onRemoveCursor(1)
+        self.onRemoveCursor(2)
 
-    #     Parameters:
-    #         checked (bool): True if checkbox is checked (snap enabled), False if unchecked (snap disabled)
-    #     """
-    #     self._snap_to_curve = checked
+    def onSnapCursorsToggled(self, checked):
+        """Handle snap cursors checkbox toggle.
 
-    # def findNearestPoint(
-    #     self, x_click: float, y_click: float
-    # ) -> Optional[tuple[float, float]]:
-    #     """
-    #     Find the nearest data point in the selected curve to the given click position.
+        Parameters:
+            checked (bool): True if checkbox is checked (snap enabled), False if unchecked (snap disabled)
+        """
+        self._snap_to_curve = checked
 
-    #     Parameters:
-    #     - x_click: X coordinate of the click
-    #     - y_click: Y coordinate of the click
+    def findNearestPoint(
+        self, x_click: float, y_click: float
+    ) -> tuple[float, float] | None:
+        """
+        Find the nearest data point in the selected curve to the given click position.
 
-    #     Returns:
-    #     - Tuple of (x_nearest, y_nearest) if a curve is selected and has data, None otherwise
-    #     """
-    #     curveID = self.getSelectedCurveID()
-    #     if not curveID or curveID not in self.curveManager.curves():
-    #         return None
+        Parameters:
+        - x_click: X coordinate of the click
+        - y_click: Y coordinate of the click
 
-    #     curve_data = self.curveManager.getCurveData(curveID)
-    #     if not curve_data:
-    #         return None
+        Returns:
+        - Tuple of (x_nearest, y_nearest) if a curve is selected and has data, None otherwise
+        """
+        curveID = self.getSelectedCurveID()
+        if not curveID or curveID not in self.curveManager.curves():
+            return None
 
-    #     ds = curve_data.get("ds")
-    #     if not ds or len(ds) < 2:
-    #         return None
+        # Get curve data from CurveManager
+        x_data, y_data = self.curveManager.getCurveXYData(curveID)
+        if x_data is None or y_data is None:
+            return None
 
-    #     x_data = ds[0]
-    #     y_data = ds[1]
+        # Ensure data are numpy arrays
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
 
-    #     # Ensure data are numpy arrays
-    #     if not isinstance(x_data, numpy.ndarray):
-    #         x_data = numpy.array(x_data, dtype=float)
-    #     if not isinstance(y_data, numpy.ndarray):
-    #         y_data = numpy.array(y_data, dtype=float)
+        # Normalize by axis ranges to account for different scales
+        x_range = self.main_axes.get_xlim()
+        y_range = self.main_axes.get_ylim()
+        x_scale = x_range[1] - x_range[0] if x_range[1] != x_range[0] else 1.0
+        y_scale = y_range[1] - y_range[0] if y_range[1] != y_range[0] else 1.0
 
-    #     # Apply offset and factor to y_data to match what's displayed
-    #     factor = curve_data.get("factor", 1)
-    #     offset = curve_data.get("offset", 0)
-    #     y_data = numpy.multiply(y_data, factor) + offset
+        # Calculate normalized distances
+        dx = (x_data - x_click) / x_scale
+        dy = (y_data - y_click) / y_scale
+        distances = numpy.sqrt(dx**2 + dy**2)
 
-    #     # Calculate distances to all points
-    #     distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
+        # Find the index of the nearest point
+        nearest_index = numpy.argmin(distances)
 
-    #     # Find the index of the nearest point
-    #     nearest_index = numpy.argmin(distances)
+        return (float(x_data[nearest_index]), float(y_data[nearest_index]))
 
-    #     return (float(x_data[nearest_index]), float(y_data[nearest_index]))
+    def onclick(self, event):
+        """Handle mouse click events on the plot to place cursors."""
+        # Check if the click was in the main_axes
+        if event.inaxes is self.main_axes:
+            # Determine cursor position based on snap setting
+            if self._snap_to_curve:
+                # Find the nearest point in the selected curve
+                nearest_point = self.findNearestPoint(event.xdata, event.ydata)
 
-    # def onclick(self, event):
-    #     # Check if the click was in the main_axes
-    #     if event.inaxes is self.main_axes:
-    #         # Determine cursor position based on snap setting
-    #         if self._snap_to_curve:
-    #             # Find the nearest point in the selected curve
-    #             nearest_point = self.findNearestPoint(event.xdata, event.ydata)
+                if nearest_point is None:
+                    # No curve selected or no data available
+                    return
 
-    #             if nearest_point is None:
-    #                 # No curve selected or no data available
-    #                 return
+                x_cursor, y_cursor = nearest_point
+            else:
+                # Use exact click position
+                x_cursor, y_cursor = event.xdata, event.ydata
 
-    #             x_cursor, y_cursor = nearest_point
-    #         else:
-    #             # Use exact click position
-    #             x_cursor, y_cursor = event.xdata, event.ydata
+            # Middle click or Alt+right click for red cursor (cursor 1)
+            if event.button == MIDDLE_BUTTON or (
+                event.button == RIGHT_BUTTON and self.alt_pressed
+            ):
+                if self.cursors[1] is not None:
+                    try:
+                        self.cursors[1].remove()  # Remove existing red cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
+                plot_result = self.main_axes.plot(
+                    x_cursor, y_cursor, "r+", markersize=15, linewidth=2
+                )
+                self.cursors[1] = plot_result[0]
+                # Update cursor position
+                self.cursors["pos1"] = (x_cursor, y_cursor)
 
-    #         # Middle click or Alt+right click for red cursor (cursor 1)
-    #         if event.button == MIDDLE_BUTTON or (
-    #             event.button == RIGHT_BUTTON and self.alt_pressed
-    #         ):
-    #             if self.cursors[1] is not None:
-    #                 try:
-    #                     self.cursors[1].remove()  # Remove existing red cursor
-    #                 except (NotImplementedError, AttributeError):
-    #                     # Handle case where artist cannot be removed
-    #                     pass
-    #             (self.cursors[1],) = self.main_axes.plot(
-    #                 x_cursor, y_cursor, "r+", markersize=15, linewidth=2
-    #             )
-    #             # Update cursor position
-    #             self.cursors["pos1"] = (x_cursor, y_cursor)
+            # Right click (without Alt) for blue cursor (cursor 2)
+            elif event.button == RIGHT_BUTTON and not self.alt_pressed:
+                if self.cursors[2] is not None:
+                    try:
+                        self.cursors[2].remove()  # Remove existing blue cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
+                plot_result = self.main_axes.plot(
+                    x_cursor, y_cursor, "b+", markersize=15, linewidth=2
+                )
+                self.cursors[2] = plot_result[0]
+                # Update cursor position
+                self.cursors["pos2"] = (x_cursor, y_cursor)
 
-    #         # Right click (without Alt) for blue cursor (cursor 2)
-    #         elif event.button == RIGHT_BUTTON and not self.alt_pressed:
-    #             if self.cursors[2] is not None:
-    #                 try:
-    #                     self.cursors[2].remove()  # Remove existing blue cursor
-    #                 except (NotImplementedError, AttributeError):
-    #                     # Handle case where artist cannot be removed
-    #                     pass
-    #             (self.cursors[2],) = self.main_axes.plot(
-    #                 x_cursor, y_cursor, "b+", markersize=15, linewidth=2
-    #             )
+            # Update the info panel with cursor positions
+            self.calculateCursors()
 
-    #             # Update cursor position
-    #             self.cursors["pos2"] = (x_cursor, y_cursor)
+            # Redraw the canvas to display the new markers
+            self.canvas.draw()
 
-    #         # Update the info panel with cursor positions
-    #         self.calculateCursors()
+    def check_modifier_keys(self):
+        """Check for modifier keys using Qt's global state."""
+        try:
+            # Get the global keyboard state
+            modifiers = QtWidgets.QApplication.keyboardModifiers()
+            self.alt_pressed = bool(modifiers & QtCore.Qt.AltModifier)
+        except Exception:
+            # Fallback if Qt method fails
+            pass
 
-    #         # Redraw the canvas to display the new markers
-    #         self.canvas.draw()
+    def calculateCursors(self):
+        """
+        Update cursor information in info panel widget.
+        """
+        # Check for the first cursor and update text accordingly
+        if self.cursors[1]:
+            x1, y1 = self.cursors["pos1"]
+            self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
+        # Check for the second cursor and update text accordingly
+        if self.cursors[2]:
+            x2, y2 = self.cursors["pos2"]
+            self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
+        # Calculate differences and midpoints only if both cursors are present
+        if self.cursors[1] and self.cursors[2]:
+            delta_x = x2 - x1
+            delta_y = y2 - y1
+            midpoint_x = (x1 + x2) / 2
+            midpoint_y = (y1 + y2) / 2
+            self.cursors["diff"] = (
+                f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
+            )
+            self.cursors["midpoint"] = (
+                f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+            )
+        self.updateCursorInfo()
 
-    # def calculateCursors(self):
-    #     """
-    #     Update cursor information in info panel widget.
-    #     """
-    #     # Check for the first cursor and update text accordingly
-    #     if self.cursors[1]:
-    #         x1, y1 = self.cursors["pos1"]
-    #         self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
-    #     # Check for the second cursor and update text accordingly
-    #     if self.cursors[2]:
-    #         x2, y2 = self.cursors["pos2"]
-    #         self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
-    #     # Calculate differences and midpoints only if both cursors are present
-    #     if self.cursors[1] and self.cursors[2]:
-    #         delta_x = x2 - x1
-    #         delta_y = y2 - y1
-    #         midpoint_x = (x1 + x2) / 2
-    #         midpoint_y = (y1 + y2) / 2
-    #         self.cursors["diff"] = (
-    #             f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
-    #         )
-    #         self.cursors["midpoint"] = (
-    #             f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
-    #         )
-    #     self.updateCursorInfo()
+    def updateCursorInfo(self):
+        """Update the cursor info UI labels."""
+        if self.parent is None:
+            return
+        self.parent.brc_run_viz.pos1_text.setText(self.cursors["text1"])
+        self.parent.brc_run_viz.pos2_text.setText(self.cursors["text2"])
+        self.parent.brc_run_viz.diff_text.setText(self.cursors["diff"])
+        self.parent.brc_run_viz.midpoint_text.setText(self.cursors["midpoint"])
 
-    # def updateCursorInfo(self):
-    #     self.mda_mvc.mda_file_viz.pos1_text.setText(self.cursors["text1"])
-    #     self.mda_mvc.mda_file_viz.pos2_text.setText(self.cursors["text2"])
-    #     self.mda_mvc.mda_file_viz.diff_text.setText(self.cursors["diff"])
-    #     self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
-
-    # def clearCursorInfo(self):
-    #     self.mda_mvc.mda_file_viz.pos1_text.setText("middle click or alt+right click")
-    #     self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
-    #     self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
-    #     self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
+    def clearCursorInfo(self):
+        """Clear the cursor info UI labels."""
+        if self.parent is None:
+            return
+        self.parent.brc_run_viz.pos1_text.setText("middle click or alt+right click")
+        self.parent.brc_run_viz.pos2_text.setText("right click")
+        self.parent.brc_run_viz.diff_text.setText("n/a")
+        self.parent.brc_run_viz.midpoint_text.setText("n/a")
 
 
 # -----------------------------------------------------------------------------
