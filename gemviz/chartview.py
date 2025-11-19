@@ -30,6 +30,11 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from . import utils
+from .curve_manager import CurveManager
+
+MIDDLE_BUTTON = 2
+RIGHT_BUTTON = 3
 
 logger = logging.getLogger(__name__)
 
@@ -143,8 +148,69 @@ class ChartView(QtWidgets.QWidget):
         # plot
         size.setHorizontalStretch(4)
 
-        self.curves = {}  # all the curves on the graph, key = label
-        self.curve_styles = {}  # original style kwargs, keyed by label
+        # Initialize CurveManager
+        self.curveManager = CurveManager(self)
+        self.curveManager.curveAdded.connect(self.onCurveAdded)
+        self.curveManager.curveUpdated.connect(self.onCurveUpdated)
+        self.curveManager.curveRemoved.connect(self.onCurveRemoved)
+        self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
+
+        # Access UI elements from parent BRCRunVisualization
+        if self.parent is not None:
+            # Connect curve combobox
+            self.curveBox = self.parent.brc_run_viz.curveBox
+            self.curveBox.clear()  # Clear any old curves from previous ChartView
+            self.curveBox.currentIndexChanged.connect(self.onCurveSelected)
+
+            # Definition clear/remove buttons
+            self.clearAll = self.parent.brc_run_viz.clearAll
+            self.curveRemove = self.parent.brc_run_viz.curveRemove
+            self.removeCursor1 = self.parent.brc_run_viz.cursor1_remove
+            self.removeCursor2 = self.parent.brc_run_viz.cursor2_remove
+
+            # Connect clear/remove buttons
+            self.clearAll.clicked.connect(self.onClearAllClicked)
+            self.curveRemove.clicked.connect(self.onCurveRemoveClicked)
+            self.removeCursor1.clicked.connect(lambda: self.onRemoveCursor(1))
+            self.removeCursor2.clicked.connect(lambda: self.onRemoveCursor(2))
+
+            # Connect offset & factor QLineEdit:
+            self.offset_value = self.parent.brc_run_viz.offset_value
+            self.factor_value = self.parent.brc_run_viz.factor_value
+            self.offset_value.editingFinished.connect(self.onOffsetFactorChanged)
+            self.factor_value.editingFinished.connect(self.onOffsetFactorChanged)
+
+            # Connect snap cursor checkbox (default to free placement)
+            self._snap_to_curve = False
+            self.snapCursors = self.parent.brc_run_viz.snapCursors
+            self.snapCursors.setChecked(self._snap_to_curve)
+            self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
+
+        else:
+            self.curveBox = None
+
+        # Connect the click event to a handler
+        self.cid = self.canvas.mpl_connect("button_press_event", self.onclick)
+        self.alt_pressed = False
+        # Set up a timer to check modifier key state
+        self.key_check_timer = QtCore.QTimer()
+        self.key_check_timer.timeout.connect(self.check_modifier_keys)
+        self.key_check_timer.start(50)  # Check every 50ms
+
+        # Initialize cursor storage
+        self.cursors = {
+            1: None,
+            "pos1": None,
+            "text1": "middle click or alt+right click",
+            2: None,
+            "pos2": None,
+            "text2": "right click",
+            "diff": "n/a",
+            "midpoint": "n/a",
+        }
+
+        # Maths & statistics
+        self.clearBasicMath()
 
         # Live plotting support
         self.live_mode = False
@@ -155,25 +221,196 @@ class ChartView(QtWidgets.QWidget):
         self.field_widget = None
         self.update_interval = 2000  # milliseconds (2 seconds)
 
+    # ==========================================
+    #   Curves management
+    # ==========================================
+
+    def onCurveAdded(self, curveID):
+        """Handle the addition of a new curve on the plot."""
+        if self.curveBox is None:
+            return
+        curve_info = self.curveManager.getCurveData(curveID)
+        if curve_info:
+            label = curve_info.get("label", curveID)
+            self.curveBox.addItem(label, curveID)
+            # Always select the newly added curve
+            self.curveBox.setCurrentIndex(self.curveBox.count() - 1)
+
+    def onCurveUpdated(self, curveID, recompute_y, update_x):
+        """Handle updates to an existing curve on the plot."""
+        pass
+
+    def onCurveRemoved(self, curveID, curve_data, count):
+        """Handle the removal of an existing curve on the plot."""
+        if self.curveBox is None:
+            return
+        print(f"DEBUG: removing curve {curveID}")
+        # Find and remove the item with this curveID
+        for i in range(self.curveBox.count()):
+            if self.curveBox.itemData(i) == curveID:
+                self.curveBox.removeItem(i)
+                break
+        # Select first remaining curve if one exists
+        if self.curveBox.count() > 0:
+            self.curveBox.setCurrentIndex(0)
+
+    def onAllCurvesRemoved(self):
+        """Handle the removal of all curves on the plot."""
+        if self.curveBox is not None:
+            self.curveBox.clear()
+
+    def onCurveSelectionChanged(self, label):
+        """Handle curve selection change in combobox."""
+        # This will be populated when we add curve interaction features
+        pass
+
+    def onCurveSelected(self, index):
+        """Handle curve selection change in combobox."""
+        if self.curveBox is None or index < 0:
+            return
+        # Get curveID from combobox item data
+        curveID = self.curveBox.itemData(index)
+        if curveID:
+            # Update basic math stats for the selected curve
+            self.updateBasicMathInfo(curveID)
+            # Populate offset and factor values for the selected curve
+            curve_info = self.curveManager.getCurveData(curveID)
+            if curve_info:
+                offset = curve_info.get("offset", 0.0)
+                factor = curve_info.get("factor", 1.0)
+                self.offset_value.setText(str(offset))
+                self.factor_value.setText(str(factor))
+
+    def onCurveRemoveClicked(self):
+        """Handle Remove Curve button click."""
+        if self.curveBox is None or self.curveBox.count() == 0:
+            return
+
+        # Get the currently selected curve
+        current_index = self.curveBox.currentIndex()
+        if current_index < 0:  # if comboBox empty
+            return
+
+        curveID = self.curveBox.itemData(current_index)
+        if curveID is None:
+            return
+
+        # Remove plot object from axes
+        plot_obj = self.curveManager.getCurvePlotObj(curveID)
+        if plot_obj is not None:
+            plot_obj.remove()
+
+        # Remove from CurveManager (will emit curveRemoved signal)
+        self.curveManager.removeCurve(curveID)
+
+        # Generate title from remaining curves and update plot
+        scan_ids = set()
+        for curveID, curve_info in self.curveManager.curves().items():
+            label = curve_info.get("label", "")
+            if label:
+                scan_id = label.split()[0] if label.split() else ""
+                if scan_id:
+                    scan_ids.add(scan_id)
+        title = f"scan(s):{', '.join(sorted(scan_ids))}" if scan_ids else ""
+        self.updatePlot(title)
+
+        # Redraw canvas
+        self.canvas.draw()
+
     def addCurve(self, *args, title="plot title", **kwargs):
         """Add to graph."""
-        plot_obj = self.main_axes.plot(*args, **kwargs)
+        # Filter out metadata kwargs before passing to matplotlib
+        # matplotlib doesn't recognize run_uid, y_field, stream_name
+        metadata_keys = {"run_uid", "y_field", "stream_name"}
+        matplotlib_kwargs = {k: v for k, v in kwargs.items() if k not in metadata_keys}
+
+        plot_obj = self.main_axes.plot(*args, **matplotlib_kwargs)
         self.updatePlot(title)
         # Add to the dictionary
         label = kwargs.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        # Capture the style kwargs separately and cache the plotted data by label
-        style_kwargs = {k: v for k, v in kwargs.items() if k not in ["label"]}
-        self.curve_styles[label] = style_kwargs
 
-        # Store the Matplotlib line together with the data arrays for reuse
-        if len(args) == 1:
-            self.curves[label] = (plot_obj[0], args[0])
-        elif len(args) >= 2:
-            self.curves[label] = (plot_obj[0], args[0], args[1])
+        # Add to CurveManager if we have the required info
+        run_uid = kwargs.get("run_uid")
+        y_field = kwargs.get("y_field")
+        stream_name = kwargs.get("stream_name")
+
+        if run_uid is not None and y_field is not None and stream_name is not None:
+            # Generate curveID and add to CurveManager
+            curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
+
+            # Prepare data for CurveManager
+            x_data = args[0] if len(args) >= 2 else None
+            y_data = args[1] if len(args) >= 2 else args[0] if len(args) >= 1 else None
+
+            # Extract only style kwargs (exclude metadata that's passed separately)
+            style_kwargs = {
+                k: v
+                for k, v in kwargs.items()
+                if k not in ["label", "run_uid", "y_field", "stream_name"]
+            }
+
+            self.curveManager.addCurve(
+                curveID=curveID,
+                plot_obj=plot_obj[0],
+                x_data=x_data,
+                y_data=y_data,
+                label=label,
+                style_kwargs=style_kwargs,
+                run_uid=run_uid,
+                y_field=y_field,
+                stream_name=stream_name,
+            )
+            logger.debug(
+                f"Added curve to CurveManager: curveID={curveID}, curves_count={len(self.curveManager.curves())}"
+            )
+            return curveID
         else:
-            self.curves[label] = (plot_obj[0],)
+            # No metadata - curve is plotted but not added to CurveManager
+            # Return None since this curve isn't tracked in CurveManager
+            return None
+
+    def getCurveIDFromLabel(self, label):
+        """
+        Find the curveID for a given display label.
+
+        Parameters:
+            label (str): The display label (e.g., "scan_id (uid[:7]) - y_field")
+
+        Returns:
+            str or None: The curveID if found, None otherwise
+        """
+        if not hasattr(self, "curveManager"):
+            return None
+
+        # Search through CurveManager curves to find matching label
+        for curveID, curve_info in self.curveManager.curves().items():
+            if curve_info.get("label") == label:
+                return curveID
+        return None
+
+    def getSelectedCurveID(self):
+        """
+        Get the ID of the currently selected curve from the combo box.
+
+        Returns:
+            str or None: The curve ID of the selected curve if valid, None otherwise.
+        """
+        if self.curveBox is None:
+            return None
+
+        current_index = self.curveBox.currentIndex()
+        if current_index >= 0:
+            curveID = self.curveBox.itemData(current_index)
+            # Validate that curve exists in manager
+            if curveID and curveID in self.curveManager.curves():
+                return curveID
+        return None
+
+    # ==========================================
+    #   Plot management
+    # ==========================================
 
     def option(self, key, default=None):
         return self.plotOptions().get(key, default)
@@ -195,8 +432,25 @@ class ChartView(QtWidgets.QWidget):
         label = ds_options.get("label")
         if label is None:
             raise KeyError("This curve has no label.")
-        if label not in self.curves:
-            self.addCurve(*args, title=title, **ds_options)
+
+        # Check if curve already exists in CurveManager
+        run_uid = ds_options.get("run_uid")
+        y_field = ds_options.get("y_field")
+        stream_name = ds_options.get("stream_name")
+
+        if run_uid and y_field and stream_name:
+            # Generate curveID and check if curve exists
+            curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
+            if curveID not in self.curveManager.curves():
+                curveID = self.addCurve(*args, title=title, **ds_options)
+        else:
+            # Check if curve already exists in CurveManager by label
+            curveID = self.getCurveIDFromLabel(label)
+            if not curveID:
+                # Curve doesn't exist yet, add it
+                curveID = self.addCurve(*args, title=title, **ds_options)
+        if curveID:
+            self.updateBasicMathInfo(curveID)
 
     def plotOptions(self):
         return self._plot_options
@@ -301,7 +555,23 @@ class ChartView(QtWidgets.QWidget):
     def ylabel(self):
         return self.option("ylabel")
 
-    # ========== Live Plotting Methods ==========
+    def onClearAllClicked(self):
+        """Handle Clear Graph button click."""
+        # Clear all plot lines, legend, axis labels, and axes title
+        self.main_axes.clear()
+
+        # Clear figure title (suptitle)
+        self.figure.suptitle("")
+
+        # Clear the curve manager (will emit allCurvesRemoved signal)
+        self.curveManager.removeAllCurves()
+
+        # Redraw the canvas
+        self.canvas.draw()
+
+    # ==========================================
+    #   Live Plotting Methods
+    # ==========================================
 
     def enableLiveMode(self, run, stream_name, data_fields, field_widget=None):
         """
@@ -416,13 +686,19 @@ class ChartView(QtWidgets.QWidget):
 
             # Update each curve
             for label, (x_field, y_field) in self.live_data_fields.items():
-                if label not in self.curves:
-                    logger.warning(f"Label {label} not found in curves dict")
+                # Get curveID from label
+                curveID = self.getCurveIDFromLabel(label)
+                if not curveID:
+                    logger.warning(f"Label {label} not found in CurveManager")
                     continue
 
-                curve_entry = self.curves[label]
-                plot_obj = curve_entry[0]
-                style_kwargs = self.curve_styles.get(label, {})
+                curve_info = self.curveManager.getCurveData(curveID)
+                if not curve_info:
+                    logger.warning(f"Curve {curveID} not found in CurveManager")
+                    continue
+
+                plot_obj = self.curveManager.getCurvePlotObj(curveID)
+                style_kwargs = curve_info.get("style_kwargs", {})
 
                 # Get new data - stream_data is already the data dict (not wrapped in "data")
                 try:
@@ -458,10 +734,11 @@ class ChartView(QtWidgets.QWidget):
                     # Try to update the existing plot object
                     # set_data expects (x, y) as two separate arguments
                     plot_obj.set_data(x_data, y_data)
-                    if len(curve_entry) == 2:
-                        self.curves[label] = (plot_obj, y_data)
-                    elif len(curve_entry) >= 3:
-                        self.curves[label] = (plot_obj, x_data, y_data)
+                    # Update CurveManager with new data
+                    self.curveManager.updateCurve(
+                        curveID=curveID, plot_obj=plot_obj, x_data=x_data, y_data=y_data
+                    )
+                    self.updateBasicMathInfo(curveID)
                 except (ValueError, TypeError) as e:
                     if "shape" in str(e).lower() or "dimension" in str(e).lower():
                         logger.info(
@@ -476,13 +753,14 @@ class ChartView(QtWidgets.QWidget):
                             x_data, y_data, label=label, **style_kwargs
                         )[0]
 
-                        # Store the Matplotlib line together with the data arrays for reuse
-                        if len(curve_entry) == 2:
-                            self.curves[label] = (new_plot, y_data)
-                        elif len(curve_entry) >= 3:
-                            self.curves[label] = (new_plot, x_data, y_data)
-                        else:
-                            self.curves[label] = (new_plot,)
+                        # Update CurveManager with new plot object and data
+                        self.curveManager.updateCurve(
+                            curveID=curveID,
+                            plot_obj=new_plot,
+                            x_data=x_data,
+                            y_data=y_data,
+                        )
+                        self.updateBasicMathInfo(curveID)
                     else:
                         logger.error(f"Error updating plot data for {label}: {e}")
                         raise
@@ -531,6 +809,305 @@ class ChartView(QtWidgets.QWidget):
             logger.error(f"Live update failed: {exc}", exc_info=True)
             self.stopLiveUpdates()
             self.setPlotSubtitle(f"Live update error: {exc}")
+
+    # ==========================================
+    #   Basic maths methods
+    # ==========================================
+
+    def onOffsetFactorChanged(self):
+        """Handle offset or factor value change."""
+        if self.curveBox is None:
+            return
+
+        current_index = self.curveBox.currentIndex()
+        if current_index < 0:
+            return
+
+        curveID = self.curveBox.itemData(current_index)
+        if curveID is None:
+            return
+
+        # Get offset and factor values from UI
+        try:
+            offset = (
+                float(self.offset_value.text()) if self.offset_value.text() else 0.0
+            )
+        except ValueError:
+            offset = 0.0
+            # Reset to default if conversion fails
+            self.offset_value.setText(str(offset))
+            return
+        try:
+            factor = (
+                float(self.factor_value.text()) if self.factor_value.text() else 1.0
+            )
+        except ValueError:
+            factor = 1.0
+            # Reset to default if conversion fails
+            self.factor_value.setText(str(factor))
+            return
+
+        # Update curve with new offset and factor
+        if self.curveManager.updateCurveOffsetFactor(
+            curveID, offset=offset, factor=factor
+        ):
+            # Update basic math info with transformed data
+            self.updateBasicMathInfo(curveID)
+
+            # Recompute axes limits and autoscale and redraw canvas
+            self.main_axes.relim()
+            self.main_axes.autoscale_view()
+            self.canvas.draw()
+
+    def updateBasicMathInfo(self, curveID):
+        if not curveID:
+            self.clearBasicMath()
+            return
+        if self.parent is None:
+            return
+        try:
+            x, y = self.curveManager.getCurveXYData(curveID)
+            if x is None or y is None:
+                self.clearBasicMath()
+                return
+            stats = self.calculateBasicMath(x, y)
+            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
+                label_widget = self.parent.findChild(QtWidgets.QLabel, txt)
+                if label_widget is not None:
+                    if isinstance(i, tuple):
+                        result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
+                    else:
+                        result = f"{utils.num2fstr(i)}" if i else "n/a"
+                    label_widget.setText(result)
+        except Exception as exc:
+            logger.error(f"Error updating basic math from CurveManager: {exc}")
+            self.clearBasicMath()
+
+    def clearBasicMath(self):
+        if self.parent is None:
+            return
+        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+            label = self.parent.findChild(QtWidgets.QLabel, txt)
+            if label is not None:  # Check for None
+                label.setText("n/a")
+
+    def calculateBasicMath(self, x_data, y_data):
+        x_array = numpy.array(x_data, dtype=float)
+        y_array = numpy.array(y_data, dtype=float)
+        # Find y_min and y_max
+        y_min = numpy.min(y_array)
+        y_max = numpy.max(y_array)
+        # Find the indices of the min and max y value
+        y_min_index = numpy.argmin(y_array)
+        y_max_index = numpy.argmax(y_array)
+        # Find the corresponding x values for y_min and y_max
+        x_at_y_min = x_array[y_min_index]
+        x_at_y_max = x_array[y_max_index]
+        # Calculate x_com and y_mean
+        x_com = (
+            numpy.sum(x_array * y_array) / numpy.sum(y_array)
+            if numpy.sum(y_array) != 0
+            else None
+        )
+        y_mean = numpy.mean(y_array)
+        return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
+
+    # ==========================================
+    #   Cursors methods
+    # ==========================================
+
+    def onRemoveCursor(self, cursor_num):
+        """Remove a cursor from the plot.
+
+        Parameters:
+            cursor_num (int): Cursor number to remove (1 or 2)
+        """
+        cross = self.cursors.get(cursor_num)
+        if cross is not None:
+            try:
+                cross.remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
+            self.cursors[cursor_num] = None
+            self.cursors[f"pos{cursor_num}"] = None
+            self.cursors[f"text{cursor_num}"] = (
+                "middle click or alt+right click" if cursor_num == 1 else "right click"
+            )
+        self.cursors["diff"] = "n/a"
+        self.cursors["midpoint"] = "n/a"
+        self.updateCursorInfo()
+        # Recompute the axes limits and autoscale:
+        self.main_axes.relim()
+        self.main_axes.autoscale_view()
+        self.canvas.draw()
+
+    def clearCursors(self):
+        """Clear both cursors from the plot."""
+        self.onRemoveCursor(1)
+        self.onRemoveCursor(2)
+
+    def onSnapCursorsToggled(self, checked):
+        """Handle snap cursors checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (snap enabled), False if unchecked (snap disabled)
+        """
+        self._snap_to_curve = checked
+
+    def findNearestPoint(
+        self, x_click: float, y_click: float
+    ) -> tuple[float, float] | None:
+        """
+        Find the nearest data point in the selected curve to the given click position.
+
+        Parameters:
+        - x_click: X coordinate of the click
+        - y_click: Y coordinate of the click
+
+        Returns:
+        - Tuple of (x_nearest, y_nearest) if a curve is selected and has data, None otherwise
+        """
+        curveID = self.getSelectedCurveID()
+        if not curveID or curveID not in self.curveManager.curves():
+            return None
+
+        # Get curve data from CurveManager
+        x_data, y_data = self.curveManager.getCurveXYData(curveID)
+        if x_data is None or y_data is None:
+            return None
+
+        # Ensure data are numpy arrays
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
+
+        # Normalize by axis ranges to account for different scales
+        x_range = self.main_axes.get_xlim()
+        y_range = self.main_axes.get_ylim()
+        x_scale = x_range[1] - x_range[0] if x_range[1] != x_range[0] else 1.0
+        y_scale = y_range[1] - y_range[0] if y_range[1] != y_range[0] else 1.0
+
+        # Calculate normalized distances
+        dx = (x_data - x_click) / x_scale
+        dy = (y_data - y_click) / y_scale
+        distances = numpy.sqrt(dx**2 + dy**2)
+
+        # Find the index of the nearest point
+        nearest_index = numpy.argmin(distances)
+
+        return (float(x_data[nearest_index]), float(y_data[nearest_index]))
+
+    def onclick(self, event):
+        """Handle mouse click events on the plot to place cursors."""
+        # Check if the click was in the main_axes
+        if event.inaxes is self.main_axes:
+            # Determine cursor position based on snap setting
+            if self._snap_to_curve:
+                # Find the nearest point in the selected curve
+                nearest_point = self.findNearestPoint(event.xdata, event.ydata)
+
+                if nearest_point is None:
+                    # No curve selected or no data available
+                    return
+
+                x_cursor, y_cursor = nearest_point
+            else:
+                # Use exact click position
+                x_cursor, y_cursor = event.xdata, event.ydata
+
+            # Middle click or Alt+right click for red cursor (cursor 1)
+            if event.button == MIDDLE_BUTTON or (
+                event.button == RIGHT_BUTTON and self.alt_pressed
+            ):
+                if self.cursors[1] is not None:
+                    try:
+                        self.cursors[1].remove()  # Remove existing red cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
+                plot_result = self.main_axes.plot(
+                    x_cursor, y_cursor, "r+", markersize=15, linewidth=2
+                )
+                self.cursors[1] = plot_result[0]
+                # Update cursor position
+                self.cursors["pos1"] = (x_cursor, y_cursor)
+
+            # Right click (without Alt) for blue cursor (cursor 2)
+            elif event.button == RIGHT_BUTTON and not self.alt_pressed:
+                if self.cursors[2] is not None:
+                    try:
+                        self.cursors[2].remove()  # Remove existing blue cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
+                plot_result = self.main_axes.plot(
+                    x_cursor, y_cursor, "b+", markersize=15, linewidth=2
+                )
+                self.cursors[2] = plot_result[0]
+                # Update cursor position
+                self.cursors["pos2"] = (x_cursor, y_cursor)
+
+            # Update the info panel with cursor positions
+            self.calculateCursors()
+
+            # Redraw the canvas to display the new markers
+            self.canvas.draw()
+
+    def check_modifier_keys(self):
+        """Check for modifier keys using Qt's global state."""
+        try:
+            # Get the global keyboard state
+            modifiers = QtWidgets.QApplication.keyboardModifiers()
+            self.alt_pressed = bool(modifiers & QtCore.Qt.AltModifier)
+        except Exception:
+            # Fallback if Qt method fails
+            pass
+
+    def calculateCursors(self):
+        """
+        Update cursor information in info panel widget.
+        """
+        # Check for the first cursor and update text accordingly
+        if self.cursors[1]:
+            x1, y1 = self.cursors["pos1"]
+            self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
+        # Check for the second cursor and update text accordingly
+        if self.cursors[2]:
+            x2, y2 = self.cursors["pos2"]
+            self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
+        # Calculate differences and midpoints only if both cursors are present
+        if self.cursors[1] and self.cursors[2]:
+            delta_x = x2 - x1
+            delta_y = y2 - y1
+            midpoint_x = (x1 + x2) / 2
+            midpoint_y = (y1 + y2) / 2
+            self.cursors["diff"] = (
+                f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
+            )
+            self.cursors["midpoint"] = (
+                f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+            )
+        self.updateCursorInfo()
+
+    def updateCursorInfo(self):
+        """Update the cursor info UI labels."""
+        if self.parent is None:
+            return
+        self.parent.brc_run_viz.pos1_text.setText(self.cursors["text1"])
+        self.parent.brc_run_viz.pos2_text.setText(self.cursors["text2"])
+        self.parent.brc_run_viz.diff_text.setText(self.cursors["diff"])
+        self.parent.brc_run_viz.midpoint_text.setText(self.cursors["midpoint"])
+
+    def clearCursorInfo(self):
+        """Clear the cursor info UI labels."""
+        if self.parent is None:
+            return
+        self.parent.brc_run_viz.pos1_text.setText("middle click or alt+right click")
+        self.parent.brc_run_viz.pos2_text.setText("right click")
+        self.parent.brc_run_viz.diff_text.setText("n/a")
+        self.parent.brc_run_viz.midpoint_text.setText("n/a")
 
 
 # -----------------------------------------------------------------------------

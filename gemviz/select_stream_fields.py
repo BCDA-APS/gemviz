@@ -257,10 +257,15 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         # verbose labels
         # ds_options["label"] = f"{y_axis} ({run.summary()} {run.uid[:7]})"
         # terse labels
-        ds_options["label"] = f"{scan_id} ({run.uid[:7]})"
+        ds_options["label"] = f"{scan_id} ({run.uid[:7]}) - {y_axis}"
         ds_options["color"] = color  # line color
         ds_options["marker"] = symbol
         ds_options["markersize"] = 5  # default: 10
+
+        # Add metadata for CurveManager
+        ds_options["run_uid"] = run.uid
+        ds_options["y_field"] = y_axis  # y_axis is the field name
+        ds_options["stream_name"] = stream_name
 
         if x_data is None:
             ds = [y_data]  # , title=f"{y_axis} v index"

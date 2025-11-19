@@ -135,6 +135,7 @@ class BRC_MVC(QtWidgets.QWidget):
 
         if action in ("remove"):
             # Remove this run from the plot
+            # TODO: this does not work, remove always removes all curves from the graph
             if key in self._title_keys:
                 self._title_keys.remove(key)
                 logger.info(f"Removed run {key} from plot")
