@@ -147,6 +147,8 @@ class ChartView(QtWidgets.QWidget):
 
         # plot
         size.setHorizontalStretch(4)
+        self._log_x = False
+        self._log_y = False
 
         # Initialize CurveManager
         self.curveManager = CurveManager(self)
@@ -186,8 +188,17 @@ class ChartView(QtWidgets.QWidget):
             self.snapCursors.setChecked(self._snap_to_curve)
             self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
 
+            # Connect derivative checkbox (default to False)
+            self._derivative = False
+            self.derivativeCheckBox = self.parent.brc_run_viz.derivativeCheckBox
+            self.derivativeCheckBox.setChecked(self._derivative)
+            self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
+
         else:
             self.curveBox = None
+            self.factor_value = None
+            self.offset_value = None
+            self.derivativeCheckBox = None
 
         # Connect the click event to a handler
         self.cid = self.canvas.mpl_connect("button_press_event", self.onclick)
@@ -278,8 +289,11 @@ class ChartView(QtWidgets.QWidget):
             if curve_info:
                 offset = curve_info.get("offset", 0.0)
                 factor = curve_info.get("factor", 1.0)
-                self.offset_value.setText(str(offset))
-                self.factor_value.setText(str(factor))
+                derivative = curve_info.get("derivative", False)
+                if self.offset_value and self.factor_value and self.derivativeCheckBox:
+                    self.offset_value.setText(str(offset))
+                    self.factor_value.setText(str(factor))
+                    self.derivativeCheckBox.setChecked(derivative)
 
     def onCurveRemoveClicked(self):
         """Handle Remove Curve button click."""
@@ -844,7 +858,8 @@ class ChartView(QtWidgets.QWidget):
         except ValueError:
             factor = 1.0
             # Reset to default if conversion fails
-            self.factor_value.setText(str(factor))
+            if self.factor_value:
+                self.factor_value.setText(str(factor))
             return
 
         # Update curve with new offset and factor
@@ -911,6 +926,30 @@ class ChartView(QtWidgets.QWidget):
         )
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
+
+    def onDerivativeToggled(self, checked):
+        """Handle derivative checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (derivative enabled), False if unchecked (derivative disabled)
+        """
+        self._derivative = checked
+        current_index = self.curveBox.currentIndex()
+        if current_index < 0:
+            return
+
+        curveID = self.curveBox.itemData(current_index)
+        if curveID is None:
+            return
+
+        # Update curve with new derivative status
+        if self.curveManager.updateCurveDerivative(curveID, derivative=checked):
+            # Update basic math info with transformed data:
+            self.updateBasicMathInfo(curveID)
+            # Recompute axes limits and autoscale and redraw canvas
+            self.main_axes.relim()
+            self.main_axes.autoscale_view()
+            self.canvas.draw()
 
     # ==========================================
     #   Cursors methods
