@@ -242,6 +242,70 @@ class GaussianFit(FitModel):
         }
 
 
+class NegativeGaussianFit(FitModel):
+    """Negative Gaussian fit model (for valleys/dips)."""
+
+    def __init__(self):
+        """Initialize negative Gaussian fit model."""
+        super().__init__(
+            "Negative Gaussian",
+            self._gaussian_function,  # Same function, just negative amplitude
+            ["amplitude", "center", "sigma", "offset"],
+        )
+
+    def _gaussian_function(
+        self,
+        x: np.ndarray,
+        amplitude: float,
+        center: float,
+        sigma: float,
+        offset: float,
+    ) -> np.ndarray:
+        """Same as Gaussian - amplitude will be negative."""
+        return amplitude * np.exp(-((x - center) ** 2) / (2 * sigma**2)) + offset
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> dict[str, float]:
+        """Get default initial guesses for negative Gaussian fit."""
+        y_max = np.max(y_data)
+        y_min = np.min(y_data)
+        x_min_idx = np.argmin(y_data)
+        x_min = x_data[x_min_idx]
+
+        # Always assume negative peak (valley)
+        amplitude = y_min - y_max  # negative
+        center = x_min
+        offset = y_max  # baseline
+
+        # Estimate sigma from FWHM (similar to Gaussian but use x_min_idx)
+        half_max = (y_max + y_min) / 2
+        left_idx = np.where(y_data <= half_max)[0]
+        if len(left_idx) > 0:
+            left_idx = left_idx[left_idx < x_min_idx]
+            if len(left_idx) > 0:
+                left_x = x_data[left_idx[-1]]
+                right_idx = np.where(y_data <= half_max)[0]
+                right_idx = right_idx[right_idx > x_min_idx]
+                if len(right_idx) > 0:
+                    right_x = x_data[right_idx[0]]
+                    fwhm = right_x - left_x
+                    sigma_est = fwhm / (2 * np.sqrt(2 * np.log(2)))
+                else:
+                    sigma_est = (x_data[-1] - x_data[0]) / 10
+            else:
+                sigma_est = (x_data[-1] - x_data[0]) / 10
+        else:
+            sigma_est = (x_data[-1] - x_data[0]) / 10
+
+        return {
+            "amplitude": amplitude,
+            "center": center,
+            "sigma": sigma_est,
+            "offset": offset,
+        }
+
+
 class LorentzianFit(FitModel):
     """Lorentzian fit model."""
 
@@ -310,6 +374,70 @@ class LorentzianFit(FitModel):
             "center": x_max,
             "gamma": gamma_est,
             "offset": y_min,
+        }
+
+
+class NegativeLorentzianFit(FitModel):
+    """Negative Lorentzian fit model (for valleys/dips)."""
+
+    def __init__(self):
+        """Initialize negative Lorentzian fit model."""
+        super().__init__(
+            "Negative Lorentzian",
+            self._lorentzian_function,  # Same function, just negative amplitude
+            ["amplitude", "center", "gamma", "offset"],
+        )
+
+    def _lorentzian_function(
+        self,
+        x: np.ndarray,
+        amplitude: float,
+        center: float,
+        gamma: float,
+        offset: float,
+    ) -> np.ndarray:
+        """Same as Lorentzian - amplitude will be negative."""
+        return amplitude * gamma**2 / ((x - center) ** 2 + gamma**2) + offset
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> dict[str, float]:
+        """Get default initial guesses for negative Lorentzian fit."""
+        y_max = np.max(y_data)
+        y_min = np.min(y_data)
+        x_min_idx = np.argmin(y_data)
+        x_min = x_data[x_min_idx]
+
+        # Always assume negative peak (valley)
+        amplitude = y_min - y_max  # negative
+        center = x_min
+        offset = y_max  # baseline
+
+        # Estimate gamma from FWHM (similar to Lorentzian but use x_min_idx)
+        half_max = (y_max + y_min) / 2
+        left_idx = np.where(y_data <= half_max)[0]
+        if len(left_idx) > 0:
+            left_idx = left_idx[left_idx < x_min_idx]
+            if len(left_idx) > 0:
+                left_x = x_data[left_idx[-1]]
+                right_idx = np.where(y_data <= half_max)[0]
+                right_idx = right_idx[right_idx > x_min_idx]
+                if len(right_idx) > 0:
+                    right_x = x_data[right_idx[0]]
+                    fwhm = right_x - left_x
+                    gamma_est = fwhm / 2
+                else:
+                    gamma_est = (x_data[-1] - x_data[0]) / 10
+            else:
+                gamma_est = (x_data[-1] - x_data[0]) / 10
+        else:
+            gamma_est = (x_data[-1] - x_data[0]) / 10
+
+        return {
+            "amplitude": amplitude,
+            "center": center,
+            "gamma": gamma_est,
+            "offset": offset,
         }
 
 
@@ -557,6 +685,8 @@ def get_available_models() -> dict[str, FitModel]:
     return {
         "Gaussian": GaussianFit(),
         "Lorentzian": LorentzianFit(),
+        "Negative Gaussian": NegativeGaussianFit(),
+        "Negative Lorentzian": NegativeLorentzianFit(),
         "Linear": LinearFit(),
         "Exponential": ExponentialFit(),
         "Quadratic": PolynomialFit(degree=2),
