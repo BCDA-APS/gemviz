@@ -1310,13 +1310,19 @@ class ChartView(QtWidgets.QWidget):
         details_text = ""
 
         # Parameters
-        details_text += "Parameters:\n"
+        details_text += "Fitting results:\n"
         for param_name, param_value in result.parameters.items():
             uncertainty = result.uncertainties.get(param_name, 0.0)
             details_text += f"  {param_name}: {utils.num2fstr(param_value, 3)}"
             if uncertainty > 0:
                 details_text += f" ± {utils.num2fstr(uncertainty, 3)}"
             details_text += "\n"
+            if fit_data.model_name == "Gaussian" and param_name == "sigma":
+                details_text += f"  FWHM: {utils.num2fstr(2.35482*param_value,3)}"
+                details_text += f" ± {utils.num2fstr(2.35482*uncertainty, 3)}\n"
+            if fit_data.model_name == "Lorentzian" and param_name == "gamma":
+                details_text += f"  FWHM: {utils.num2fstr(2*param_value,3)}"
+                details_text += f" ± {utils.num2fstr(2*uncertainty, 3)}\n"
 
         # Quality metrics
         details_text += "\nQuality Metrics:\n"
