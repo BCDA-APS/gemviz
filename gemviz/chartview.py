@@ -32,6 +32,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from . import utils
 from .curve_manager import CurveManager
+from .fit_manager import FitManager
 
 MIDDLE_BUTTON = 2
 RIGHT_BUTTON = 3
@@ -157,6 +158,14 @@ class ChartView(QtWidgets.QWidget):
         self.curveManager.curveRemoved.connect(self.onCurveRemoved)
         self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
 
+        # Initialize FitManager
+        self.fitManager = FitManager(self)
+        self.fitManager.fitAdded.connect(self.onFitAdded)
+        self.fitManager.fitUpdated.connect(self.onFitUpdated)
+        self.fitManager.fitRemoved.connect(self.onFitRemoved)
+        # Track fit plot objects (dict mapping curveID to fit Line2D objects)
+        self.fitObjects = {}  #
+
         # Access UI elements from parent BRCRunVisualization
         if self.parent is not None:
             # Connect curve combobox
@@ -194,11 +203,38 @@ class ChartView(QtWidgets.QWidget):
             self.derivativeCheckBox.setChecked(self._derivative)
             self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
 
+            # Definition fit UI elements
+            self.fitModelCombo = self.parent.brc_run_viz.fitModelCombo
+            self.fitButton = self.parent.brc_run_viz.fitButton
+            self.clearFitsButton = self.parent.brc_run_viz.clearFitsButton
+            self.useFitRangeCheck = self.parent.brc_run_viz.useFitRangeCheck
+            self.fitDetails = self.parent.brc_run_viz.fitDetails
+            self.fitDetails.clear()
+
+            # Populate fit model combo box with available models
+            from .fit_models import get_available_models
+
+            available_models = get_available_models()
+            self.fitModelCombo.clear()
+            self.fitModelCombo.addItems(list(available_models.keys()))
+
+            # Connect fit button to handler
+            self.fitButton.clicked.connect(self.onFitButtonClicked)
+            self.clearFitsButton.clicked.connect(self.onClearFitClicked)
+
         else:
             self.curveBox = None
             self.factor_value = None
             self.offset_value = None
             self.derivativeCheckBox = None
+            self.fitModelCombo = None
+            self.fitButton = None
+            self.clearFitsButton = None
+            self.useFitRangeCheck = None
+            self.fitDetails = None
+
+        # Initially disable fit buttons (no curve selected yet)
+        self.updateFitButtonStates()
 
         # Connect the click event to a handler
         self.cid = self.canvas.mpl_connect("button_press_event", self.onclick)
@@ -246,6 +282,8 @@ class ChartView(QtWidgets.QWidget):
             self.curveBox.addItem(label, curveID)
             # Always select the newly added curve
             self.curveBox.setCurrentIndex(self.curveBox.count() - 1)
+        # Update fit button states (new curve is auto-selected)
+        self.updateFitButtonStates()
 
     def onCurveUpdated(self, curveID, recompute_y, update_x):
         """Handle updates to an existing curve on the plot."""
@@ -253,6 +291,12 @@ class ChartView(QtWidgets.QWidget):
 
     def onCurveRemoved(self, curveID, curve_data, count):
         """Handle the removal of an existing curve on the plot."""
+        # Remove fit if this curve had one
+        if self.fitManager.hasFit(curveID):
+            self.fitManager.removeFit(curveID)
+            # RemoveFit will emit fitRemoved signal which calls onFitRemoved
+            # which will handle removing the plot line and redrawing
+
         if self.curveBox is None:
             return
         print(f"DEBUG: removing curve {curveID}")
@@ -265,10 +309,26 @@ class ChartView(QtWidgets.QWidget):
         if self.curveBox.count() > 0:
             self.curveBox.setCurrentIndex(0)
 
+        # Update fit button states
+        self.updateFitButtonStates()
+
     def onAllCurvesRemoved(self):
         """Handle the removal of all curves on the plot."""
+        # Remove any existing fit
+        for curveID in list(self.fitObjects.keys()):
+            if self.fitManager.hasFit(curveID):
+                self.fitManager.removeFit(curveID)
+            # Clear fitObjects dict entry (plot object already removed by axes.clear() in onClearAllClicked())
+            del self.fitObjects[curveID]
+
         if self.curveBox is not None:
             self.curveBox.clear()
+
+        if self.fitDetails is not None:
+            self.fitDetails.clear()
+
+        # Disable fit buttons when no curves remain
+        self.updateFitButtonStates()
 
     def onCurveSelectionChanged(self, label):
         """Handle curve selection change in combobox."""
@@ -278,6 +338,7 @@ class ChartView(QtWidgets.QWidget):
     def onCurveSelected(self, index):
         """Handle curve selection change in combobox."""
         if self.curveBox is None or index < 0:
+            self.updateFitButtonStates()
             return
         # Get curveID from combobox item data
         curveID = self.curveBox.itemData(index)
@@ -294,6 +355,8 @@ class ChartView(QtWidgets.QWidget):
                     self.offset_value.setText(str(offset))
                     self.factor_value.setText(str(factor))
                     self.derivativeCheckBox.setChecked(derivative)
+        # Update fit button states
+        self.updateFitButtonStates()
 
     def onCurveRemoveClicked(self):
         """Handle Remove Curve button click."""
@@ -605,6 +668,12 @@ class ChartView(QtWidgets.QWidget):
 
     def onClearAllClicked(self):
         """Handle Clear Graph button click."""
+        # Store current log scale state before clearing
+        if self.parent and hasattr(self.parent, "brc_run_viz"):
+            stored_log_x, stored_log_y = self.parent.brc_run_viz.getLogScaleState()
+        else:
+            stored_log_x, stored_log_y = self._log_x, self._log_y
+
         # Clear all plot lines, legend, axis labels, and axes title
         self.main_axes.clear()
 
@@ -613,6 +682,9 @@ class ChartView(QtWidgets.QWidget):
 
         # Clear the curve manager (will emit allCurvesRemoved signal)
         self.curveManager.removeAllCurves()
+
+        # Reapply log scale state after clearing
+        self.setLogScales(stored_log_x, stored_log_y)
 
         # Redraw the canvas
         self.canvas.draw()
@@ -1181,6 +1253,221 @@ class ChartView(QtWidgets.QWidget):
         self.parent.brc_run_viz.pos2_text.setText("right click")
         self.parent.brc_run_viz.diff_text.setText("n/a")
         self.parent.brc_run_viz.midpoint_text.setText("n/a")
+
+    def getCursorRange(self):
+        """
+        Get the range defined by the cursors.
+
+        Returns:
+        - Tuple of (x_min, x_max) if both cursors are set, None otherwise
+        """
+        pos1 = self.cursors.get("pos1")
+        pos2 = self.cursors.get("pos2")
+        if pos1 is not None and pos2 is not None:
+            x1, y1 = pos1
+            x2, y2 = pos2
+            return (min(x1, x2), max(x1, x2))
+        return None
+
+    # ==========================================
+    #   Fit methods
+    # ==========================================
+
+    def updateFitButtonStates(self) -> None:
+        """Update enabled/disabled state of fit buttons based on curve selection."""
+        if self.fitButton is None or self.clearFitsButton is None:
+            return
+
+        # Enable buttons if a curve is selected
+        has_selection = (
+            self.curveBox is not None
+            and self.curveBox.count() > 0
+            and self.curveBox.currentIndex() >= 0
+        )
+
+        self.fitButton.setEnabled(has_selection)
+        self.clearFitsButton.setEnabled(has_selection)
+
+    def updateFitDetails(self, curveID: str) -> None:
+        """
+        Update the fit details display.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        if self.fitDetails is None:
+            return
+
+        # Get fit data
+        fit_data = self.fitManager.getFitData(curveID)
+        if not fit_data:
+            self.fitDetails.clear()
+            return
+
+        # Format fit results
+        result = fit_data.fit_result
+        curve_info = self.curveManager.getCurveData(curveID)
+        details_text = ""
+
+        # Parameters
+        details_text += "Parameters:\n"
+        for param_name, param_value in result.parameters.items():
+            uncertainty = result.uncertainties.get(param_name, 0.0)
+            details_text += f"  {param_name}: {utils.num2fstr(param_value, 3)}"
+            if uncertainty > 0:
+                details_text += f" ± {utils.num2fstr(uncertainty, 3)}"
+            details_text += "\n"
+
+        # Quality metrics
+        details_text += "\nQuality Metrics:\n"
+        details_text += f"  R²: {utils.num2fstr(result.r_squared,3)}\n"
+        details_text += f"  χ²: {utils.num2fstr(result.chi_squared,3)}\n"
+        details_text += (
+            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared,3)}\n"
+        )
+
+        if curve_info:
+            # Data transformation
+            details_text += "\nData transformation:\n"
+            details_text += f"  Derivative: {curve_info['derivative']}\n"
+            details_text += f"  Factor: {curve_info['factor']}\n"
+            details_text += f"  Offset: {curve_info['offset']}\n"
+
+        self.fitDetails.setText(details_text)
+
+    def onFitAdded(self, curveID: str) -> None:
+        """
+        Handle when a fit is added to a curve.
+
+        Parameters:
+        - curveID: ID of the curve that was fitted
+        """
+        # Get fit data and plot the fit curve
+        fit_data = self.fitManager.getFitCurveData(curveID)
+        if fit_data:
+            x_fit, y_fit = fit_data
+            # Plot fit curve with dashed line style and higher z-order
+            fit_line = self.main_axes.plot(
+                x_fit, y_fit, "--", alpha=1, linewidth=2, zorder=10
+            )[0]
+            self.fitObjects[curveID] = fit_line
+
+            # Update fit results
+            self.updateFitDetails(curveID)
+
+            # Redraw the canvas
+            self.canvas.draw()
+
+    def onFitUpdated(self, curveID: str) -> None:
+        """
+        Handle when a fit is updated.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        # Remove existing fit line if any
+        self.onFitRemoved(curveID, False)
+        self.onFitAdded(curveID)
+
+    def onFitRemoved(self, curveID: str, redraw: bool = True) -> None:
+        """
+        Handle when a fit is removed.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        # Remove fit line from plot
+        if curveID in self.fitObjects:
+            try:
+                self.fitObjects[curveID].remove()
+            except (NotImplementedError, AttributeError):
+                pass
+            del self.fitObjects[curveID]
+            # Clear fit results
+            if self.fitDetails is not None:
+                self.fitDetails.clear()
+            # Redraw the canvas
+            if redraw:
+                self.canvas.draw()
+
+    def onFitButtonClicked(self) -> None:
+        """Handle Fit button click - fit the currently selected curve."""
+        # Get the currently selected curve
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
+
+        # Get curve data
+        curve_info = self.curveManager.getCurveData(curveID)
+        if curve_info is None:
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "Could not retrieve curve data."
+            )
+            return
+
+        # Get transformed x and y data (already has offset/factor/derivative applied)
+        plot_obj, x_data, y_data = curve_info["data"]
+
+        # Convert to numpy arrays if needed
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
+
+        # Check for valid data
+        if len(x_data) == 0 or len(y_data) == 0:
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "No data available for fitting."
+            )
+            return
+
+        if len(x_data) != len(y_data):
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "X and Y data have different lengths."
+            )
+            return
+
+        # Get selected fit model
+        model_name = self.fitModelCombo.currentText()
+        if not model_name:
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "Please select a fit model."
+            )
+            return
+
+        # Get fit range if "use cursor range" is checked
+        x_range = None
+        if self.useFitRangeCheck.isChecked():
+            x_range = self.getCursorRange()
+
+        try:
+            # Clear any existing fit from other curves (only one fit at a time)
+            all_curves = list(self.curveManager.curves().keys())
+            for other_curve_id in all_curves:
+                if other_curve_id != curveID and self.fitManager.hasFit(other_curve_id):
+                    self.fitManager.removeFit(other_curve_id)
+
+            # Perform the fit (this will replace any existing fit for the current curve)
+            self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
+
+        except ValueError as e:
+            # Show error message
+            QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
+
+    def onClearFitClicked(self) -> None:
+        """Handle Clear Fit button click - remove fit from currently selected curve."""
+        # Get the currently selected curve
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            # Button should be disabled, but check just in case
+            return
+        # Clear fit results
+        if self.fitDetails is not None:
+            self.fitDetails.clear()
+        # Remove fit if it exists: curveManager emits fitRemoved signal which trigers onFitRemoved
+        if self.fitManager.hasFit(curveID):
+            self.fitManager.removeFit(curveID)
+        # If no fit exists, silently do nothing (button is enabled when curve selected)
 
 
 # -----------------------------------------------------------------------------

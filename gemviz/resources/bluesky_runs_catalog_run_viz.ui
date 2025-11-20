@@ -36,8 +36,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>691</width>
-        <height>724</height>
+        <width>673</width>
+        <height>739</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -290,23 +290,35 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>200</height>
+           <height>210</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>200</height>
+           <height>205</height>
           </size>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
           <item>
            <widget class="QTabWidget" name="graphInfo">
             <property name="tabPosition">
              <enum>QTabWidget::East</enum>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="Stats">
              <attribute name="title">
@@ -728,23 +740,23 @@
                  </sizepolicy>
                 </property>
                 <property name="title">
-                 <string>Fit Result</string>
+                 <string/>
                 </property>
                 <layout class="QVBoxLayout" name="fitResultsLayout">
                  <property name="spacing">
                   <number>5</number>
                  </property>
                  <property name="leftMargin">
-                  <number>5</number>
+                  <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>5</number>
+                  <number>0</number>
                  </property>
                  <property name="rightMargin">
-                  <number>5</number>
+                  <number>0</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>5</number>
+                  <number>0</number>
                  </property>
                  <item>
                   <widget class="QTextEdit" name="fitDetails">
