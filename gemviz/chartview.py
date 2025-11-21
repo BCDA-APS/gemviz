@@ -339,6 +339,7 @@ class ChartView(QtWidgets.QWidget):
         """Handle curve selection change in combobox."""
         if self.curveBox is None or index < 0:
             self.updateFitButtonStates()
+            self.clearBasicMath()
             return
         # Get curveID from combobox item data
         curveID = self.curveBox.itemData(index)
@@ -987,18 +988,24 @@ class ChartView(QtWidgets.QWidget):
         if self.parent is None:
             return
         try:
+            self.clearBasicMath()
             x, y = self.curveManager.getCurveXYData(curveID)
             if x is None or y is None:
                 self.clearBasicMath()
                 return
+            text = ["min_text", "max_text", "com_text", "mean_text"]
             stats = self.calculateBasicMath(x, y)
-            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
+            peak = self.calculateRawDataPeak(curveID)
+            if peak:
+                stats = stats + peak
+                text = text + ["peak_text", "FWHM_text", "center_text"]
+            for i, txt in zip(stats, text):
                 label_widget = self.parent.findChild(QtWidgets.QLabel, txt)
                 if label_widget is not None:
                     if isinstance(i, tuple):
                         result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
                     else:
-                        result = f"{utils.num2fstr(i)}" if i else "n/a"
+                        result = f"{utils.num2fstr(i)}" if i is not None else "n/a"
                     label_widget.setText(result)
         except Exception as exc:
             logger.error(f"Error updating basic math from CurveManager: {exc}")
@@ -1007,7 +1014,15 @@ class ChartView(QtWidgets.QWidget):
     def clearBasicMath(self):
         if self.parent is None:
             return
-        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+        for txt in [
+            "min_text",
+            "max_text",
+            "com_text",
+            "mean_text",
+            "peak_text",
+            "FWHM_text",
+            "center_text",
+        ]:
             label = self.parent.findChild(QtWidgets.QLabel, txt)
             if label is not None:  # Check for None
                 label.setText("n/a")
@@ -1031,7 +1046,241 @@ class ChartView(QtWidgets.QWidget):
             else None
         )
         y_mean = numpy.mean(y_array)
-        return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
+        return [(x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean]
+
+    def calculateRawDataPeak(self, curveID: str) -> list | None:
+        """
+        Calculate peak characteristics from raw data (not fit), assuming a single
+        positive peak on top of a (possibly sloped) baseline.
+
+        Parameters
+        ----------
+        curveID : str
+            ID of the curve.
+
+        Returns
+        -------
+        list or None
+            [peak_position, fwhm, fwhm_center] or None if computation is not possible
+        """
+
+        # --- Get curve data from curveManager ---
+        curve_info = self.curveManager.getCurveData(curveID)
+        if curve_info is None:
+            return None
+
+        plot_obj, x_data, y_data = curve_info["data"]
+
+        # --- Convert to numpy arrays ---
+        x = numpy.asarray(x_data, dtype=float)
+        y = numpy.asarray(y_data, dtype=float)
+
+        # Remove NaNs / infs
+        mask = numpy.isfinite(x) & numpy.isfinite(y)
+        x = x[mask]
+        y = y[mask]
+
+        if x.size < 3 or y.size < 3:
+            return None
+
+        # Ensure sorted in x (just in case)
+        order = numpy.argsort(x)
+        x = x[order]
+        y = y[order]
+
+        # Use average of first and last N points (e.g., 10% or min 5 points)
+        # n_edge = max(5, len(y) // 10)
+        # baseline = 0.5 * (numpy.mean(y[:n_edge]) + numpy.mean(y[-n_edge:]))
+
+        # Positive peak: global maximum above baseline
+        peak_idx = numpy.argmax(y)
+        y_max = y[peak_idx]
+        x_peak = x[peak_idx]
+        baseline_at_peak, baseline_value, baseline_coeffs = self.calculateBaseline(
+            x, y, x_peak
+        )
+        baseline = baseline_at_peak
+        amplitude = y_max - baseline
+
+        # Reject peaks at boundaries
+        if peak_idx == 0 or peak_idx == len(y) - 1:
+            return None
+
+        # Require a strictly positive peak
+        if amplitude <= 0:
+            return None
+
+        # Amplitude vs baseline check
+        if amplitude < 0.005 * abs(baseline):
+            return None
+
+        # Calculate FWHM and its center
+        result = self.calculateFWHM(
+            x, y, peak_idx, baseline_coeffs, baseline_value, amplitude
+        )
+
+        if result is None:
+            return None
+
+        fwhm, fwhm_center = result
+        return [x_peak, fwhm, fwhm_center]
+
+    def calculateBaseline(self, x, y, x_peak):
+        # Baseline: fit line to edge regions to handle sloped baselines
+        n_edge = max(5, len(y) // 10)
+        baseline_coeffs = None
+        baseline_value = None
+
+        # Try to fit sloped baseline to edges
+        if len(y) >= 2 * n_edge:
+            x_left = x[:n_edge]
+            y_left = y[:n_edge]
+            x_right = x[-n_edge:]
+            y_right = y[-n_edge:]
+
+            # Check if we have enough unique x values for fitting (need at least 2 distinct x values)
+            if len(set(x_left)) > 1 and len(set(x_right)) > 1:
+                try:
+                    x_edges = numpy.concatenate([x_left, x_right])
+                    y_edges = numpy.concatenate([y_left, y_right])
+                    coeffs = numpy.polyfit(x_edges, y_edges, 1)
+
+                    # Validate fit: check if residuals are reasonable
+                    y_fit = numpy.polyval(coeffs, x_edges)
+                    residuals = numpy.abs(y_edges - y_fit)
+                    # Accept if median residual is reasonable (< 50% of data std)
+                    if numpy.median(residuals) < 0.5 * numpy.std(y_edges):
+                        baseline_coeffs = coeffs
+                except (numpy.linalg.LinAlgError, ValueError, numpy.RankWarning):
+                    pass
+
+        # Fallback to constant baseline (median of lowest or edge average)
+        if baseline_coeffs is None:
+            sorted_y = numpy.sort(y)
+            n_low = max(5, len(sorted_y) // 10)
+            baseline_value = numpy.median(sorted_y[:n_low])
+            # Alternative: baseline_value = 0.5 * (numpy.mean(y[:n_edge]) + numpy.mean(y[-n_edge:]))
+
+        # Evaluate baseline at peak position for amplitude calculation
+        if baseline_coeffs is not None:
+            baseline_at_peak = numpy.polyval(baseline_coeffs, x_peak)
+        else:
+            baseline_at_peak = baseline_value
+
+        return baseline_at_peak, baseline_value, baseline_coeffs
+
+    def calculateFWHM(self, x, y, peak_idx, baseline_coeffs, baseline_value, amplitude):
+        """
+        Find left/right intersection with half-level, handling sloped baselines.
+
+        Parameters
+        ----------
+        x, y : array-like
+            Data arrays
+        peak_idx : int
+            Index of peak
+        baseline_coeffs : array or None
+            Polynomial coefficients for sloped baseline [slope, intercept] or None
+        baseline_value : float or None
+            Constant baseline value (used if baseline_coeffs is None)
+        amplitude : float
+            Peak amplitude above baseline
+
+        Returns
+        -------
+        tuple or None
+            (fwhm, fwhm_center) or None if FWHM cannot be determined
+        """
+        # Helper function to evaluate baseline at any x position
+        if baseline_coeffs is not None:
+
+            def baseline_at(x_pos):
+                return numpy.polyval(baseline_coeffs, x_pos)
+
+        else:
+
+            def baseline_at(x_pos):
+                return baseline_value
+
+        # Helper function to evaluate half-level at any x position
+        def half_level_at(x_pos):
+            return baseline_at(x_pos) + 0.5 * amplitude
+
+        # Search backwards from peak to find the closest crossing
+        left_x = None
+        for i in range(peak_idx - 1, -1, -1):
+            if i + 1 >= len(y):
+                continue
+            y1, y2 = y[i], y[i + 1]
+            x1, x2 = x[i], x[i + 1]
+
+            # Evaluate half_level at segment midpoint for comparison
+            x_mid = 0.5 * (x1 + x2)
+            half_level = half_level_at(x_mid)
+
+            # Check for crossing
+            if y1 <= half_level < y2:
+                denom = y2 - y1
+                if denom == 0:
+                    continue
+                # Linear interpolation to find crossing point
+                t = (half_level - y1) / denom
+                x_cross = x1 + t * (x2 - x1)
+
+                # For sloped baseline, refine by re-evaluating at crossing point
+                if baseline_coeffs is not None:
+                    half_level_refined = half_level_at(x_cross)
+                    # Iterate once for better accuracy
+                    t = (half_level_refined - y1) / denom
+                    x_cross = x1 + t * (x2 - x1)
+
+                left_x = x_cross
+                break  # Found closest crossing, stop searching
+
+        # Find right intersection with half_level (closest crossing after peak)
+        right_x = None
+        for i in range(peak_idx, len(y) - 1):
+            y1, y2 = y[i], y[i + 1]
+            x1, x2 = x[i], x[i + 1]
+
+            x_mid = 0.5 * (x1 + x2)
+            half_level = half_level_at(x_mid)
+
+            # Crossing from above to below (or at) half_level
+            if y1 >= half_level > y2:
+                denom = y2 - y1
+                if denom == 0:
+                    continue
+
+                t = (half_level - y1) / denom
+                x_cross = x1 + t * (x2 - x1)
+
+                if baseline_coeffs is not None:
+                    half_level_refined = half_level_at(x_cross)
+                    t = (half_level_refined - y1) / denom
+                    x_cross = x1 + t * (x2 - x1)
+
+                right_x = x_cross
+                break
+
+        # Validation
+        if left_x is None or right_x is None:
+            return None
+
+        fwhm = right_x - left_x
+        fwhm_center = 0.5 * (left_x + right_x)
+
+        # Ensure FWHM is within data range and reasonable
+        x_min, x_max = x[0], x[-1]
+        if (
+            left_x < x_min
+            or right_x > x_max
+            or fwhm > 0.9 * (x_max - x_min)
+            or fwhm < 0
+        ):
+            return None
+
+        return fwhm, fwhm_center
 
     def onDerivativeToggled(self, checked):
         """Handle derivative checkbox toggle.
