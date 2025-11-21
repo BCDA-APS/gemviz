@@ -982,36 +982,48 @@ class ChartView(QtWidgets.QWidget):
             self.canvas.draw()
 
     def updateBasicMathInfo(self, curveID):
-        if not curveID:
+        """Update basic math statistics for the selected curve."""
+        if not curveID or self.parent is None:
             self.clearBasicMath()
             return
-        if self.parent is None:
-            return
+
+        self.clearBasicMath()
+
         try:
-            self.clearBasicMath()
             x, y = self.curveManager.getCurveXYData(curveID)
             if x is None or y is None:
-                self.clearBasicMath()
                 return
-            text = ["min_text", "max_text", "com_text", "mean_text"]
-            stats = self.calculateBasicMath(x, y)
-            peak = self.calculateRawDataPeak(curveID)
-            if peak:
-                stats = stats + peak
-                text = text + ["peak_text", "FWHM_text", "center_text"]
-            for i, txt in zip(stats, text):
-                label_widget = self.parent.findChild(QtWidgets.QLabel, txt)
-                if label_widget is not None:
-                    if isinstance(i, tuple):
-                        result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
-                    else:
-                        result = f"{utils.num2fstr(i)}" if i is not None else "n/a"
-                    label_widget.setText(result)
+
+            basic_stats = self.calculateBasicMath(x, y)
+            peak_stats = self.calculateRawDataPeak(curveID)
+            if peak_stats:
+                basic_stats.update(peak_stats)
+            for label_name, stats_value in basic_stats.items():
+                self._updateMathLabel(label_name, stats_value)
+
         except Exception as exc:
             logger.error(f"Error updating basic math from CurveManager: {exc}")
             self.clearBasicMath()
 
+    def _updateMathLabel(self, label_name, stats_value):
+        """Update a single math label with formatted value."""
+        if self.parent is None:
+            return
+        label_widget = self.parent.findChild(QtWidgets.QLabel, label_name)
+        if label_widget is not None:
+            formatted_text = self._formatStatValue(stats_value)
+            label_widget.setText(formatted_text)
+
+    def _formatStatValue(self, value):
+        """Format statistic value for display."""
+        if value is None:
+            return "n/a"
+        if isinstance(value, tuple):
+            return f"({utils.num2fstr(value[0])}, {utils.num2fstr(value[1])})"
+        return f"{utils.num2fstr(value)}"
+
     def clearBasicMath(self):
+        """Clear basic maths text label ('n/a')"""
         if self.parent is None:
             return
         for txt in [
@@ -1028,6 +1040,7 @@ class ChartView(QtWidgets.QWidget):
                 label.setText("n/a")
 
     def calculateBasicMath(self, x_data, y_data):
+        """Calculate basic curve statistics"""
         x_array = numpy.array(x_data, dtype=float)
         y_array = numpy.array(y_data, dtype=float)
         # Find y_min and y_max
@@ -1046,9 +1059,16 @@ class ChartView(QtWidgets.QWidget):
             else None
         )
         y_mean = numpy.mean(y_array)
-        return [(x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean]
+        # Return a dictionary
+        result = {
+            "min_text": (x_at_y_min, y_min),
+            "max_text": (x_at_y_max, y_max),
+            "com_text": x_com,
+            "mean_text": y_mean,
+        }
+        return result
 
-    def calculateRawDataPeak(self, curveID: str) -> list | None:
+    def calculateRawDataPeak(self, curveID: str) -> dict | None:
         """
         Calculate peak characteristics from raw data (not fit), assuming a single
         positive peak on top of a (possibly sloped) baseline.
@@ -1060,8 +1080,10 @@ class ChartView(QtWidgets.QWidget):
 
         Returns
         -------
-        list or None
-            [peak_position, fwhm, fwhm_center] or None if computation is not possible
+        dict or None
+            Dictionary with keys 'peak_text', 'FWHM_text', 'center_text'
+            containing peak position, FWHM width, and center values, or None if
+            computation is not possible
         """
 
         # --- Get curve data from curveManager ---
@@ -1123,9 +1145,41 @@ class ChartView(QtWidgets.QWidget):
             return None
 
         fwhm, fwhm_center = result
-        return [x_peak, fwhm, fwhm_center]
+
+        peak_stats = {
+            "peak_text": x_peak,
+            "FWHM_text": fwhm,
+            "center_text": fwhm_center,
+        }
+        return peak_stats
 
     def calculateBaseline(self, x, y, x_peak):
+        """
+        Calculate baseline for peak analysis, handling both sloped and constant baselines.
+
+        Attempts to fit a linear baseline to edge regions of the data (first and last
+        10% or minimum 5 points). If the linear fit is not valid or fails, falls back
+        to a constant baseline calculated as the median of the lowest values.
+
+        Parameters
+        ----------
+        x : array-like
+            X data array
+        y : array-like
+            Y data array
+        x_peak : float
+            X position of the peak where baseline should be evaluated
+
+        Returns
+        -------
+        tuple
+            (baseline_at_peak, baseline_value, baseline_coeffs)
+            - baseline_at_peak (float): Baseline value at the peak position
+            - baseline_value (float or None): Constant baseline value if sloped fit
+            failed, None if sloped fit succeeded
+            - baseline_coeffs (array or None): Polynomial coefficients [slope, intercept]
+            for linear baseline if fit succeeded, None if constant baseline used
+        """
         # Baseline: fit line to edge regions to handle sloped baselines
         n_edge = max(5, len(y) // 10)
         baseline_coeffs = None
