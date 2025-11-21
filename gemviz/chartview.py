@@ -331,8 +331,6 @@ class ChartView(QtWidgets.QWidget):
         for curveID in list(self.fitObjects.keys()):
             if self.fitManager.hasFit(curveID):
                 self.fitManager.removeFit(curveID)
-            # Clear fitObjects dict entry (plot object already removed by axes.clear() in onClearAllClicked())
-            del self.fitObjects[curveID]
 
         if self.curveBox is not None:
             self.curveBox.clear()
