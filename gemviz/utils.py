@@ -53,6 +53,7 @@ def num2fstr(x: float, decimal=2) -> str:
 
     Parameters:
         x (float): Number to format
+        decimal (int, optional): Number of decimal places to display. Default is 2.
 
     Returns:
         str: Formatted string
