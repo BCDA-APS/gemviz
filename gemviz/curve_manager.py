@@ -200,9 +200,16 @@ class CurveManager(QtCore.QObject):
             curveID (str): Unique identifier of the curve to update
             plot_obj: New Matplotlib Line2D object (optional, if line needs to be recreated)
             x_data (array, optional): New X-axis data array
-            y_data (array, optional): New Y-axis data array
+            y_data (array, optional): New Y-axis data array. **IMPORTANT**: When
+                ``update_original_data=True``, ``y_data`` MUST be raw/untransformed data.
+                If transformed data is passed, it will incorrectly overwrite the original
+                baseline data.
             label (str, optional): New display label for the curve
             style_kwargs (dict, optional): New style properties (color, marker, etc.)
+            update_original_data (bool, optional): If True, update ``original_y_data`` with
+                the provided ``y_data`` and reapply any active transformations. This is
+                used during live updates to keep ``original_y_data`` synchronized with
+                the latest raw data. Requires that ``y_data`` is raw/untransformed.
             **kwargs: Additional properties to update (run_uid, y_field, stream_name, etc.)
 
         Returns:
@@ -235,6 +242,8 @@ class CurveManager(QtCore.QObject):
         # If this is a live update, update original_y_data and reapply transformations
         if update_original_data and y_data is not None:
             # Update the original y_data with the new raw data
+            # CRITICAL: y_data MUST be raw/untransformed data here. If transformed data
+            # is passed, it will corrupt original_y_data and break future transformations.
             curve_info["original_y_data"] = numpy.array(y_data).copy()
 
             # Check if any transformations are active

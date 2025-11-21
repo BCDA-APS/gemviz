@@ -850,6 +850,7 @@ class ChartView(QtWidgets.QWidget):
                         )
                         continue
 
+                    # Get raw data from stream (not transformed)
                     x_data = numpy.asarray(stream_data[x_field])
                     y_data = numpy.asarray(stream_data[y_field])
 
@@ -877,6 +878,9 @@ class ChartView(QtWidgets.QWidget):
                     # set_data expects (x, y) as two separate arguments
                     plot_obj.set_data(x_data, y_data)
                     # Update CurveManager with new data
+                    # Note: y_data is raw from stream, not transformed.
+                    # update_original_data=True will update original_y_data and reapply
+                    # any active transformations.
                     self.curveManager.updateCurve(
                         curveID=curveID,
                         plot_obj=plot_obj,
@@ -900,6 +904,8 @@ class ChartView(QtWidgets.QWidget):
                         )[0]
 
                         # Update CurveManager with new plot object and data
+                        # Note: y_data is raw from stream, update_original_data=True
+                        # will update original_y_data and reapply transformations.
                         self.curveManager.updateCurve(
                             curveID=curveID,
                             plot_obj=new_plot,
