@@ -878,7 +878,11 @@ class ChartView(QtWidgets.QWidget):
                     plot_obj.set_data(x_data, y_data)
                     # Update CurveManager with new data
                     self.curveManager.updateCurve(
-                        curveID=curveID, plot_obj=plot_obj, x_data=x_data, y_data=y_data
+                        curveID=curveID,
+                        plot_obj=plot_obj,
+                        x_data=x_data,
+                        y_data=y_data,
+                        update_original_data=True,
                     )
                     self.updateBasicMathInfo(curveID)
                 except (ValueError, TypeError) as e:
@@ -901,6 +905,7 @@ class ChartView(QtWidgets.QWidget):
                             plot_obj=new_plot,
                             x_data=x_data,
                             y_data=y_data,
+                            update_original_data=True,
                         )
                         self.updateBasicMathInfo(curveID)
                     else:
