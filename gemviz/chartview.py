@@ -806,6 +806,9 @@ class ChartView(QtWidgets.QWidget):
                     self.field_widget = None
 
             # Update each curve
+            x_data = (
+                None  # Initialize to avoid UnboundLocalError if no curves are updated
+            )
             for label, (x_field, y_field) in self.live_data_fields.items():
                 # Get curveID from label
                 curveID = self.getCurveIDFromLabel(label)
@@ -900,7 +903,9 @@ class ChartView(QtWidgets.QWidget):
                 subtitle = f"catalog={cat_name!r}  {subtitle}"
             self.setPlotSubtitle(subtitle)
 
-            logger.info(f"Plot refreshed: {len(x_data)} points")
+            # Only log if at least one curve was successfully updated
+            if x_data is not None:
+                logger.info(f"Plot refreshed: {len(x_data)} points")
 
         except Exception as exc:
             # Check if this is a transient error (data inconsistency during acquisition)
