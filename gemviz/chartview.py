@@ -299,15 +299,28 @@ class ChartView(QtWidgets.QWidget):
 
         if self.curveBox is None:
             return
-        print(f"DEBUG: removing curve {curveID}")
-        # Find and remove the item with this curveID
-        for i in range(self.curveBox.count()):
-            if self.curveBox.itemData(i) == curveID:
-                self.curveBox.removeItem(i)
-                break
-        # Select first remaining curve if one exists
+
+        # Block signals to prevent currentIndexChanged from firing during removal
+        # This prevents the combo box from getting into an inconsistent state
+        self.curveBox.blockSignals(True)
+
+        try:
+            # Find and remove the item with this curveID
+            for i in range(self.curveBox.count()):
+                if self.curveBox.itemData(i) == curveID:
+                    self.curveBox.removeItem(i)
+                    break
+        finally:
+            # Always unblock signals, even if an exception occurs
+            self.curveBox.blockSignals(False)
+
+        # Select first remaining curve if one exists (will trigger currentIndexChanged signal)
+        # or clear basic math if no curves remain
         if self.curveBox.count() > 0:
             self.curveBox.setCurrentIndex(0)
+        else:
+            # No curves remaining - clear basic math
+            self.clearBasicMath()
 
         # Update fit button states
         self.updateFitButtonStates()
@@ -601,10 +614,17 @@ class ChartView(QtWidgets.QWidget):
         return self.option("title")
 
     def updateLegend(self):
+        """Update or remove the legend based on current plot handles."""
         labels = self.main_axes.get_legend_handles_labels()[1]
         valid_labels = [label for label in labels if not label.startswith("_")]
         if valid_labels:
             self.main_axes.legend()
+        else:
+            # Remove legend when no curves with visible labels remain
+            # (curves with labels starting with "_" are hidden from legend by matplotlib convention)
+            legend = self.main_axes.get_legend()
+            if legend is not None:
+                legend.remove()
 
     def updatePlot(self, title):
         """Update annotations (titles & axis labels)."""
