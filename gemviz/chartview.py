@@ -831,6 +831,9 @@ class ChartView(QtWidgets.QWidget):
             x_data = (
                 None  # Initialize to avoid UnboundLocalError if no curves are updated
             )
+            # Get selected curve ID
+            selected_curveID = self.getSelectedCurveID()
+
             for label, (x_field, y_field) in self.live_data_fields.items():
                 # Get curveID from label
                 curveID = self.getCurveIDFromLabel(label)
@@ -879,8 +882,8 @@ class ChartView(QtWidgets.QWidget):
                 # Check if data shapes have changed
                 try:
                     # Try to update the existing plot object
-                    # set_data expects (x, y) as two separate arguments
                     plot_obj.set_data(x_data, y_data)
+
                     # Update CurveManager with new data
                     # Note: y_data is raw from stream, not transformed.
                     # update_original_data=True will update original_y_data and reapply
@@ -892,7 +895,6 @@ class ChartView(QtWidgets.QWidget):
                         y_data=y_data,
                         update_original_data=True,
                     )
-                    self.updateBasicMathInfo(curveID)
                 except (ValueError, TypeError) as e:
                     if "shape" in str(e).lower() or "dimension" in str(e).lower():
                         logger.info(
@@ -917,10 +919,13 @@ class ChartView(QtWidgets.QWidget):
                             y_data=y_data,
                             update_original_data=True,
                         )
-                        self.updateBasicMathInfo(curveID)
                     else:
                         logger.error(f"Error updating plot data for {label}: {e}")
                         raise
+
+            # Update basic math info for the selected curve after all curves are updated
+            if selected_curveID:
+                self.updateBasicMathInfo(selected_curveID)
 
             # Refresh display
             self.main_axes.relim()
@@ -1058,7 +1063,7 @@ class ChartView(QtWidgets.QWidget):
             return "n/a"
         if isinstance(value, tuple):
             return f"({utils.num2fstr(value[0])}, {utils.num2fstr(value[1])})"
-        return f"{utils.num2fstr(value)}"
+        return f"{utils.num2fstr(value,3)}"
 
     def clearBasicMath(self):
         """Clear basic maths text label ('n/a')"""
