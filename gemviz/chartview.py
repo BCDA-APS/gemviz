@@ -314,10 +314,14 @@ class ChartView(QtWidgets.QWidget):
             # Always unblock signals, even if an exception occurs
             self.curveBox.blockSignals(False)
 
-        # Select first remaining curve if one exists (will trigger currentIndexChanged signal)
-        # or clear basic math if no curves remain
+        # Select first remaining curve if one exists
+        # currentIndexChanged signal triggers onCurveSelected if index changes
+        # If index didn't change (signal didn't fire), call onCurveSelected manually
         if self.curveBox.count() > 0:
+            current_index = self.curveBox.currentIndex()
             self.curveBox.setCurrentIndex(0)
+            if self.curveBox.currentIndex() == current_index:
+                self.onCurveSelected(0)
         else:
             # No curves remaining - clear basic math
             self.clearBasicMath()
