@@ -23,16 +23,14 @@ class CurveManager(QtCore.QObject):
     Signals:
         curveAdded: Emitted when a curve is added (curveID)
         curveRemoved: Emitted when a curve is removed (curveID, curveData, count)
-        curveUpdated: Emitted when a curve is updated (curveID, recompute_y, update_x)
+        curveUpdated: Emitted when a curve is updated (curveID)
         allCurvesRemoved: Emitted when all curves are removed
     """
 
     # Signals
     curveAdded = QtCore.pyqtSignal(str)  # Emit curveID when a curve is added
     curveRemoved = QtCore.pyqtSignal(str, dict, int)  # Emit curveID, curveData, count
-    curveUpdated = QtCore.pyqtSignal(
-        str, bool, bool
-    )  # Emit curveID, recompute_y, update_x
+    curveUpdated = QtCore.pyqtSignal(str)  # Emit curveID
     allCurvesRemoved = QtCore.pyqtSignal()  # No parameters
 
     def __init__(self, parent=None):
@@ -165,7 +163,7 @@ class CurveManager(QtCore.QObject):
         # Store additional metadata
         curve_info = {
             "data": curve_data,
-            "original_y_data": y_data.copy(),
+            "original_y_data": numpy.array(y_data).copy(),
             "factor": 1.0,
             "offset": 0.0,
             "derivative": False,
@@ -236,9 +234,6 @@ class CurveManager(QtCore.QObject):
         new_x_data = x_data if x_data is not None else current_x
         new_y_data = y_data if y_data is not None else current_y
 
-        # Update the data tuple
-        curve_info["data"] = (new_plot_obj, new_x_data, new_y_data)
-
         # If this is a live update, update original_y_data and reapply transformations
         if update_original_data and y_data is not None:
             # Update the original y_data with the new raw data
@@ -256,10 +251,20 @@ class CurveManager(QtCore.QObject):
                 transformed_y = self._applyTransformations(
                     curveID, original_y=curve_info["original_y_data"]
                 )
-                # Update the plot object
-                new_plot_obj.set_data(new_x_data, transformed_y)
+                # Update the plot object with transformed data
+                if new_plot_obj is not None:
+                    new_plot_obj.set_data(new_x_data, transformed_y)
                 # Update the data tuple with transformed data
                 curve_info["data"] = (new_plot_obj, new_x_data, transformed_y)
+            else:
+                # No transformations active, update plot object with raw data
+                if new_plot_obj is not None:
+                    new_plot_obj.set_data(new_x_data, new_y_data)
+                # Update data tuple here for consistency
+                curve_info["data"] = (new_plot_obj, new_x_data, new_y_data)
+        else:
+            # Not a live update, just update the data tuple
+            curve_info["data"] = (new_plot_obj, new_x_data, new_y_data)
 
         # Update label and style_kwargs if provided
         if label is not None:
@@ -271,15 +276,9 @@ class CurveManager(QtCore.QObject):
         for key, value in kwargs.items():
             curve_info[key] = value
 
-        # Determine what changed for signal
-        recompute_y = y_data is not None
-        update_x = x_data is not None
-
-        logger.debug(
-            f"Updated curve {curveID}: recompute_y={recompute_y}, update_x={update_x}"
-        )
         # Emit signal
-        self.curveUpdated.emit(curveID, recompute_y, update_x)
+        self.curveUpdated.emit(curveID)
+        logger.debug(f"Updated curve {curveID}")
         return True
 
     def updateCurveOffsetFactor(self, curveID, offset=None, factor=None):
@@ -348,7 +347,7 @@ class CurveManager(QtCore.QObject):
         )
 
         # Emit signal
-        self.curveUpdated.emit(curveID, True, False)
+        self.curveUpdated.emit(curveID)
         return True
 
     def _applyTransformations(self, curveID, original_y):

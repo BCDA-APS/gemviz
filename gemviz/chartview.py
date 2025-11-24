@@ -285,7 +285,7 @@ class ChartView(QtWidgets.QWidget):
         # Update fit button states (new curve is auto-selected)
         self.updateFitButtonStates()
 
-    def onCurveUpdated(self, curveID, recompute_y, update_x):
+    def onCurveUpdated(self, curveID):
         """Handle updates to an existing curve on the plot."""
         pass
 
@@ -325,6 +325,7 @@ class ChartView(QtWidgets.QWidget):
         else:
             # No curves remaining - clear basic math
             self.clearBasicMath()
+            self.clearTransformations()
 
         # Update fit button states
         self.updateFitButtonStates()
@@ -344,11 +345,7 @@ class ChartView(QtWidgets.QWidget):
 
         # Disable fit buttons when no curves remain
         self.updateFitButtonStates()
-
-    def onCurveSelectionChanged(self, label):
-        """Handle curve selection change in combobox."""
-        # This will be populated when we add curve interaction features
-        pass
+        self.clearTransformations()
 
     def onCurveSelected(self, index):
         """Handle curve selection change in combobox."""
@@ -388,13 +385,15 @@ class ChartView(QtWidgets.QWidget):
         if curveID is None:
             return
 
-        # Remove plot object from axes
+        # Get the plot object reference
         plot_obj = self.curveManager.getCurvePlotObj(curveID)
-        if plot_obj is not None:
-            plot_obj.remove()
 
         # Remove from CurveManager (will emit curveRemoved signal)
         self.curveManager.removeCurve(curveID)
+
+        # Remove plot object from axes
+        if plot_obj is not None:
+            plot_obj.remove()
 
         # Generate title from remaining curves and update plot
         scan_ids = set()
@@ -531,17 +530,17 @@ class ChartView(QtWidgets.QWidget):
         y_field = ds_options.get("y_field")
         stream_name = ds_options.get("stream_name")
 
+        # Determine curveID based on available metadata
         if run_uid and y_field and stream_name:
-            # Generate curveID and check if curve exists
             curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
-            if curveID not in self.curveManager.curves():
-                curveID = self.addCurve(*args, title=title, **ds_options)
+            curve_exists = curveID in self.curveManager.curves()
         else:
-            # Check if curve already exists in CurveManager by label
             curveID = self.getCurveIDFromLabel(label)
-            if not curveID:
-                # Curve doesn't exist yet, add it
-                curveID = self.addCurve(*args, title=title, **ds_options)
+            curve_exists = curveID is not None
+
+        # Add curve if it doesn't exist
+        if not curve_exists:
+            curveID = self.addCurve(*args, title=title, **ds_options)
         if curveID:
             self.updateBasicMathInfo(curveID)
 
@@ -697,14 +696,14 @@ class ChartView(QtWidgets.QWidget):
         else:
             stored_log_x, stored_log_y = self._log_x, self._log_y
 
+        # Clear the curve manager (will emit allCurvesRemoved signal)
+        self.curveManager.removeAllCurves()
+
         # Clear all plot lines, legend, axis labels, and axes title
         self.main_axes.clear()
 
         # Clear figure title (suptitle)
         self.figure.suptitle("")
-
-        # Clear the curve manager (will emit allCurvesRemoved signal)
-        self.curveManager.removeAllCurves()
 
         # Reapply log scale state after clearing
         self.setLogScales(stored_log_x, stored_log_y)
@@ -881,9 +880,6 @@ class ChartView(QtWidgets.QWidget):
 
                 # Check if data shapes have changed
                 try:
-                    # Try to update the existing plot object
-                    plot_obj.set_data(x_data, y_data)
-
                     # Update CurveManager with new data
                     # Note: y_data is raw from stream, not transformed.
                     # update_original_data=True will update original_y_data and reapply
@@ -902,7 +898,8 @@ class ChartView(QtWidgets.QWidget):
                         )
                         # Data shape changed, need to recreate the plot
                         # Clear the old plot
-                        plot_obj.remove()
+                        if plot_obj:
+                            plot_obj.remove()
 
                         # Create new plot with same style
                         new_plot = self.main_axes.plot(
@@ -1082,10 +1079,30 @@ class ChartView(QtWidgets.QWidget):
             if label is not None:  # Check for None
                 label.setText("n/a")
 
+    def clearTransformations(self):
+        """Reset derivative, offset and factor values"""
+        self._derivative = False
+        if self.derivativeCheckBox:
+            self.derivativeCheckBox.setChecked(self._derivative)
+        if self.factor_value:
+            self.factor_value.setText(str(1.0))
+        if self.offset_value:
+            self.offset_value.setText(str(0))
+
     def calculateBasicMath(self, x_data, y_data):
         """Calculate basic curve statistics"""
+
         x_array = numpy.array(x_data, dtype=float)
         y_array = numpy.array(y_data, dtype=float)
+        if len(x_array) == 0 or len(y_array) == 0:
+            result = {
+                "min_text": None,
+                "max_text": None,
+                "com_text": None,
+                "mean_text": None,
+            }
+            return result
+
         # Find y_min and y_max
         y_min = numpy.min(y_array)
         y_max = numpy.max(y_array)
@@ -1474,6 +1491,9 @@ class ChartView(QtWidgets.QWidget):
         if not isinstance(y_data, numpy.ndarray):
             y_data = numpy.array(y_data, dtype=float)
 
+        if len(x_data) == 0 or len(y_data) == 0:
+            return None
+
         # Normalize by axis ranges to account for different scales
         x_range = self.main_axes.get_xlim()
         y_range = self.main_axes.get_ylim()
@@ -1561,15 +1581,20 @@ class ChartView(QtWidgets.QWidget):
         Update cursor information in info panel widget.
         """
         # Check for the first cursor and update text accordingly
-        if self.cursors[1]:
+        if self.cursors[1] and self.cursors["pos1"] is not None:
             x1, y1 = self.cursors["pos1"]
             self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
         # Check for the second cursor and update text accordingly
-        if self.cursors[2]:
+        if self.cursors[2] and self.cursors["pos2"] is not None:
             x2, y2 = self.cursors["pos2"]
             self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
         # Calculate differences and midpoints only if both cursors are present
-        if self.cursors[1] and self.cursors[2]:
+        if (
+            self.cursors[1]
+            and self.cursors["pos1"] is not None
+            and self.cursors[2]
+            and self.cursors["pos2"] is not None
+        ):
             delta_x = x2 - x1
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
@@ -1789,7 +1814,7 @@ class ChartView(QtWidgets.QWidget):
 
         # Get fit range if "use cursor range" is checked
         x_range = None
-        if self.useFitRangeCheck.isChecked():
+        if self.useFitRangeCheck and self.useFitRangeCheck.isChecked():
             x_range = self.getCursorRange()
 
         try:
