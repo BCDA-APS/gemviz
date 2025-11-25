@@ -32,6 +32,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from . import utils
 from .curve_manager import CurveManager
+from .fit_manager import FitManager
 
 MIDDLE_BUTTON = 2
 RIGHT_BUTTON = 3
@@ -147,6 +148,8 @@ class ChartView(QtWidgets.QWidget):
 
         # plot
         size.setHorizontalStretch(4)
+        self._log_x = False
+        self._log_y = False
 
         # Initialize CurveManager
         self.curveManager = CurveManager(self)
@@ -154,6 +157,14 @@ class ChartView(QtWidgets.QWidget):
         self.curveManager.curveUpdated.connect(self.onCurveUpdated)
         self.curveManager.curveRemoved.connect(self.onCurveRemoved)
         self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
+
+        # Initialize FitManager
+        self.fitManager = FitManager(self)
+        self.fitManager.fitAdded.connect(self.onFitAdded)
+        self.fitManager.fitUpdated.connect(self.onFitUpdated)
+        self.fitManager.fitRemoved.connect(self.onFitRemoved)
+        # Track fit plot objects (dict mapping curveID to fit Line2D objects)
+        self.fitObjects = {}  #
 
         # Access UI elements from parent BRCRunVisualization
         if self.parent is not None:
@@ -186,8 +197,44 @@ class ChartView(QtWidgets.QWidget):
             self.snapCursors.setChecked(self._snap_to_curve)
             self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
 
+            # Connect derivative checkbox (default to False)
+            self._derivative = False
+            self.derivativeCheckBox = self.parent.brc_run_viz.derivativeCheckBox
+            self.derivativeCheckBox.setChecked(self._derivative)
+            self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
+
+            # Definition fit UI elements
+            self.fitModelCombo = self.parent.brc_run_viz.fitModelCombo
+            self.fitButton = self.parent.brc_run_viz.fitButton
+            self.clearFitsButton = self.parent.brc_run_viz.clearFitsButton
+            self.useFitRangeCheck = self.parent.brc_run_viz.useFitRangeCheck
+            self.fitDetails = self.parent.brc_run_viz.fitDetails
+            self.fitDetails.clear()
+
+            # Populate fit model combo box with available models
+            from .fit_models import get_available_models
+
+            available_models = get_available_models()
+            self.fitModelCombo.clear()
+            self.fitModelCombo.addItems(list(available_models.keys()))
+
+            # Connect fit button to handler
+            self.fitButton.clicked.connect(self.onFitButtonClicked)
+            self.clearFitsButton.clicked.connect(self.onClearFitClicked)
+
         else:
             self.curveBox = None
+            self.factor_value = None
+            self.offset_value = None
+            self.derivativeCheckBox = None
+            self.fitModelCombo = None
+            self.fitButton = None
+            self.clearFitsButton = None
+            self.useFitRangeCheck = None
+            self.fitDetails = None
+
+        # Initially disable fit buttons (no curve selected yet)
+        self.updateFitButtonStates()
 
         # Connect the click event to a handler
         self.cid = self.canvas.mpl_connect("button_press_event", self.onclick)
@@ -235,38 +282,76 @@ class ChartView(QtWidgets.QWidget):
             self.curveBox.addItem(label, curveID)
             # Always select the newly added curve
             self.curveBox.setCurrentIndex(self.curveBox.count() - 1)
+        # Update fit button states (new curve is auto-selected)
+        self.updateFitButtonStates()
 
-    def onCurveUpdated(self, curveID, recompute_y, update_x):
+    def onCurveUpdated(self, curveID):
         """Handle updates to an existing curve on the plot."""
         pass
 
     def onCurveRemoved(self, curveID, curve_data, count):
         """Handle the removal of an existing curve on the plot."""
+        # Remove fit if this curve had one
+        if self.fitManager.hasFit(curveID):
+            self.fitManager.removeFit(curveID)
+            # RemoveFit will emit fitRemoved signal which calls onFitRemoved
+            # which will handle removing the plot line and redrawing
+
         if self.curveBox is None:
             return
-        print(f"DEBUG: removing curve {curveID}")
-        # Find and remove the item with this curveID
-        for i in range(self.curveBox.count()):
-            if self.curveBox.itemData(i) == curveID:
-                self.curveBox.removeItem(i)
-                break
+
+        # Block signals to prevent currentIndexChanged from firing during removal
+        # This prevents the combo box from getting into an inconsistent state
+        self.curveBox.blockSignals(True)
+
+        try:
+            # Find and remove the item with this curveID
+            for i in range(self.curveBox.count()):
+                if self.curveBox.itemData(i) == curveID:
+                    self.curveBox.removeItem(i)
+                    break
+        finally:
+            # Always unblock signals, even if an exception occurs
+            self.curveBox.blockSignals(False)
+
         # Select first remaining curve if one exists
+        # currentIndexChanged signal triggers onCurveSelected if index changes
+        # If index didn't change (signal didn't fire), call onCurveSelected manually
         if self.curveBox.count() > 0:
+            current_index = self.curveBox.currentIndex()
             self.curveBox.setCurrentIndex(0)
+            if self.curveBox.currentIndex() == current_index:
+                self.onCurveSelected(0)
+        else:
+            # No curves remaining - clear basic math
+            self.clearBasicMath()
+            self.clearTransformations()
+
+        # Update fit button states
+        self.updateFitButtonStates()
 
     def onAllCurvesRemoved(self):
         """Handle the removal of all curves on the plot."""
+        # Remove any existing fit
+        for curveID in list(self.fitObjects.keys()):
+            if self.fitManager.hasFit(curveID):
+                self.fitManager.removeFit(curveID)
+
         if self.curveBox is not None:
             self.curveBox.clear()
 
-    def onCurveSelectionChanged(self, label):
-        """Handle curve selection change in combobox."""
-        # This will be populated when we add curve interaction features
-        pass
+        if self.fitDetails is not None:
+            self.fitDetails.clear()
+
+        # Disable fit buttons when no curves remain
+        self.updateFitButtonStates()
+        self.clearTransformations()
 
     def onCurveSelected(self, index):
         """Handle curve selection change in combobox."""
         if self.curveBox is None or index < 0:
+            self.updateFitButtonStates()
+            self.clearBasicMath()
             return
         # Get curveID from combobox item data
         curveID = self.curveBox.itemData(index)
@@ -278,8 +363,13 @@ class ChartView(QtWidgets.QWidget):
             if curve_info:
                 offset = curve_info.get("offset", 0.0)
                 factor = curve_info.get("factor", 1.0)
-                self.offset_value.setText(str(offset))
-                self.factor_value.setText(str(factor))
+                derivative = curve_info.get("derivative", False)
+                if self.offset_value and self.factor_value and self.derivativeCheckBox:
+                    self.offset_value.setText(str(offset))
+                    self.factor_value.setText(str(factor))
+                    self.derivativeCheckBox.setChecked(derivative)
+        # Update fit button states
+        self.updateFitButtonStates()
 
     def onCurveRemoveClicked(self):
         """Handle Remove Curve button click."""
@@ -295,13 +385,15 @@ class ChartView(QtWidgets.QWidget):
         if curveID is None:
             return
 
-        # Remove plot object from axes
+        # Get the plot object reference
         plot_obj = self.curveManager.getCurvePlotObj(curveID)
-        if plot_obj is not None:
-            plot_obj.remove()
 
         # Remove from CurveManager (will emit curveRemoved signal)
         self.curveManager.removeCurve(curveID)
+
+        # Remove plot object from axes
+        if plot_obj is not None:
+            plot_obj.remove()
 
         # Generate title from remaining curves and update plot
         scan_ids = set()
@@ -438,17 +530,17 @@ class ChartView(QtWidgets.QWidget):
         y_field = ds_options.get("y_field")
         stream_name = ds_options.get("stream_name")
 
+        # Determine curveID based on available metadata
         if run_uid and y_field and stream_name:
-            # Generate curveID and check if curve exists
             curveID = self.curveManager.generateCurveID(run_uid, stream_name, y_field)
-            if curveID not in self.curveManager.curves():
-                curveID = self.addCurve(*args, title=title, **ds_options)
+            curve_exists = curveID in self.curveManager.curves()
         else:
-            # Check if curve already exists in CurveManager by label
             curveID = self.getCurveIDFromLabel(label)
-            if not curveID:
-                # Curve doesn't exist yet, add it
-                curveID = self.addCurve(*args, title=title, **ds_options)
+            curve_exists = curveID is not None
+
+        # Add curve if it doesn't exist
+        if not curve_exists:
+            curveID = self.addCurve(*args, title=title, **ds_options)
         if curveID:
             self.updateBasicMathInfo(curveID)
 
@@ -523,10 +615,17 @@ class ChartView(QtWidgets.QWidget):
         return self.option("title")
 
     def updateLegend(self):
+        """Update or remove the legend based on current plot handles."""
         labels = self.main_axes.get_legend_handles_labels()[1]
         valid_labels = [label for label in labels if not label.startswith("_")]
         if valid_labels:
             self.main_axes.legend()
+        else:
+            # Remove legend when no curves with visible labels remain
+            # (curves with labels starting with "_" are hidden from legend by matplotlib convention)
+            legend = self.main_axes.get_legend()
+            if legend is not None:
+                legend.remove()
 
     def updatePlot(self, title):
         """Update annotations (titles & axis labels)."""
@@ -555,16 +654,59 @@ class ChartView(QtWidgets.QWidget):
     def ylabel(self):
         return self.option("ylabel")
 
+    def setLogScales(self, log_x: bool, log_y: bool):
+        """
+        Set logarithmic scales for X and Y axes.
+
+        Parameters:
+        - log_x (bool): Whether to use logarithmic scale for X-axis
+        - log_y (bool): Whether to use logarithmic scale for Y-axis
+        """
+        try:
+            # Store the log scale state
+            self._log_x = log_x
+            self._log_y = log_y
+
+            if log_x:
+                self.main_axes.set_xscale("log")
+            else:
+                self.main_axes.set_xscale("linear")
+
+            if log_y:
+                self.main_axes.set_yscale("log")
+            else:
+                self.main_axes.set_yscale("linear")
+
+            # Redraw the canvas to apply changes
+            self.canvas.draw()
+        except Exception as exc:
+            logger.error(f"Error setting log scales: {exc}")
+            # If setting log scale fails (e.g., negative values), revert to linear
+            self._log_x = False
+            self._log_y = False
+            self.main_axes.set_xscale("linear")
+            self.main_axes.set_yscale("linear")
+            self.canvas.draw()
+
     def onClearAllClicked(self):
         """Handle Clear Graph button click."""
+        # Store current log scale state before clearing
+        if self.parent and hasattr(self.parent, "brc_run_viz"):
+            stored_log_x, stored_log_y = self.parent.brc_run_viz.getLogScaleState()
+        else:
+            stored_log_x, stored_log_y = self._log_x, self._log_y
+
+        # Clear the curve manager (will emit allCurvesRemoved signal)
+        self.curveManager.removeAllCurves()
+
         # Clear all plot lines, legend, axis labels, and axes title
         self.main_axes.clear()
 
         # Clear figure title (suptitle)
         self.figure.suptitle("")
 
-        # Clear the curve manager (will emit allCurvesRemoved signal)
-        self.curveManager.removeAllCurves()
+        # Reapply log scale state after clearing
+        self.setLogScales(stored_log_x, stored_log_y)
 
         # Redraw the canvas
         self.canvas.draw()
@@ -685,6 +827,12 @@ class ChartView(QtWidgets.QWidget):
                     self.field_widget = None
 
             # Update each curve
+            x_data = (
+                None  # Initialize to avoid UnboundLocalError if no curves are updated
+            )
+            # Get selected curve ID
+            selected_curveID = self.getSelectedCurveID()
+
             for label, (x_field, y_field) in self.live_data_fields.items():
                 # Get curveID from label
                 curveID = self.getCurveIDFromLabel(label)
@@ -708,6 +856,7 @@ class ChartView(QtWidgets.QWidget):
                         )
                         continue
 
+                    # Get raw data from stream (not transformed)
                     x_data = numpy.asarray(stream_data[x_field])
                     y_data = numpy.asarray(stream_data[y_field])
 
@@ -731,14 +880,17 @@ class ChartView(QtWidgets.QWidget):
 
                 # Check if data shapes have changed
                 try:
-                    # Try to update the existing plot object
-                    # set_data expects (x, y) as two separate arguments
-                    plot_obj.set_data(x_data, y_data)
                     # Update CurveManager with new data
+                    # Note: y_data is raw from stream, not transformed.
+                    # update_original_data=True will update original_y_data and reapply
+                    # any active transformations.
                     self.curveManager.updateCurve(
-                        curveID=curveID, plot_obj=plot_obj, x_data=x_data, y_data=y_data
+                        curveID=curveID,
+                        plot_obj=plot_obj,
+                        x_data=x_data,
+                        y_data=y_data,
+                        update_original_data=True,
                     )
-                    self.updateBasicMathInfo(curveID)
                 except (ValueError, TypeError) as e:
                     if "shape" in str(e).lower() or "dimension" in str(e).lower():
                         logger.info(
@@ -746,7 +898,8 @@ class ChartView(QtWidgets.QWidget):
                         )
                         # Data shape changed, need to recreate the plot
                         # Clear the old plot
-                        plot_obj.remove()
+                        if plot_obj:
+                            plot_obj.remove()
 
                         # Create new plot with same style
                         new_plot = self.main_axes.plot(
@@ -754,16 +907,22 @@ class ChartView(QtWidgets.QWidget):
                         )[0]
 
                         # Update CurveManager with new plot object and data
+                        # Note: y_data is raw from stream, update_original_data=True
+                        # will update original_y_data and reapply transformations.
                         self.curveManager.updateCurve(
                             curveID=curveID,
                             plot_obj=new_plot,
                             x_data=x_data,
                             y_data=y_data,
+                            update_original_data=True,
                         )
-                        self.updateBasicMathInfo(curveID)
                     else:
                         logger.error(f"Error updating plot data for {label}: {e}")
                         raise
+
+            # Update basic math info for the selected curve after all curves are updated
+            if selected_curveID:
+                self.updateBasicMathInfo(selected_curveID)
 
             # Refresh display
             self.main_axes.relim()
@@ -779,7 +938,9 @@ class ChartView(QtWidgets.QWidget):
                 subtitle = f"catalog={cat_name!r}  {subtitle}"
             self.setPlotSubtitle(subtitle)
 
-            logger.info(f"Plot refreshed: {len(x_data)} points")
+            # Only log if at least one curve was successfully updated
+            if x_data is not None:
+                logger.info(f"Plot refreshed: {len(x_data)} points")
 
         except Exception as exc:
             # Check if this is a transient error (data inconsistency during acquisition)
@@ -844,7 +1005,8 @@ class ChartView(QtWidgets.QWidget):
         except ValueError:
             factor = 1.0
             # Reset to default if conversion fails
-            self.factor_value.setText(str(factor))
+            if self.factor_value:
+                self.factor_value.setText(str(factor))
             return
 
         # Update curve with new offset and factor
@@ -860,40 +1022,87 @@ class ChartView(QtWidgets.QWidget):
             self.canvas.draw()
 
     def updateBasicMathInfo(self, curveID):
-        if not curveID:
+        """Update basic math statistics for the selected curve."""
+        if not curveID or self.parent is None:
             self.clearBasicMath()
             return
-        if self.parent is None:
-            return
+
+        self.clearBasicMath()
+
         try:
             x, y = self.curveManager.getCurveXYData(curveID)
             if x is None or y is None:
-                self.clearBasicMath()
                 return
-            stats = self.calculateBasicMath(x, y)
-            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
-                label_widget = self.parent.findChild(QtWidgets.QLabel, txt)
-                if label_widget is not None:
-                    if isinstance(i, tuple):
-                        result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
-                    else:
-                        result = f"{utils.num2fstr(i)}" if i else "n/a"
-                    label_widget.setText(result)
+
+            basic_stats = self.calculateBasicMath(x, y)
+            peak_stats = self.calculateRawDataPeak(curveID)
+            if peak_stats:
+                basic_stats.update(peak_stats)
+            for label_name, stats_value in basic_stats.items():
+                self._updateMathLabel(label_name, stats_value)
+
         except Exception as exc:
             logger.error(f"Error updating basic math from CurveManager: {exc}")
             self.clearBasicMath()
 
-    def clearBasicMath(self):
+    def _updateMathLabel(self, label_name, stats_value):
+        """Update a single math label with formatted value."""
         if self.parent is None:
             return
-        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+        label_widget = self.parent.findChild(QtWidgets.QLabel, label_name)
+        if label_widget is not None:
+            formatted_text = self._formatStatValue(stats_value)
+            label_widget.setText(formatted_text)
+
+    def _formatStatValue(self, value):
+        """Format statistic value for display."""
+        if value is None:
+            return "n/a"
+        if isinstance(value, tuple):
+            return f"({utils.num2fstr(value[0])}, {utils.num2fstr(value[1])})"
+        return f"{utils.num2fstr(value,3)}"
+
+    def clearBasicMath(self):
+        """Clear basic maths text label ('n/a')"""
+        if self.parent is None:
+            return
+        for txt in [
+            "min_text",
+            "max_text",
+            "com_text",
+            "mean_text",
+            "peak_text",
+            "FWHM_text",
+            "center_text",
+        ]:
             label = self.parent.findChild(QtWidgets.QLabel, txt)
             if label is not None:  # Check for None
                 label.setText("n/a")
 
+    def clearTransformations(self):
+        """Reset derivative, offset and factor values"""
+        self._derivative = False
+        if self.derivativeCheckBox:
+            self.derivativeCheckBox.setChecked(self._derivative)
+        if self.factor_value:
+            self.factor_value.setText(str(1.0))
+        if self.offset_value:
+            self.offset_value.setText(str(0))
+
     def calculateBasicMath(self, x_data, y_data):
+        """Calculate basic curve statistics"""
+
         x_array = numpy.array(x_data, dtype=float)
         y_array = numpy.array(y_data, dtype=float)
+        if len(x_array) == 0 or len(y_array) == 0:
+            result = {
+                "min_text": None,
+                "max_text": None,
+                "com_text": None,
+                "mean_text": None,
+            }
+            return result
+
         # Find y_min and y_max
         y_min = numpy.min(y_array)
         y_max = numpy.max(y_array)
@@ -910,7 +1119,306 @@ class ChartView(QtWidgets.QWidget):
             else None
         )
         y_mean = numpy.mean(y_array)
-        return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
+        # Return a dictionary
+        result = {
+            "min_text": (x_at_y_min, y_min),
+            "max_text": (x_at_y_max, y_max),
+            "com_text": x_com,
+            "mean_text": y_mean,
+        }
+        return result
+
+    def calculateRawDataPeak(self, curveID: str) -> dict | None:
+        """
+        Calculate peak characteristics from raw data (not fit), assuming a single
+        positive peak on top of a (possibly sloped) baseline.
+
+        Parameters
+        ----------
+        curveID : str
+            ID of the curve.
+
+        Returns
+        -------
+        dict or None
+            Dictionary with keys 'peak_text', 'FWHM_text', 'center_text'
+            containing peak position, FWHM width, and center values, or None if
+            computation is not possible
+        """
+
+        # --- Get curve data from curveManager ---
+        curve_info = self.curveManager.getCurveData(curveID)
+        if curve_info is None:
+            return None
+
+        plot_obj, x_data, y_data = curve_info["data"]
+
+        # --- Convert to numpy arrays ---
+        x = numpy.asarray(x_data, dtype=float)
+        y = numpy.asarray(y_data, dtype=float)
+
+        # Remove NaNs / infs
+        mask = numpy.isfinite(x) & numpy.isfinite(y)
+        x = x[mask]
+        y = y[mask]
+
+        if x.size < 3 or y.size < 3:
+            return None
+
+        # Ensure sorted in x (just in case)
+        order = numpy.argsort(x)
+        x = x[order]
+        y = y[order]
+
+        # Use average of first and last N points (e.g., 10% or min 5 points)
+        # n_edge = max(5, len(y) // 10)
+        # baseline = 0.5 * (numpy.mean(y[:n_edge]) + numpy.mean(y[-n_edge:]))
+
+        # Positive peak: global maximum above baseline
+        peak_idx = numpy.argmax(y)
+        y_max = y[peak_idx]
+        x_peak = x[peak_idx]
+        baseline_at_peak, baseline_value, baseline_coeffs = self.calculateBaseline(
+            x, y, x_peak
+        )
+        baseline = baseline_at_peak
+        amplitude = y_max - baseline
+
+        # Reject peaks at boundaries
+        if peak_idx == 0 or peak_idx == len(y) - 1:
+            return None
+
+        # Require a strictly positive peak
+        if amplitude <= 0:
+            return None
+
+        # Amplitude vs baseline check
+        if amplitude < 0.005 * abs(baseline):
+            return None
+
+        # Calculate FWHM and its center
+        result = self.calculateFWHM(
+            x, y, peak_idx, baseline_coeffs, baseline_value, amplitude
+        )
+
+        if result is None:
+            return None
+
+        fwhm, fwhm_center = result
+
+        peak_stats = {
+            "peak_text": x_peak,
+            "FWHM_text": fwhm,
+            "center_text": fwhm_center,
+        }
+        return peak_stats
+
+    def calculateBaseline(self, x, y, x_peak):
+        """
+        Calculate baseline for peak analysis, handling both sloped and constant baselines.
+
+        Attempts to fit a linear baseline to edge regions of the data (first and last
+        10% or minimum 5 points). If the linear fit is not valid or fails, falls back
+        to a constant baseline calculated as the median of the lowest values.
+
+        Parameters
+        ----------
+        x : array-like
+            X data array
+        y : array-like
+            Y data array
+        x_peak : float
+            X position of the peak where baseline should be evaluated
+
+        Returns
+        -------
+        tuple
+            (baseline_at_peak, baseline_value, baseline_coeffs)
+            - baseline_at_peak (float): Baseline value at the peak position
+            - baseline_value (float or None): Constant baseline value if sloped fit
+            failed, None if sloped fit succeeded
+            - baseline_coeffs (array or None): Polynomial coefficients [slope, intercept]
+            for linear baseline if fit succeeded, None if constant baseline used
+        """
+        # Baseline: fit line to edge regions to handle sloped baselines
+        n_edge = max(5, len(y) // 10)
+        baseline_coeffs = None
+        baseline_value = None
+
+        # Try to fit sloped baseline to edges
+        if len(y) >= 2 * n_edge:
+            x_left = x[:n_edge]
+            y_left = y[:n_edge]
+            x_right = x[-n_edge:]
+            y_right = y[-n_edge:]
+
+            # Check if we have enough unique x values for fitting (need at least 2 distinct x values)
+            if len(set(x_left)) > 1 and len(set(x_right)) > 1:
+                try:
+                    x_edges = numpy.concatenate([x_left, x_right])
+                    y_edges = numpy.concatenate([y_left, y_right])
+                    coeffs = numpy.polyfit(x_edges, y_edges, 1)
+
+                    # Validate fit: check if residuals are reasonable
+                    y_fit = numpy.polyval(coeffs, x_edges)
+                    residuals = numpy.abs(y_edges - y_fit)
+                    # Accept if median residual is reasonable (< 50% of data std)
+                    if numpy.median(residuals) < 0.5 * numpy.std(y_edges):
+                        baseline_coeffs = coeffs
+                except (numpy.linalg.LinAlgError, ValueError, numpy.RankWarning):
+                    pass
+
+        # Fallback to constant baseline (median of lowest or edge average)
+        if baseline_coeffs is None:
+            sorted_y = numpy.sort(y)
+            n_low = max(5, len(sorted_y) // 10)
+            baseline_value = numpy.median(sorted_y[:n_low])
+            # Alternative: baseline_value = 0.5 * (numpy.mean(y[:n_edge]) + numpy.mean(y[-n_edge:]))
+
+        # Evaluate baseline at peak position for amplitude calculation
+        if baseline_coeffs is not None:
+            baseline_at_peak = numpy.polyval(baseline_coeffs, x_peak)
+        else:
+            baseline_at_peak = baseline_value
+
+        return baseline_at_peak, baseline_value, baseline_coeffs
+
+    def calculateFWHM(self, x, y, peak_idx, baseline_coeffs, baseline_value, amplitude):
+        """
+        Find left/right intersection with half-level, handling sloped baselines.
+
+        Parameters
+        ----------
+        x, y : array-like
+            Data arrays
+        peak_idx : int
+            Index of peak
+        baseline_coeffs : array or None
+            Polynomial coefficients for sloped baseline [slope, intercept] or None
+        baseline_value : float or None
+            Constant baseline value (used if baseline_coeffs is None)
+        amplitude : float
+            Peak amplitude above baseline
+
+        Returns
+        -------
+        tuple or None
+            (fwhm, fwhm_center) or None if FWHM cannot be determined
+        """
+        # Helper function to evaluate baseline at any x position
+        if baseline_coeffs is not None:
+
+            def baseline_at(x_pos):
+                return numpy.polyval(baseline_coeffs, x_pos)
+
+        else:
+
+            def baseline_at(x_pos):
+                return baseline_value
+
+        # Helper function to evaluate half-level at any x position
+        def half_level_at(x_pos):
+            return baseline_at(x_pos) + 0.5 * amplitude
+
+        # Search backwards from peak to find the closest crossing
+        left_x = None
+        for i in range(peak_idx - 1, -1, -1):
+            if i + 1 >= len(y):
+                continue
+            y1, y2 = y[i], y[i + 1]
+            x1, x2 = x[i], x[i + 1]
+
+            # Evaluate half_level at segment midpoint for comparison
+            x_mid = 0.5 * (x1 + x2)
+            half_level = half_level_at(x_mid)
+
+            # Check for crossing
+            if y1 <= half_level < y2:
+                denom = y2 - y1
+                if denom == 0:
+                    continue
+                # Linear interpolation to find crossing point
+                t = (half_level - y1) / denom
+                x_cross = x1 + t * (x2 - x1)
+
+                # For sloped baseline, refine by re-evaluating at crossing point
+                if baseline_coeffs is not None:
+                    half_level_refined = half_level_at(x_cross)
+                    # Iterate once for better accuracy
+                    t = (half_level_refined - y1) / denom
+                    x_cross = x1 + t * (x2 - x1)
+
+                left_x = x_cross
+                break  # Found closest crossing, stop searching
+
+        # Find right intersection with half_level (closest crossing after peak)
+        right_x = None
+        for i in range(peak_idx, len(y) - 1):
+            y1, y2 = y[i], y[i + 1]
+            x1, x2 = x[i], x[i + 1]
+
+            x_mid = 0.5 * (x1 + x2)
+            half_level = half_level_at(x_mid)
+
+            # Crossing from above to below (or at) half_level
+            if y1 >= half_level > y2:
+                denom = y2 - y1
+                if denom == 0:
+                    continue
+
+                t = (half_level - y1) / denom
+                x_cross = x1 + t * (x2 - x1)
+
+                if baseline_coeffs is not None:
+                    half_level_refined = half_level_at(x_cross)
+                    t = (half_level_refined - y1) / denom
+                    x_cross = x1 + t * (x2 - x1)
+
+                right_x = x_cross
+                break
+
+        # Validation
+        if left_x is None or right_x is None:
+            return None
+
+        fwhm = right_x - left_x
+        fwhm_center = 0.5 * (left_x + right_x)
+
+        # Ensure FWHM is within data range and reasonable
+        x_min, x_max = x[0], x[-1]
+        if (
+            left_x < x_min
+            or right_x > x_max
+            or fwhm > 0.9 * (x_max - x_min)
+            or fwhm < 0
+        ):
+            return None
+
+        return fwhm, fwhm_center
+
+    def onDerivativeToggled(self, checked):
+        """Handle derivative checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (derivative enabled), False if unchecked (derivative disabled)
+        """
+        self._derivative = checked
+        current_index = self.curveBox.currentIndex()
+        if current_index < 0:
+            return
+
+        curveID = self.curveBox.itemData(current_index)
+        if curveID is None:
+            return
+
+        # Update curve with new derivative status
+        if self.curveManager.updateCurveDerivative(curveID, derivative=checked):
+            # Update basic math info with transformed data:
+            self.updateBasicMathInfo(curveID)
+            # Recompute axes limits and autoscale and redraw canvas
+            self.main_axes.relim()
+            self.main_axes.autoscale_view()
+            self.canvas.draw()
 
     # ==========================================
     #   Cursors methods
@@ -982,6 +1490,9 @@ class ChartView(QtWidgets.QWidget):
             x_data = numpy.array(x_data, dtype=float)
         if not isinstance(y_data, numpy.ndarray):
             y_data = numpy.array(y_data, dtype=float)
+
+        if len(x_data) == 0 or len(y_data) == 0:
+            return None
 
         # Normalize by axis ranges to account for different scales
         x_range = self.main_axes.get_xlim()
@@ -1070,15 +1581,20 @@ class ChartView(QtWidgets.QWidget):
         Update cursor information in info panel widget.
         """
         # Check for the first cursor and update text accordingly
-        if self.cursors[1]:
+        if self.cursors[1] and self.cursors["pos1"] is not None:
             x1, y1 = self.cursors["pos1"]
             self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
         # Check for the second cursor and update text accordingly
-        if self.cursors[2]:
+        if self.cursors[2] and self.cursors["pos2"] is not None:
             x2, y2 = self.cursors["pos2"]
             self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
         # Calculate differences and midpoints only if both cursors are present
-        if self.cursors[1] and self.cursors[2]:
+        if (
+            self.cursors[1]
+            and self.cursors["pos1"] is not None
+            and self.cursors[2]
+            and self.cursors["pos2"] is not None
+        ):
             delta_x = x2 - x1
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
@@ -1108,6 +1624,227 @@ class ChartView(QtWidgets.QWidget):
         self.parent.brc_run_viz.pos2_text.setText("right click")
         self.parent.brc_run_viz.diff_text.setText("n/a")
         self.parent.brc_run_viz.midpoint_text.setText("n/a")
+
+    def getCursorRange(self):
+        """
+        Get the range defined by the cursors.
+
+        Returns:
+        - Tuple of (x_min, x_max) if both cursors are set, None otherwise
+        """
+        pos1 = self.cursors.get("pos1")
+        pos2 = self.cursors.get("pos2")
+        if pos1 is not None and pos2 is not None:
+            x1, y1 = pos1
+            x2, y2 = pos2
+            return (min(x1, x2), max(x1, x2))
+        return None
+
+    # ==========================================
+    #   Fit methods
+    # ==========================================
+
+    def updateFitButtonStates(self) -> None:
+        """Update enabled/disabled state of fit buttons based on curve selection."""
+        if self.fitButton is None or self.clearFitsButton is None:
+            return
+
+        # Enable buttons if a curve is selected
+        has_selection = (
+            self.curveBox is not None
+            and self.curveBox.count() > 0
+            and self.curveBox.currentIndex() >= 0
+        )
+
+        self.fitButton.setEnabled(has_selection)
+        self.clearFitsButton.setEnabled(has_selection)
+
+    def updateFitDetails(self, curveID: str) -> None:
+        """
+        Update the fit details display.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        if self.fitDetails is None:
+            return
+
+        # Get fit data
+        fit_data = self.fitManager.getFitData(curveID)
+        if not fit_data:
+            self.fitDetails.clear()
+            return
+
+        # Format fit results
+        result = fit_data.fit_result
+        curve_info = self.curveManager.getCurveData(curveID)
+        details_text = ""
+
+        # Parameters
+        details_text += "Fitting results:\n"
+        for param_name, param_value in result.parameters.items():
+            uncertainty = result.uncertainties.get(param_name, 0.0)
+            details_text += f"  {param_name}: {utils.num2fstr(param_value, 3)}"
+            if uncertainty > 0:
+                details_text += f" ± {utils.num2fstr(uncertainty, 3)}"
+            details_text += "\n"
+            if fit_data.model_name == "Gaussian" and param_name == "sigma":
+                details_text += f"  FWHM: {utils.num2fstr(2.35482*param_value,3)}"
+                details_text += f" ± {utils.num2fstr(2.35482*uncertainty, 3)}\n"
+            if fit_data.model_name == "Lorentzian" and param_name == "gamma":
+                details_text += f"  FWHM: {utils.num2fstr(2*param_value,3)}"
+                details_text += f" ± {utils.num2fstr(2*uncertainty, 3)}\n"
+
+        # Quality metrics
+        details_text += "\nQuality Metrics:\n"
+        details_text += f"  R²: {utils.num2fstr(result.r_squared,3)}\n"
+        details_text += f"  χ²: {utils.num2fstr(result.chi_squared,3)}\n"
+        details_text += (
+            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared,3)}\n"
+        )
+
+        if curve_info:
+            # Data transformation
+            details_text += "\nData transformation:\n"
+            details_text += f"  Derivative: {curve_info['derivative']}\n"
+            details_text += f"  Factor: {curve_info['factor']}\n"
+            details_text += f"  Offset: {curve_info['offset']}\n"
+
+        self.fitDetails.setText(details_text)
+
+    def onFitAdded(self, curveID: str) -> None:
+        """
+        Handle when a fit is added to a curve.
+
+        Parameters:
+        - curveID: ID of the curve that was fitted
+        """
+        # Get fit data and plot the fit curve
+        fit_data = self.fitManager.getFitCurveData(curveID)
+        if fit_data:
+            x_fit, y_fit = fit_data
+            # Plot fit curve with dashed line style and higher z-order
+            fit_line = self.main_axes.plot(
+                x_fit, y_fit, "--", alpha=1, linewidth=2, zorder=10
+            )[0]
+            self.fitObjects[curveID] = fit_line
+
+            # Update fit results
+            self.updateFitDetails(curveID)
+
+            # Redraw the canvas
+            self.canvas.draw()
+
+    def onFitUpdated(self, curveID: str) -> None:
+        """
+        Handle when a fit is updated.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        # Remove existing fit line if any
+        self.onFitRemoved(curveID, False)
+        self.onFitAdded(curveID)
+
+    def onFitRemoved(self, curveID: str, redraw: bool = True) -> None:
+        """
+        Handle when a fit is removed.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        # Remove fit line from plot
+        if curveID in self.fitObjects:
+            try:
+                self.fitObjects[curveID].remove()
+            except (NotImplementedError, AttributeError):
+                pass
+            del self.fitObjects[curveID]
+            # Clear fit results
+            if self.fitDetails is not None:
+                self.fitDetails.clear()
+            # Redraw the canvas
+            if redraw:
+                self.canvas.draw()
+
+    def onFitButtonClicked(self) -> None:
+        """Handle Fit button click - fit the currently selected curve."""
+        # Get the currently selected curve
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
+
+        # Get curve data
+        curve_info = self.curveManager.getCurveData(curveID)
+        if curve_info is None:
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "Could not retrieve curve data."
+            )
+            return
+
+        # Get transformed x and y data (already has offset/factor/derivative applied)
+        plot_obj, x_data, y_data = curve_info["data"]
+
+        # Convert to numpy arrays if needed
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
+
+        # Check for valid data
+        if len(x_data) == 0 or len(y_data) == 0:
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "No data available for fitting."
+            )
+            return
+
+        if len(x_data) != len(y_data):
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "X and Y data have different lengths."
+            )
+            return
+
+        # Get selected fit model
+        model_name = self.fitModelCombo.currentText()
+        if not model_name:
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "Please select a fit model."
+            )
+            return
+
+        # Get fit range if "use cursor range" is checked
+        x_range = None
+        if self.useFitRangeCheck and self.useFitRangeCheck.isChecked():
+            x_range = self.getCursorRange()
+
+        try:
+            # Clear any existing fit from other curves (only one fit at a time)
+            all_curves = list(self.curveManager.curves().keys())
+            for other_curve_id in all_curves:
+                if other_curve_id != curveID and self.fitManager.hasFit(other_curve_id):
+                    self.fitManager.removeFit(other_curve_id)
+
+            # Perform the fit (this will replace any existing fit for the current curve)
+            self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
+
+        except ValueError as e:
+            # Show error message
+            QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
+
+    def onClearFitClicked(self) -> None:
+        """Handle Clear Fit button click - remove fit from currently selected curve."""
+        # Get the currently selected curve
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            # Button should be disabled, but check just in case
+            return
+        # Clear fit results
+        if self.fitDetails is not None:
+            self.fitDetails.clear()
+        # Remove fit if it exists: curveManager emits fitRemoved signal which trigers onFitRemoved
+        if self.fitManager.hasFit(curveID):
+            self.fitManager.removeFit(curveID)
+        # If no fit exists, silently do nothing (button is enabled when curve selected)
 
 
 # -----------------------------------------------------------------------------

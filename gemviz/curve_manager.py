@@ -23,16 +23,14 @@ class CurveManager(QtCore.QObject):
     Signals:
         curveAdded: Emitted when a curve is added (curveID)
         curveRemoved: Emitted when a curve is removed (curveID, curveData, count)
-        curveUpdated: Emitted when a curve is updated (curveID, recompute_y, update_x)
+        curveUpdated: Emitted when a curve is updated (curveID)
         allCurvesRemoved: Emitted when all curves are removed
     """
 
     # Signals
     curveAdded = QtCore.pyqtSignal(str)  # Emit curveID when a curve is added
     curveRemoved = QtCore.pyqtSignal(str, dict, int)  # Emit curveID, curveData, count
-    curveUpdated = QtCore.pyqtSignal(
-        str, bool, bool
-    )  # Emit curveID, recompute_y, update_x
+    curveUpdated = QtCore.pyqtSignal(str)  # Emit curveID
     allCurvesRemoved = QtCore.pyqtSignal()  # No parameters
 
     def __init__(self, parent=None):
@@ -165,9 +163,10 @@ class CurveManager(QtCore.QObject):
         # Store additional metadata
         curve_info = {
             "data": curve_data,
-            "original_y_data": y_data.copy(),
+            "original_y_data": numpy.array(y_data).copy(),
             "factor": 1.0,
             "offset": 0.0,
+            "derivative": False,
             "label": label,
             "style_kwargs": style_kwargs or {},
             **kwargs,  # run_uid, y_field, stream_name, offset, factor, etc.
@@ -189,6 +188,7 @@ class CurveManager(QtCore.QObject):
         y_data=None,
         label=None,
         style_kwargs=None,
+        update_original_data=False,
         **kwargs,
     ):
         """
@@ -198,9 +198,16 @@ class CurveManager(QtCore.QObject):
             curveID (str): Unique identifier of the curve to update
             plot_obj: New Matplotlib Line2D object (optional, if line needs to be recreated)
             x_data (array, optional): New X-axis data array
-            y_data (array, optional): New Y-axis data array
+            y_data (array, optional): New Y-axis data array. **IMPORTANT**: When
+                ``update_original_data=True``, ``y_data`` MUST be raw/untransformed data.
+                If transformed data is passed, it will incorrectly overwrite the original
+                baseline data.
             label (str, optional): New display label for the curve
             style_kwargs (dict, optional): New style properties (color, marker, etc.)
+            update_original_data (bool, optional): If True, update ``original_y_data`` with
+                the provided ``y_data`` and reapply any active transformations. This is
+                used during live updates to keep ``original_y_data`` synchronized with
+                the latest raw data. Requires that ``y_data`` is raw/untransformed.
             **kwargs: Additional properties to update (run_uid, y_field, stream_name, etc.)
 
         Returns:
@@ -227,8 +234,37 @@ class CurveManager(QtCore.QObject):
         new_x_data = x_data if x_data is not None else current_x
         new_y_data = y_data if y_data is not None else current_y
 
-        # Update the data tuple
-        curve_info["data"] = (new_plot_obj, new_x_data, new_y_data)
+        # If this is a live update, update original_y_data and reapply transformations
+        if update_original_data and y_data is not None:
+            # Update the original y_data with the new raw data
+            # CRITICAL: y_data MUST be raw/untransformed data here. If transformed data
+            # is passed, it will corrupt original_y_data and break future transformations.
+            curve_info["original_y_data"] = numpy.array(y_data).copy()
+
+            # Check if any transformations are active
+            offset = curve_info.get("offset", 0.0)
+            factor = curve_info.get("factor", 1.0)
+            derivative = curve_info.get("derivative", False)
+
+            # If transformations are active, reapply them to the new original_y_data
+            if offset != 0.0 or factor != 1.0 or derivative:
+                transformed_y = self._applyTransformations(
+                    curveID, original_y=curve_info["original_y_data"]
+                )
+                # Update the plot object with transformed data
+                if new_plot_obj is not None:
+                    new_plot_obj.set_data(new_x_data, transformed_y)
+                # Update the data tuple with transformed data
+                curve_info["data"] = (new_plot_obj, new_x_data, transformed_y)
+            else:
+                # No transformations active, update plot object with raw data
+                if new_plot_obj is not None:
+                    new_plot_obj.set_data(new_x_data, new_y_data)
+                # Update data tuple here for consistency
+                curve_info["data"] = (new_plot_obj, new_x_data, new_y_data)
+        else:
+            # Not a live update, just update the data tuple
+            curve_info["data"] = (new_plot_obj, new_x_data, new_y_data)
 
         # Update label and style_kwargs if provided
         if label is not None:
@@ -240,32 +276,37 @@ class CurveManager(QtCore.QObject):
         for key, value in kwargs.items():
             curve_info[key] = value
 
-        # Determine what changed for signal
-        recompute_y = y_data is not None
-        update_x = x_data is not None
-
-        logger.debug(
-            f"Updated curve {curveID}: recompute_y={recompute_y}, update_x={update_x}"
-        )
         # Emit signal
-        self.curveUpdated.emit(curveID, recompute_y, update_x)
+        self.curveUpdated.emit(curveID)
+        logger.debug(f"Updated curve {curveID}")
         return True
 
     def updateCurveOffsetFactor(self, curveID, offset=None, factor=None):
+        """Update offset and/or factor for a curve and apply transformation."""
+        return self.updateCurveTransformations(curveID, offset=offset, factor=factor)
+
+    def updateCurveDerivative(self, curveID, derivative=None):
+        """Update the derivative for a curve and apply transformation."""
+        return self.updateCurveTransformations(curveID, derivative=derivative)
+
+    def updateCurveTransformations(
+        self, curveID, offset=None, factor=None, derivative=None
+    ):
         """
-        Update offset and/or factor for a curve and apply transformation.
+        Update transformation parameters for a curve and apply transformation.
 
         Parameters:
             curveID (str): Unique identifier of the curve
             offset (float, optional): New offset value (None to keep current)
             factor (float, optional): New factor value (None to keep current)
+            derivative (bool, optional): New derivative value (None to keep current)
 
         Returns:
             bool: True if curve was found and updated, False otherwise
         """
         if curveID not in self._curves:
             logger.debug(
-                f"Curve {curveID} not found in manager for offset/factor update"
+                f"Curve {curveID} not found in manager for transformation update"
             )
             return False
 
@@ -279,19 +320,16 @@ class CurveManager(QtCore.QObject):
             )
             return False
 
-        # Update offset and/or factor (keep current if None)
+        # Update parameters (keep current if None)
         if offset is not None:
             curve_info["offset"] = offset
         if factor is not None:
             curve_info["factor"] = factor
+        if derivative is not None:
+            curve_info["derivative"] = derivative
 
-        # Get current values (may have been updated above)
-        current_offset = curve_info.get("offset", 0.0)
-        current_factor = curve_info.get("factor", 1.0)
-
-        # Apply transformation: new_y = offset + (factor * original_y)
-        original_y_array = numpy.array(original_y)
-        transformed_y = current_offset + (current_factor * original_y_array)
+        # Apply transformations using helper
+        transformed_y = self._applyTransformations(curveID, original_y)
 
         # Get the plot object and x_data
         plot_obj = curve_info["data"][0]
@@ -302,13 +340,48 @@ class CurveManager(QtCore.QObject):
 
         # Update stored data
         curve_info["data"] = (plot_obj, x_data, transformed_y)
+
         logger.debug(
-            f"Updated curve {curveID}: offset={current_offset}, factor={current_factor}"
+            f"Updated curve {curveID}: offset={curve_info.get('offset', 0.0)}, "
+            f"factor={curve_info.get('factor', 1.0)}, derivative={curve_info.get('derivative', False)}"
         )
 
         # Emit signal
-        self.curveUpdated.emit(curveID, True, False)  # recompute_y=True, update_x=False
+        self.curveUpdated.emit(curveID)
         return True
+
+    def _applyTransformations(self, curveID, original_y):
+        """
+        Apply current transformations to original_y data.
+
+        Parameters:
+            curveID (str): Curve identifier
+            original_y (array): Raw y data to transform
+
+        Returns:
+            array: Transformed y data
+        """
+        curve_info = self._curves.get(curveID)
+        if not curve_info:
+            return original_y
+
+        # Get current transformation parameters
+        offset = curve_info.get("offset", 0.0)
+        factor = curve_info.get("factor", 1.0)
+        derivative = curve_info.get("derivative", False)
+
+        # Convert to numpy array
+        original_y_array = numpy.array(original_y)
+
+        # Apply transformation
+        if derivative:
+            # Apply derivative transformation
+            transformed_y = offset + (factor * numpy.gradient(original_y_array))
+        else:
+            # Apply simple offset + factor transformation
+            transformed_y = offset + (factor * original_y_array)
+
+        return transformed_y
 
     def removeCurve(self, curveID):
         """

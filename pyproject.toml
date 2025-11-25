@@ -49,6 +49,7 @@ dependencies = [
   "matplotlib",
   "pyRestTable",
   "tiled",
+  "scipy",
 ]
 
 [project.optional-dependencies]
