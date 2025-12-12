@@ -503,6 +503,192 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     return cat
 
 
+def is_catalog_of_bluesky_runs(node):
+    """
+    Check if a tiled node is a CatalogOfBlueskyRuns.
+
+    Parameters:
+    -----------
+    node : tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a CatalogOfBlueskyRuns
+    """
+    try:
+        if hasattr(node, "specs") and len(node.specs) > 0:
+            spec = node.specs[0]
+            return spec.name == "CatalogOfBlueskyRuns"
+    except Exception:
+        pass
+    return False
+
+
+def is_run(node):
+    """
+    Check if a tiled node is a BlueskyRun.
+
+    Parameters:
+    -----------
+    node : tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a Run (has BlueskyRun spec)
+    """
+    try:
+        if hasattr(node, "specs") and len(node.specs) > 0:
+            spec = node.specs[0]
+            return spec.name == "BlueskyRun"
+    except Exception:
+        pass
+    return False
+
+
+def is_pure_container(node):
+    """
+    Check if a tiled node is a pure Container (not a Catalog, not a Run).
+
+    A pure container has:
+    - structure_family == 'container'
+    - specs == [] (empty)
+
+    Pure containers can contain other containers, files, or other items.
+    We want to recurse into pure containers to find nested Catalogs.
+
+    Parameters:
+    -----------
+    node : tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a pure Container (empty specs, not a Catalog or Run)
+    """
+    try:
+        # Must be a container
+        if hasattr(node, "item"):
+            structure_family = node.item.get("attributes", {}).get("structure_family")
+            if structure_family != "container":
+                return False
+        # Must have empty specs (not a Catalog, not a Run)
+        if hasattr(node, "specs"):
+            return len(node.specs) == 0
+    except Exception:
+        pass
+    return False
+
+
+def discover_catalogs(
+    client, path="", deep_search=False, max_depth=None, root_client=None
+):
+    """
+    Recursively discover all CatalogOfBlueskyRuns in a tiled server.
+
+    Parameters:
+    -----------
+    client : tiled client node
+        Starting point (server root or Container)
+    path : str
+        Current path prefix
+    deep_search : bool
+        If True, also search inside Catalogs for nested Containers
+    max_depth : int, optional
+        Maximum recursion depth (None = unlimited)
+    root_client : tiled client node
+        Root server client. Required for path-based access when inside Catalogs.
+
+    Returns:
+    --------
+    list of tuples
+        [(path, catalog_node), ...] where path is the full path to the catalog
+    """
+    if root_client is None:
+        root_client = client
+    catalogs = []
+
+    if max_depth is not None and max_depth <= 0:
+        return catalogs
+
+    try:
+        if is_catalog_of_bluesky_runs(client):
+            catalogs.append((path, client))
+            if deep_search:
+                try:
+                    children = list(client)
+                    for key in children:
+                        child_path = f"{path}/{key}" if path else key
+                        try:
+                            child = root_client[child_path]
+                            # Skip non-container nodes (files, etc.) - check structure_family first
+                            if hasattr(child, "item"):
+                                structure_family = child.item.get("attributes", {}).get(
+                                    "structure_family"
+                                )
+                                if structure_family != "container":
+                                    continue
+                            if is_run(child):
+                                continue
+                            if is_catalog_of_bluesky_runs(child) or is_pure_container(
+                                child
+                            ):
+                                catalogs.extend(
+                                    discover_catalogs(
+                                        child,
+                                        child_path,
+                                        deep_search,
+                                        max_depth - 1 if max_depth else None,
+                                        root_client=root_client,
+                                    )
+                                )
+                        except Exception as exc:
+                            logger.debug(f"Error processing child {child_path}: {exc}")
+                            continue
+                except Exception as exc:
+                    logger.debug(f"Error searching inside catalog {path}: {exc}")
+            return catalogs
+
+        if is_pure_container(client):
+            try:
+                children = list(client)
+                for key in children:
+                    child_path = f"{path}/{key}" if path else key
+                    try:
+                        child = root_client[child_path]
+                        # Skip non-container nodes (files, etc.) - check structure_family first
+                        if hasattr(child, "item"):
+                            structure_family = child.item.get("attributes", {}).get(
+                                "structure_family"
+                            )
+                            if structure_family != "container":
+                                continue
+                        if is_run(child):
+                            continue
+                        catalogs.extend(
+                            discover_catalogs(
+                                child,
+                                child_path,
+                                deep_search,
+                                max_depth - 1 if max_depth else None,
+                                root_client=root_client,
+                            )
+                        )
+                    except Exception as exc:
+                        logger.debug(f"Error processing child {child_path}: {exc}")
+                        continue
+            except Exception as exc:
+                logger.debug(f"Error searching Container {path}: {exc}")
+    except Exception as exc:
+        logger.debug(f"Error processing node at {path}: {exc}")
+
+    return catalogs
+
+
 # -----------------------------------------------------------------------------
 # :copyright: (c) 2023-2025, UChicago Argonne, LLC
 #
