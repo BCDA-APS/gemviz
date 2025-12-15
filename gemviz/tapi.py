@@ -549,6 +549,31 @@ def is_run(node):
     return False
 
 
+def is_not_container(node):
+    """
+    Return True if node is not a tiled container.
+
+    Args:
+        node: tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a not a container
+    """
+    try:
+        if hasattr(node, "item"):
+            attrs = node.item.get("attributes", {})
+            structure_family = attrs.get("structure_family")
+            return structure_family != "container"
+        # If there is no .item, treat it as not-a-container
+        return True
+    except Exception:
+        # On any error, be conservative and skip it as not-a-container
+        return True
+
+
 def is_pure_container(node):
     """
     Check if a tiled node is a pure Container (not a Catalog, not a Run).
@@ -621,18 +646,18 @@ def discover_catalogs(
             if deep_search:
                 try:
                     children = list(client)
-                    for key in children:
+                    for key in reversed(children):
+                        # Skip "processed" nodes; do not contain runs
+                        if key == "processed":
+                            continue
                         child_path = f"{path}/{key}" if path else key
                         try:
                             child = root_client[child_path]
-                            # Skip non-container nodes (files, etc.) - check structure_family first
-                            if hasattr(child, "item"):
-                                structure_family = child.item.get("attributes", {}).get(
-                                    "structure_family"
-                                )
-                                if structure_family != "container":
-                                    continue
+                            # Runs come after container when iterating in reversed; earlier items are all runs too → stop.
                             if is_run(child):
+                                break
+                            # Skip non-container nodes (files, etc.)
+                            if is_not_container(child):
                                 continue
                             if is_catalog_of_bluesky_runs(child) or is_pure_container(
                                 child
@@ -656,18 +681,18 @@ def discover_catalogs(
         if is_pure_container(client):
             try:
                 children = list(client)
-                for key in children:
+                for key in reversed(children):
+                    # Skip "processed" nodes; do not contain runs
+                    if key == "processed":
+                        continue
                     child_path = f"{path}/{key}" if path else key
                     try:
                         child = root_client[child_path]
-                        # Skip non-container nodes (files, etc.) - check structure_family first
-                        if hasattr(child, "item"):
-                            structure_family = child.item.get("attributes", {}).get(
-                                "structure_family"
-                            )
-                            if structure_family != "container":
-                                continue
+                        # Skip Bluesky runs
                         if is_run(child):
+                            continue
+                        # Skip non-container nodes (files, etc.)
+                        if is_not_container(child):
                             continue
                         catalogs.extend(
                             discover_catalogs(
