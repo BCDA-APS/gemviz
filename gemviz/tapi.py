@@ -638,30 +638,59 @@ def discover_catalogs(
     catalogs = []
 
     if max_depth is not None and max_depth <= 0:
+        logger.debug(f"discover_catalogs: Max depth reached at path={path!r}")
         return catalogs
+
+    logger.debug(
+        f"discover_catalogs: Starting discovery at path={path!r}, "
+        f"deep_search={deep_search}, max_depth={max_depth}"
+    )
 
     try:
         if is_catalog_of_bluesky_runs(client):
+            logger.debug(f"discover_catalogs: Found Catalog at path={path!r}")
             catalogs.append((path, client))
             if deep_search:
                 try:
                     children = list(client)
+                    logger.debug(
+                        f"discover_catalogs: Searching inside Catalog {path!r}, "
+                        f"found {len(children)} children"
+                    )
                     for key in reversed(children):
                         # Skip "processed" nodes; do not contain runs
                         if key == "processed":
+                            logger.debug(
+                                f"discover_catalogs: Skipping 'processed' at {path!r}"
+                            )
                             continue
                         child_path = f"{path}/{key}" if path else key
                         try:
                             child = root_client[child_path]
                             # Runs come after container when iterating in reversed; earlier items are all runs too → stop.
                             if is_run(child):
+                                logger.debug(
+                                    f"discover_catalogs: Hit first run at {child_path!r}, "
+                                    f"stopping iteration (containers come first in reverse)"
+                                )
                                 break
                             # Skip non-container nodes (files, etc.)
                             if is_not_container(child):
+                                logger.debug(
+                                    f"discover_catalogs: Skipping non-container at {child_path!r}"
+                                )
                                 continue
                             if is_catalog_of_bluesky_runs(child) or is_pure_container(
                                 child
                             ):
+                                node_type = (
+                                    "Catalog"
+                                    if is_catalog_of_bluesky_runs(child)
+                                    else "pure Container"
+                                )
+                                logger.debug(
+                                    f"discover_catalogs: Recursing into {node_type} at {child_path!r}"
+                                )
                                 catalogs.extend(
                                     discover_catalogs(
                                         child,
@@ -676,24 +705,48 @@ def discover_catalogs(
                             continue
                 except Exception as exc:
                     logger.debug(f"Error searching inside catalog {path}: {exc}")
+            logger.debug(
+                f"discover_catalogs: Returning {len(catalogs)} catalog(s) from path={path!r}"
+            )
             return catalogs
 
         if is_pure_container(client):
             try:
                 children = list(client)
+                logger.debug(
+                    f"discover_catalogs: Searching pure Container at path={path!r}, "
+                    f"found {len(children)} children"
+                )
                 for key in reversed(children):
                     # Skip "processed" nodes; do not contain runs
                     if key == "processed":
+                        logger.debug(
+                            f"discover_catalogs: Skipping 'processed' at {path!r}"
+                        )
                         continue
                     child_path = f"{path}/{key}" if path else key
                     try:
                         child = root_client[child_path]
                         # Skip Bluesky runs
                         if is_run(child):
+                            logger.debug(
+                                f"discover_catalogs: Skipping run at {child_path!r}"
+                            )
                             continue
                         # Skip non-container nodes (files, etc.)
                         if is_not_container(child):
+                            logger.debug(
+                                f"discover_catalogs: Skipping non-container at {child_path!r}"
+                            )
                             continue
+                        node_type = (
+                            "Catalog"
+                            if is_catalog_of_bluesky_runs(child)
+                            else "pure Container"
+                        )
+                        logger.debug(
+                            f"discover_catalogs: Recursing into {node_type} at {child_path!r}"
+                        )
                         catalogs.extend(
                             discover_catalogs(
                                 child,
@@ -711,6 +764,9 @@ def discover_catalogs(
     except Exception as exc:
         logger.debug(f"Error processing node at {path}: {exc}")
 
+    logger.debug(
+        f"discover_catalogs: Returning {len(catalogs)} catalog(s) from path={path!r}"
+    )
     return catalogs
 
 
