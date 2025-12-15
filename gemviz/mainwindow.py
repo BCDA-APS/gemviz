@@ -213,7 +213,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     continue
         else:
             # New server - use nested discovery
-            discovered = tapi.discover_catalogs(server, deep_search=True)
+            discovered = tapi.discover_catalogs(server, deep_search=False)
             for path, _ in discovered:
                 self.catalogs.addItem(path)
 
