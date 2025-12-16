@@ -44,7 +44,7 @@ class BRCTableModel(QtCore.QAbstractTableModel):
             "#points": lambda run: run.get_run_md("start", "num_points"),
             "Date": lambda run: utils.ts2iso(round(run.get_run_md("start", "time"))),
             "Status": lambda run: run.get_run_md("stop", "exit_status"),
-            "Streams": lambda run: get_str_list(run, "summary", "stream_names"),
+            "Streams": lambda run: ", ".join(run.stream_metadata().keys()),
             # "uid": lambda run: run.get_run_md("start", "uid"),
             # "uid7": lambda run: run.get_run_md("start", "uid")[:7],
         }

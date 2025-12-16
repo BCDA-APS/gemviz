@@ -109,7 +109,7 @@ class RunMetadata:
         def find_name_device_or_signal(key):
             if key in stream_hints:  # from ophyd.Device
                 return stream_hints[key]["fields"]
-            elif key in descriptor["data_keys"]:  # from ophyd.Signal
+            elif key in data_keys:  # from ophyd.Signal
                 return [key]
             raise KeyError(f"Could not find {key=}")
 
@@ -122,7 +122,7 @@ class RunMetadata:
                 return key  # "time" is a special case
 
         def is_numeric(signal):
-            dtype = descriptor["data_keys"][signal]["dtype"]
+            dtype = data_keys[signal]["dtype"]
             if dtype == "array":
                 stream_data = self.stream_data(self.stream_name)
                 ntype = stream_data["data"][signal].dtype.name
@@ -141,14 +141,35 @@ class RunMetadata:
         stream = streams[0]
 
         # description of the data stream objects
-        descriptors = self.stream_metadata(stream).get("descriptors", {})
-        if len(descriptors) != 1:
-            raise ValueError(f"Not handling situation of {len(descriptors)=}")
+        stream_md = self.stream_metadata(stream)
 
-        descriptor = descriptors[0]
-
-        # Mapping from object_keys to data_keys.
-        stream_hints = descriptor.get("hints", {})
+        # Handle both old (with descriptors) and new (flattened) structures
+        if "descriptors" in stream_md:
+            descriptors = stream_md.get("descriptors", [])
+            if len(descriptors) != 1:
+                raise ValueError(f"Not handling situation of {len(descriptors)=}")
+            descriptor = descriptors[0]
+            # Mapping from object_keys to data_keys.
+            stream_hints = descriptor.get("hints", {})
+            data_keys = descriptor.get("data_keys", {})
+            object_keys = descriptor.get("object_keys", {})
+        else:
+            stream_hints = stream_md.get("hints", {})
+            data_keys = stream_md.get("data_keys", {})
+            # Derive object_keys by grouping data_keys by object_name
+            object_keys = {}
+            for field_name, field_info in data_keys.items():
+                obj_name = field_info.get("object_name")
+                if obj_name not in object_keys:
+                    object_keys[obj_name] = []
+                object_keys[obj_name].append(field_name)
+            # Create descriptor-like structure for compability
+            descriptor = {
+                "hints": stream_hints,
+                "data_keys": data_keys,
+                "object_keys": object_keys,
+            }
+            descriptors = [descriptor]
 
         # First motor signal for each dimension.
         try:
@@ -219,7 +240,7 @@ class RunMetadata:
 
         if stream_name not in self.streams_data:
             try:
-                self.streams_data[stream_name] = self.run[stream_name]["data"].read()
+                self.streams_data[stream_name] = self.run[stream_name].read()
             except ValueError as exc:
                 if "conflicting sizes" in str(exc).lower():
                     logger.debug(
@@ -248,7 +269,7 @@ class RunMetadata:
         # Force fresh data read from server
         try:
             logger.info(f"Reading fresh data from run[{stream_name}][data]")
-            fresh_data = self.run[stream_name]["data"].read()
+            fresh_data = self.run[stream_name].read()
 
             if raw:
                 arrays = self._dataset_to_arrays(fresh_data)
@@ -309,7 +330,7 @@ class RunMetadata:
         arrays = {}
         min_len = None
 
-        data_node = self.run[stream_name]["data"]
+        data_node = self.run[stream_name]
         for field in data_node:
             try:
                 data = data_node[field].read()
@@ -369,9 +390,14 @@ class RunMetadata:
         """EPICS PV name of this field."""
         pv = ""
         try:
-            descriptors = self.stream_metadata(stream_name).get("descriptors", {})
-            assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
-            source = descriptors[0]["data_keys"][field_name].get("source", "")
+            stream_md = self.stream_metadata(stream_name)
+            if "descriptors" in stream_md:
+                descriptors = stream_md.get("descriptors", [])
+                assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
+                data_keys = descriptors[0]["data_keys"]
+            else:
+                data_keys = stream_md.get("data_keys", {})
+            source = data_keys[field_name].get("source", "")
             if source.startswith("PV:"):
                 pv = source[3:]
         except Exception:
@@ -382,9 +408,14 @@ class RunMetadata:
         """Engineering units of this field."""
         units = ""
         try:
-            descriptors = self.stream_metadata(stream_name).get("descriptors", {})
-            assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
-            units = descriptors[0]["data_keys"][field_name].get("units", "")
+            stream_md = self.stream_metadata(stream_name)
+            if "descriptors" in stream_md:
+                descriptors = stream_md.get("descriptors", [])
+                assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
+                data_keys = descriptors[0]["data_keys"]
+            else:
+                data_keys = stream_md.get("data_keys", {})
+            units = data_keys[field_name].get("units", "")
         except Exception:
             pass
         return units
