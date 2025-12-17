@@ -161,7 +161,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             if hasattr(catalog_node, "specs") and len(catalog_node.specs) > 0:
                 spec = catalog_node.specs[0]
-                if tapi.tapi.is_catalog_of_bluesky_runs(catalog_node):
+                if tapi.is_catalog_of_bluesky_runs(catalog_node):
                     version = spec.version
         except Exception:
             pass
