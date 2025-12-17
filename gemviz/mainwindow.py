@@ -155,13 +155,32 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setStatus(f"Catalog {catalog_name!r} is not accessible: {exc}")
             return
         self._catalogName = catalog_name
+
+        # Detect version
+        version = None
+        try:
+            if hasattr(catalog_node, "specs") and len(catalog_node.specs) > 0:
+                spec = catalog_node.specs[0]
+                if tapi.tapi.is_catalog_of_bluesky_runs(catalog_node):
+                    version = spec.version
+        except Exception:
+            pass
+
         # Sort by time - use user preference for sort order
         newest_first = self._getSortPreference()
         sort_direction = -1 if newest_first else 1
+
+        # Choose sort field based on version
+        if version == "1":
+            sort_field = "time"  # old server (0.1.0)
+        else:
+            sort_field = "start.time"  # new server (0.2.2)
+
         logger.debug(
-            f"Sort preference: newest_first={newest_first}, sort_direction={sort_direction}"
+            f"Sort preference: newest_first={newest_first}, sort_direction={sort_direction}, "
+            f"version={version}, sort_field={sort_field}"
         )
-        self._catalog = catalog_node.sort(("time", sort_direction))
+        self._catalog = catalog_node.sort((sort_field, sort_direction))
 
         spec_name = self.catalogType()
         self.spec_name.setText(spec_name)
