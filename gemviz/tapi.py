@@ -242,7 +242,8 @@ class RunMetadata:
             try:
                 self.streams_data[stream_name] = self.run[stream_name].read()
             except ValueError as exc:
-                if "conflicting sizes" in str(exc).lower():
+                error_msg = str(exc).lower()
+                if "conflicting sizes" in error_msg or "columns" in error_msg:
                     logger.debug(
                         f"Stream {stream_name} not aligned during read; returning raw arrays"
                     )
@@ -284,7 +285,8 @@ class RunMetadata:
             )
             return fresh_data
         except ValueError as exc:
-            if raw and "conflicting sizes" in str(exc).lower():
+            error_msg = str(exc).lower()
+            if raw and ("conflicting sizes" in error_msg or "columns" in error_msg):
                 logger.debug(
                     f"Stream {stream_name} data not aligned yet (conflicting sizes); reading fields individually"
                 )
