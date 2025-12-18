@@ -331,10 +331,49 @@ class RunMetadata:
         min_len = None
 
         data_node = self.run[stream_name]
-        for field in data_node:
+
+        # Try iteration first (works with batch_size=1 for both tiled versions)
+        try:
+            field_names = list(data_node)
+            if not field_names:
+                # Fall back to metadata if iteration is empty
+                raise ValueError("data_node iteration returned empty")
+        except (TypeError, AttributeError, ValueError):
+            # Fall back to metadata-based approach
+            stream_md = self.stream_metadata(stream_name)
+            if "descriptors" in stream_md:
+                descriptors = stream_md.get("descriptors", [])
+                if len(descriptors) != 1:
+                    raise ValueError(f"Not handling situation of {len(descriptors)=}")
+                data_keys = descriptors[0].get("data_keys", {})
+            else:
+                data_keys = stream_md.get("data_keys", {})
+            field_names = list(data_keys.keys())
+
+        if not field_names:
+            logger.warning(f"No fields found for stream {stream_name}")
+            return arrays
+
+        # Read fields, skipping those with shape mismatches or not available yet
+        for field in field_names:
             try:
                 data = data_node[field].read()
+            except (KeyError, AttributeError) as exc:
+                # Field doesn't exist yet - skip it
+                logger.warning(
+                    f"Field {field} not yet available for {stream_name}: {exc}"
+                )
+                continue
             except Exception as exc:
+                # Handle shape mismatch errors (conflicting sizes during live acquisition)
+                if (
+                    "conflicting sizes" in str(exc).lower()
+                    or "expected_shape" in str(exc).lower()
+                ):
+                    logger.warning(
+                        f"Field {field} has conflicting sizes for {stream_name}, skipping: {exc}"
+                    )
+                    continue
                 logger.error(
                     f"Failed to refresh field {field} for {stream_name}: {exc}"
                 )

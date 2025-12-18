@@ -872,6 +872,13 @@ class ChartView(QtWidgets.QWidget):
                         x_data = x_data[:min_len]
                         y_data = y_data[:min_len]
 
+                    # Sort by x_data to avoid artifacts when data is not in order
+                    # (happens with batch_size=1 incremental writes in Tiled 0.2.2)
+                    if x_data.ndim != 0 and y_data.ndim != 0 and len(x_data) > 0:
+                        sort_indices = numpy.argsort(x_data)
+                        x_data = x_data[sort_indices]
+                        y_data = y_data[sort_indices]
+
                 except KeyError as e:
                     logger.error(
                         f"Field {e} not found in stream data. Available keys: {list(stream_data.keys()) if hasattr(stream_data, 'keys') else 'unknown'}"
