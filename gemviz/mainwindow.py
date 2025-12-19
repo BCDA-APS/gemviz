@@ -13,11 +13,10 @@ from . import APP_TITLE
 from . import tapi
 from . import utils
 from .tiledserverdialog import LOCALHOST_URL
-from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
 from .user_settings import settings
 
-TESTING_URLS = [TESTING_URL, LOCALHOST_URL]
+TESTING_URLS = [LOCALHOST_URL]
 MAX_RECENT_URI = 5
 UI_FILE = utils.getUiFileName(__file__)
 SORT_ASCENDING = 1
@@ -290,6 +289,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"Error for {server_uri=!r}: {exc}")
                 return
             self.setServer(server_uri, client)
+            # Update recent servers list
+            self.setServerList(server_uri)
 
     def isValidServerUri(self, server_uri):
         """Check if the server URI is valid and absolute."""
