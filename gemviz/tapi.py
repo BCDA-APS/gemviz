@@ -172,8 +172,9 @@ class RunMetadata:
             descriptors = [descriptor]
 
         # First motor signal for each dimension.
+        # Handle dimensions with empty motor lists by using "time" as fallback
         try:
-            axes = [get_signal(d[0][0]) for d in run_dims]
+            axes = [get_signal(d[0][0]) if len(d[0]) > 0 else "time" for d in run_dims]
         except KeyError as exc:
             raise exc
 
