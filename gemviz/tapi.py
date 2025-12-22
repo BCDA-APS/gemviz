@@ -109,7 +109,7 @@ class RunMetadata:
         def find_name_device_or_signal(key):
             if key in stream_hints:  # from ophyd.Device
                 return stream_hints[key]["fields"]
-            elif key in descriptor["data_keys"]:  # from ophyd.Signal
+            elif key in data_keys:  # from ophyd.Signal
                 return [key]
             raise KeyError(f"Could not find {key=}")
 
@@ -122,7 +122,7 @@ class RunMetadata:
                 return key  # "time" is a special case
 
         def is_numeric(signal):
-            dtype = descriptor["data_keys"][signal]["dtype"]
+            dtype = data_keys[signal]["dtype"]
             if dtype == "array":
                 stream_data = self.stream_data(self.stream_name)
                 ntype = stream_data["data"][signal].dtype.name
@@ -141,14 +141,35 @@ class RunMetadata:
         stream = streams[0]
 
         # description of the data stream objects
-        descriptors = self.stream_metadata(stream).get("descriptors", {})
-        if len(descriptors) != 1:
-            raise ValueError(f"Not handling situation of {len(descriptors)=}")
+        stream_md = self.stream_metadata(stream)
 
-        descriptor = descriptors[0]
-
-        # Mapping from object_keys to data_keys.
-        stream_hints = descriptor.get("hints", {})
+        # Handle both old (with descriptors) and new (flattened) structures
+        if "descriptors" in stream_md:
+            descriptors = stream_md.get("descriptors", [])
+            if len(descriptors) != 1:
+                raise ValueError(f"Not handling situation of {len(descriptors)=}")
+            descriptor = descriptors[0]
+            # Mapping from object_keys to data_keys.
+            stream_hints = descriptor.get("hints", {})
+            data_keys = descriptor.get("data_keys", {})
+            object_keys = descriptor.get("object_keys", {})
+        else:
+            stream_hints = stream_md.get("hints", {})
+            data_keys = stream_md.get("data_keys", {})
+            # Derive object_keys by grouping data_keys by object_name
+            object_keys = {}
+            for field_name, field_info in data_keys.items():
+                obj_name = field_info.get("object_name")
+                if obj_name not in object_keys:
+                    object_keys[obj_name] = []
+                object_keys[obj_name].append(field_name)
+            # Create descriptor-like structure for compability
+            descriptor = {
+                "hints": stream_hints,
+                "data_keys": data_keys,
+                "object_keys": object_keys,
+            }
+            descriptors = [descriptor]
 
         # First motor signal for each dimension.
         try:
@@ -219,9 +240,10 @@ class RunMetadata:
 
         if stream_name not in self.streams_data:
             try:
-                self.streams_data[stream_name] = self.run[stream_name]["data"].read()
+                self.streams_data[stream_name] = self.run[stream_name].read()
             except ValueError as exc:
-                if "conflicting sizes" in str(exc).lower():
+                error_msg = str(exc).lower()
+                if "conflicting sizes" in error_msg or "columns" in error_msg:
                     logger.debug(
                         f"Stream {stream_name} not aligned during read; returning raw arrays"
                     )
@@ -248,7 +270,7 @@ class RunMetadata:
         # Force fresh data read from server
         try:
             logger.info(f"Reading fresh data from run[{stream_name}][data]")
-            fresh_data = self.run[stream_name]["data"].read()
+            fresh_data = self.run[stream_name].read()
 
             if raw:
                 arrays = self._dataset_to_arrays(fresh_data)
@@ -263,7 +285,8 @@ class RunMetadata:
             )
             return fresh_data
         except ValueError as exc:
-            if raw and "conflicting sizes" in str(exc).lower():
+            error_msg = str(exc).lower()
+            if raw and ("conflicting sizes" in error_msg or "columns" in error_msg):
                 logger.debug(
                     f"Stream {stream_name} data not aligned yet (conflicting sizes); reading fields individually"
                 )
@@ -309,11 +332,50 @@ class RunMetadata:
         arrays = {}
         min_len = None
 
-        data_node = self.run[stream_name]["data"]
-        for field in data_node:
+        data_node = self.run[stream_name]
+
+        # Try iteration first (works with batch_size=1 for both tiled versions)
+        try:
+            field_names = list(data_node)
+            if not field_names:
+                # Fall back to metadata if iteration is empty
+                raise ValueError("data_node iteration returned empty")
+        except (TypeError, AttributeError, ValueError):
+            # Fall back to metadata-based approach
+            stream_md = self.stream_metadata(stream_name)
+            if "descriptors" in stream_md:
+                descriptors = stream_md.get("descriptors", [])
+                if len(descriptors) != 1:
+                    raise ValueError(f"Not handling situation of {len(descriptors)=}")
+                data_keys = descriptors[0].get("data_keys", {})
+            else:
+                data_keys = stream_md.get("data_keys", {})
+            field_names = list(data_keys.keys())
+
+        if not field_names:
+            logger.warning(f"No fields found for stream {stream_name}")
+            return arrays
+
+        # Read fields, skipping those with shape mismatches or not available yet
+        for field in field_names:
             try:
                 data = data_node[field].read()
+            except (KeyError, AttributeError) as exc:
+                # Field doesn't exist yet - skip it
+                logger.warning(
+                    f"Field {field} not yet available for {stream_name}: {exc}"
+                )
+                continue
             except Exception as exc:
+                # Handle shape mismatch errors (conflicting sizes during live acquisition)
+                if (
+                    "conflicting sizes" in str(exc).lower()
+                    or "expected_shape" in str(exc).lower()
+                ):
+                    logger.warning(
+                        f"Field {field} has conflicting sizes for {stream_name}, skipping: {exc}"
+                    )
+                    continue
                 logger.error(
                     f"Failed to refresh field {field} for {stream_name}: {exc}"
                 )
@@ -369,9 +431,14 @@ class RunMetadata:
         """EPICS PV name of this field."""
         pv = ""
         try:
-            descriptors = self.stream_metadata(stream_name).get("descriptors", {})
-            assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
-            source = descriptors[0]["data_keys"][field_name].get("source", "")
+            stream_md = self.stream_metadata(stream_name)
+            if "descriptors" in stream_md:
+                descriptors = stream_md.get("descriptors", [])
+                assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
+                data_keys = descriptors[0]["data_keys"]
+            else:
+                data_keys = stream_md.get("data_keys", {})
+            source = data_keys[field_name].get("source", "")
             if source.startswith("PV:"):
                 pv = source[3:]
         except Exception:
@@ -382,9 +449,14 @@ class RunMetadata:
         """Engineering units of this field."""
         units = ""
         try:
-            descriptors = self.stream_metadata(stream_name).get("descriptors", {})
-            assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
-            units = descriptors[0]["data_keys"][field_name].get("units", "")
+            stream_md = self.stream_metadata(stream_name)
+            if "descriptors" in stream_md:
+                descriptors = stream_md.get("descriptors", [])
+                assert len(descriptors) == 1, f"{stream_name=} has {len(descriptors)=}"
+                data_keys = descriptors[0]["data_keys"]
+            else:
+                data_keys = stream_md.get("data_keys", {})
+            units = data_keys[field_name].get("units", "")
         except Exception:
             pass
         return units
@@ -501,6 +573,273 @@ def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     for v in text_case:
         cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
+
+
+def is_catalog_of_bluesky_runs(node):
+    """
+    Check if a tiled node is a CatalogOfBlueskyRuns.
+
+    Parameters:
+    -----------
+    node : tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a CatalogOfBlueskyRuns
+    """
+    try:
+        if hasattr(node, "specs") and len(node.specs) > 0:
+            spec = node.specs[0]
+            return spec.name == "CatalogOfBlueskyRuns"
+    except Exception:
+        pass
+    return False
+
+
+def is_run(node):
+    """
+    Check if a tiled node is a BlueskyRun.
+
+    Parameters:
+    -----------
+    node : tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a Run (has BlueskyRun spec)
+    """
+    try:
+        if hasattr(node, "specs") and len(node.specs) > 0:
+            spec = node.specs[0]
+            return spec.name == "BlueskyRun"
+    except Exception:
+        pass
+    return False
+
+
+def is_not_container(node):
+    """
+    Return True if node is not a tiled container.
+
+    Args:
+        node: tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a not a container
+    """
+    try:
+        if hasattr(node, "item"):
+            attrs = node.item.get("attributes", {})
+            structure_family = attrs.get("structure_family")
+            return structure_family != "container"
+        # If there is no .item, treat it as not-a-container
+        return True
+    except Exception:
+        # On any error, be conservative and skip it as not-a-container
+        return True
+
+
+def is_pure_container(node):
+    """
+    Check if a tiled node is a pure Container (not a Catalog, not a Run).
+
+    A pure container has:
+    - structure_family == 'container'
+    - specs == [] (empty)
+
+    Pure containers can contain other containers, files, or other items.
+    We want to recurse into pure containers to find nested Catalogs.
+
+    Parameters:
+    -----------
+    node : tiled client node
+        The node to check
+
+    Returns:
+    --------
+    bool
+        True if node is a pure Container (empty specs, not a Catalog or Run)
+    """
+    try:
+        # Must be a container
+        if hasattr(node, "item"):
+            structure_family = node.item.get("attributes", {}).get("structure_family")
+            if structure_family != "container":
+                return False
+        # Must have empty specs (not a Catalog, not a Run)
+        if hasattr(node, "specs"):
+            return len(node.specs) == 0
+    except Exception:
+        pass
+    return False
+
+
+def discover_catalogs(
+    client, path="", deep_search=False, max_depth=None, root_client=None
+):
+    """
+    Recursively discover all CatalogOfBlueskyRuns in a tiled server.
+
+    Parameters:
+    -----------
+    client : tiled client node
+        Starting point (server root or Container)
+    path : str
+        Current path prefix
+    deep_search : bool
+        If True, also search inside Catalogs for nested Containers
+    max_depth : int, optional
+        Maximum recursion depth (None = unlimited)
+    root_client : tiled client node
+        Root server client. Required for path-based access when inside Catalogs.
+
+    Returns:
+    --------
+    list of tuples
+        [(path, catalog_node), ...] where path is the full path to the catalog
+    """
+    if root_client is None:
+        root_client = client
+    catalogs = []
+
+    if max_depth is not None and max_depth <= 0:
+        logger.debug(f"discover_catalogs: Max depth reached at path={path!r}")
+        return catalogs
+
+    logger.debug(
+        f"discover_catalogs: Starting discovery at path={path!r}, "
+        f"deep_search={deep_search}, max_depth={max_depth}"
+    )
+
+    try:
+        if is_catalog_of_bluesky_runs(client):
+            logger.debug(f"discover_catalogs: Found Catalog at path={path!r}")
+            catalogs.append((path, client))
+            if deep_search:
+                try:
+                    children = list(client)
+                    logger.debug(
+                        f"discover_catalogs: Searching inside Catalog {path!r}, "
+                        f"found {len(children)} children"
+                    )
+                    for key in reversed(children):
+                        # Skip "processed" nodes; do not contain runs
+                        if key == "processed":
+                            logger.debug(
+                                f"discover_catalogs: Skipping 'processed' at {path!r}"
+                            )
+                            continue
+                        child_path = f"{path}/{key}" if path else key
+                        try:
+                            child = root_client[child_path]
+                            # Runs come after container when iterating in reversed; earlier items are all runs too → stop.
+                            if is_run(child):
+                                logger.debug(
+                                    f"discover_catalogs: Hit first run at {child_path!r}, "
+                                    f"stopping iteration (containers come first in reverse)"
+                                )
+                                break
+                            # Skip non-container nodes (files, etc.)
+                            if is_not_container(child):
+                                logger.debug(
+                                    f"discover_catalogs: Skipping non-container at {child_path!r}"
+                                )
+                                continue
+                            if is_catalog_of_bluesky_runs(child) or is_pure_container(
+                                child
+                            ):
+                                node_type = (
+                                    "Catalog"
+                                    if is_catalog_of_bluesky_runs(child)
+                                    else "pure Container"
+                                )
+                                logger.debug(
+                                    f"discover_catalogs: Recursing into {node_type} at {child_path!r}"
+                                )
+                                catalogs.extend(
+                                    discover_catalogs(
+                                        child,
+                                        child_path,
+                                        deep_search,
+                                        max_depth - 1 if max_depth else None,
+                                        root_client=root_client,
+                                    )
+                                )
+                        except Exception as exc:
+                            logger.debug(f"Error processing child {child_path}: {exc}")
+                            continue
+                except Exception as exc:
+                    logger.debug(f"Error searching inside catalog {path}: {exc}")
+            logger.debug(
+                f"discover_catalogs: Returning {len(catalogs)} catalog(s) from path={path!r}"
+            )
+            return catalogs
+
+        if is_pure_container(client):
+            try:
+                children = list(client)
+                logger.debug(
+                    f"discover_catalogs: Searching pure Container at path={path!r}, "
+                    f"found {len(children)} children"
+                )
+                for key in reversed(children):
+                    # Skip "processed" nodes; do not contain runs
+                    if key == "processed":
+                        logger.debug(
+                            f"discover_catalogs: Skipping 'processed' at {path!r}"
+                        )
+                        continue
+                    child_path = f"{path}/{key}" if path else key
+                    try:
+                        child = root_client[child_path]
+                        # Skip Bluesky runs
+                        if is_run(child):
+                            logger.debug(
+                                f"discover_catalogs: Skipping run at {child_path!r}"
+                            )
+                            continue
+                        # Skip non-container nodes (files, etc.)
+                        if is_not_container(child):
+                            logger.debug(
+                                f"discover_catalogs: Skipping non-container at {child_path!r}"
+                            )
+                            continue
+                        node_type = (
+                            "Catalog"
+                            if is_catalog_of_bluesky_runs(child)
+                            else "pure Container"
+                        )
+                        logger.debug(
+                            f"discover_catalogs: Recursing into {node_type} at {child_path!r}"
+                        )
+                        catalogs.extend(
+                            discover_catalogs(
+                                child,
+                                child_path,
+                                deep_search,
+                                max_depth - 1 if max_depth else None,
+                                root_client=root_client,
+                            )
+                        )
+                    except Exception as exc:
+                        logger.debug(f"Error processing child {child_path}: {exc}")
+                        continue
+            except Exception as exc:
+                logger.debug(f"Error searching Container {path}: {exc}")
+    except Exception as exc:
+        logger.debug(f"Error processing node at {path}: {exc}")
+
+    logger.debug(
+        f"discover_catalogs: Returning {len(catalogs)} catalog(s) from path={path!r}"
+    )
+    return catalogs
 
 
 # -----------------------------------------------------------------------------

@@ -13,11 +13,10 @@ from . import APP_TITLE
 from . import tapi
 from . import utils
 from .tiledserverdialog import LOCALHOST_URL
-from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
 from .user_settings import settings
 
-TESTING_URLS = [TESTING_URL, LOCALHOST_URL]
+TESTING_URLS = [LOCALHOST_URL]
 MAX_RECENT_URI = 5
 UI_FILE = utils.getUiFileName(__file__)
 SORT_ASCENDING = 1
@@ -135,7 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         try:
             spec = specs[0]
-            spec_name = f"{spec.name}, v{spec.version}"
+            spec_name = f"{spec.name}"
         except IndexError:
             spec_name = "not supported now"
         return spec_name
@@ -146,18 +145,41 @@ class MainWindow(QtWidgets.QMainWindow):
     def setCatalog(self, catalog_name, sort_direction=SORT_DIRECTION):
         """A catalog was selected (from the pop-up menu)."""
         self.setStatus(f"Selected catalog {catalog_name!r}.")
-        if len(catalog_name) == 0 or catalog_name not in self.server():
-            if len(catalog_name) > 0:
-                self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
+        if len(catalog_name) == 0:
+            return
+        try:
+            # Try to access the catalog (works for both top-level and nested paths)
+            catalog_node = self.server()[catalog_name]
+        except (KeyError, ValueError) as exc:
+            self.setStatus(f"Catalog {catalog_name!r} is not accessible: {exc}")
             return
         self._catalogName = catalog_name
+
+        # Detect version
+        version = None
+        try:
+            if hasattr(catalog_node, "specs") and len(catalog_node.specs) > 0:
+                spec = catalog_node.specs[0]
+                if tapi.is_catalog_of_bluesky_runs(catalog_node):
+                    version = spec.version
+        except Exception:
+            pass
+
         # Sort by time - use user preference for sort order
         newest_first = self._getSortPreference()
         sort_direction = -1 if newest_first else 1
+
+        # Choose sort field based on version
+        if version == "1":
+            sort_field = "time"  # old server (0.1.0)
+        else:
+            sort_field = "start.time"  # new server (0.2.2)
+
         logger.debug(
-            f"Sort preference: newest_first={newest_first}, sort_direction={sort_direction}"
+            f"Sort preference: newest_first={newest_first}, sort_direction={sort_direction}, "
+            f"version={version}, sort_field={sort_field}"
         )
-        self._catalog = self.server()[catalog_name].sort(("time", sort_direction))
+        self._catalog = catalog_node.sort((sort_field, sort_direction))
 
         spec_name = self.catalogType()
         self.spec_name.setText(spec_name)
@@ -166,7 +188,7 @@ class MainWindow(QtWidgets.QMainWindow):
         layout = self.groupbox.layout()
         self.clearContent(clear_cat=False)
 
-        if spec_name == "CatalogOfBlueskyRuns, v1":
+        if spec_name == "CatalogOfBlueskyRuns":
             from .bluesky_runs_catalog import BRC_MVC
 
             self.mvc_catalog = BRC_MVC(self)
@@ -181,18 +203,37 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Set the names (of server's catalogs) in the pop-up list.
 
-        Only add catalogs of CatalogOfBlueskyRuns.
+        Recursively discovers all CatalogOfBlueskyRuns, including nested ones.
         """
         self.catalogs.clear()
-        for catalog_name in catalogs:
-            try:
-                spec = self.server()[catalog_name].specs[0]
-                if spec.name == "CatalogOfBlueskyRuns" and spec.version == "1":
-                    self.catalogs.addItem(catalog_name)
-            except Exception as exc:
-                message = f"Problem with catalog {catalog_name}: {exc}"
-                logger.debug(message)
-                self.setStatus(message)
+        server = self.server()
+
+        # Check version
+        version = None
+        try:
+            for key in catalogs:
+                node = server[key]
+                if tapi.is_catalog_of_bluesky_runs(node):
+                    spec = node.specs[0]
+                    version = spec.version
+                    break
+        except Exception:
+            pass
+
+        if version == "1":
+            # Old server - just check top-level items
+            for key in catalogs:
+                try:
+                    node = server[key]
+                    if tapi.is_catalog_of_bluesky_runs(node):
+                        self.catalogs.addItem(key)
+                except Exception:
+                    continue
+        else:
+            # New server - use nested discovery
+            discovered = tapi.discover_catalogs(server, deep_search=False)
+            for path, _ in discovered:
+                self.catalogs.addItem(path)
 
     def clearContent(self, clear_cat=True):
         layout = self.groupbox.layout()
@@ -248,6 +289,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"Error for {server_uri=!r}: {exc}")
                 return
             self.setServer(server_uri, client)
+            # Update recent servers list
+            self.setServerList(server_uri)
 
     def isValidServerUri(self, server_uri):
         """Check if the server URI is valid and absolute."""

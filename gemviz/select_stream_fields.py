@@ -276,6 +276,12 @@ def to_datasets(run, stream_name, selections, scan_id=None):
                     f" X ({x_shape!r})"
                     f" and Y ({y_shape!r}) data."
                 )
+            # Sort by x_data to avoid artifacts when data is not in order
+            # (happens with batch_size=1 incremental writes)
+            sort_indices = numpy.argsort(x_data)
+            x_data = x_data[sort_indices]
+            y_data = y_data[sort_indices]
+
             ds = [x_data, y_data]
         datasets.append((ds, ds_options))
 

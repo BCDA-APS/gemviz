@@ -96,7 +96,7 @@ class ApplicationQSettings(QtCore.QSettings):
         return {k: self.getKey(k) for k in self.allKeys()}
 
     def init_global_keys(self):
-        logger.debug("fileName=%s", self.fileName)
+        logger.info("fileName=%s", self.fileName())
         d = dict(
             this_file=self.fileName(),  # the .ini file, that is
             version=1.0,  #

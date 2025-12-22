@@ -50,6 +50,7 @@ dependencies = [
   "pyRestTable",
   "tiled",
   "scipy",
+  "bluesky-tiled-plugins",
 ]
 
 [project.optional-dependencies]
