@@ -1,0 +1,26 @@
+name: gemviz010
+
+# conda env create -n gemviz010 -f ./env010.yml
+# For Tiled 0.1.0 server compatibility
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - libopenblas
+  - matplotlib
+  - python >=3.9
+  - pip
+  - pyqt =5
+  - pyRestTable
+  - qt =5
+  - scipy
+
+  - pip:
+    - tiled[all]>=0.1.0a104,<0.2.0
+    - bluesky-tiled-plugins==2.0.0b54
+
+  # needed by developer
+  # - build
+  # - setuptools-scm
