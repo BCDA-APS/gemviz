@@ -254,6 +254,9 @@ class RunMetadata:
                 else:
                     logger.error(f"Failed to read stream data for {stream_name}: {exc}")
                     raise
+            except Exception as exc:
+                logger.error(f"Error reading stream data for {stream_name}: {exc}")
+                raise
 
         return self.streams_data[stream_name]
 
@@ -296,7 +299,7 @@ class RunMetadata:
             logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
             raise
         except Exception as exc:
-            logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
+            logger.error(f"Error refreshing stream data for {stream_name}: {exc}")
             raise
 
     def _dataset_to_arrays(self, dataset):
