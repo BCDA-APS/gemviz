@@ -187,6 +187,9 @@ def to_datasets(run, stream_name, selections, scan_id=None):
     except KeyError as exc:
         logger.error(f"Stream {stream_name} not found in run data: {exc}")
         raise ValueError(f"Stream {stream_name} not found in run data")
+    except Exception as exc:
+        logger.error(f"Error reading stream {stream_name}: {exc}")
+        raise ValueError(f"Error reading stream {stream_name}: {exc}") from exc
 
     raw_stream = isinstance(stream, dict)
     if stream is None or (raw_stream and not stream):
@@ -205,7 +208,7 @@ def to_datasets(run, stream_name, selections, scan_id=None):
             logger.error(f"Error reading data for {field_name}: {exc}")
             available = list(stream.keys()) if hasattr(stream, "keys") else "unknown"
             logger.error(f"Stream data keys: {available}")
-            raise
+            raise ValueError(f"Error reading field '{field_name}': {exc}") from exc
 
         return data
 

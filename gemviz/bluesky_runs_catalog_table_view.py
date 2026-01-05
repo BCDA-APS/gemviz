@@ -47,14 +47,8 @@ class BRCTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
-        if self.pageSize.findText(str(page_size)) == -1:
-            self.pageSize.insertItem(0, str(page_size))
-        self.pageSize.setCurrentText(str(page_size))
         self.setPage(page_offset, page_size)
 
-        self.pageSize.currentTextChanged.connect(
-            partial(self.doPagerButtons, "pageSize")
-        )
         for button_name in "first back next last".split():
             button = getattr(self, button_name)
             # custom: pass the button name to the receiver
@@ -77,6 +71,57 @@ class BRCTableView(QtWidgets.QWidget):
         self.refresh_timer.start(self.refresh_interval)
         logger.info(f"Table auto-refresh enabled (interval: {self.refresh_interval}ms)")
 
+        # Auto-size page based on visible rows
+        self.tableView.viewport().installEventFilter(self)
+        QtCore.QTimer.singleShot(100, self.updatePageSizeFromVisibleRows)
+
+    def calculateVisibleRows(self):
+        """Calculate the number of visible whole rows in the table view."""
+        viewport = self.tableView.viewport()
+        if viewport.height() <= 0:
+            return 10  # Default fallback
+
+        # Get available height for rows
+        available_height = viewport.height()
+
+        # Get the row height
+        if self.model.rowCount() > 0:
+            row_height = self.tableView.rowHeight(0)
+            if row_height <= 0:
+                row_height = self.tableView.verticalHeader().defaultSectionSize()
+        else:
+            row_height = self.tableView.verticalHeader().defaultSectionSize()
+
+        if row_height <= 0:
+            return 10
+
+        # Calculate the number of visible whole rows
+        visible_rows = max(1, available_height // row_height)
+        return visible_rows
+
+    def updatePageSizeFromVisibleRows(self):
+        """Update page size based on number of visible rows."""
+        visible_rows = self.calculateVisibleRows()
+        if visible_rows != self.page_size:
+            logger.debug(
+                f"Updating page size from {self.page_size} to {visible_rows} (visible rows)"
+            )
+            # Preserve current offset if possible
+            self.setPage(self.page_offset, visible_rows)
+            self.setButtonPermissions()
+            self.setPagerStatus()
+
+    def eventFilter(self, obj, event):
+        """Filter events to detect table viewport resize."""
+        if obj == self.tableView.viewport() and event.type() == QtCore.QEvent.Resize:
+            # Use a timer to debounce rapid resize events
+            if not hasattr(self, "_resize_timer"):
+                self._resize_timer = QtCore.QTimer(self)
+                self._resize_timer.setSingleShot(True)
+                self._resize_timer.timeout.connect(self.updatePageSizeFromVisibleRows)
+            self._resize_timer.start(100)  # Wait 100ms after resize stops
+        return super().eventFilter(obj, event)
+
     def doPagerButtons(self, action, **kwargs):
         """User clicked a button to change the page."""
         logger.debug("action=%s", action)
@@ -85,8 +130,6 @@ class BRCTableView(QtWidgets.QWidget):
             self.setPage(0, self.page_size)
         elif action == "back":
             self.setPage(self.page_offset - self.page_size, self.page_size)
-        elif action == "pageSize":
-            self.setPage(self.page_offset, self.pageSize.currentText())
         elif action == "next":
             self.setPage(self.page_offset + self.page_size, self.page_size)
         elif action == "last":
@@ -128,8 +171,6 @@ class BRCTableView(QtWidgets.QWidget):
         else:
             offset = self.catalogLength() - self.page_size
         self.page_offset = max(0, offset)
-        if int(self.pageSize.currentText()) != self.page_size:
-            self.pageSize.setCurrentText(str(self.page_size))
         logger.debug(
             "len(catalog)=%d  offset=%d  size=%d",
             self.catalogLength(),

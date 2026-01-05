@@ -172,8 +172,9 @@ class RunMetadata:
             descriptors = [descriptor]
 
         # First motor signal for each dimension.
+        # Handle dimensions with empty motor lists by using "time" as fallback
         try:
-            axes = [get_signal(d[0][0]) for d in run_dims]
+            axes = [get_signal(d[0][0]) if len(d[0]) > 0 else "time" for d in run_dims]
         except KeyError as exc:
             raise exc
 
@@ -253,6 +254,9 @@ class RunMetadata:
                 else:
                     logger.error(f"Failed to read stream data for {stream_name}: {exc}")
                     raise
+            except Exception as exc:
+                logger.error(f"Error reading stream data for {stream_name}: {exc}")
+                raise
 
         return self.streams_data[stream_name]
 
@@ -295,7 +299,7 @@ class RunMetadata:
             logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
             raise
         except Exception as exc:
-            logger.error(f"Failed to refresh stream data for {stream_name}: {exc}")
+            logger.error(f"Error refreshing stream data for {stream_name}: {exc}")
             raise
 
     def _dataset_to_arrays(self, dataset):
