@@ -115,57 +115,10 @@
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="pageSize">
-       <property name="toolTip">
-        <string>Number of runs to show per page.</string>
-       </property>
-       <item>
-        <property name="text">
-         <string>5</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>10</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>25</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>50</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>100</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>250</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>500</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>1000</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
       <widget class="QLabel" name="status">
        <property name="font">
         <font>
-         <pointsize>7</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="toolTip">
