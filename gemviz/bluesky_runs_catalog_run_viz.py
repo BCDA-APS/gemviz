@@ -28,6 +28,8 @@ class BRCRunVisualization(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
+        self.splitter.setStretchFactor(0, 4)  # top = 4/5
+        self.splitter.setStretchFactor(1, 1)  # bottom = 1/5
         # Initialize log scale state
         self._log_x_state = False
         self._log_y_state = False
