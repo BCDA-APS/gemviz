@@ -242,6 +242,8 @@ class BRC_MVC(QtWidgets.QWidget):
             logger.info(f"Refreshing active run {run.uid[:7]} to get latest data")
             # Note: is_active refreshes metadata
 
+        self.selected_run_uid = run.get_run_md("start", "uid")
+
         run_md = run.run_md
         self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
         try:
@@ -252,7 +254,6 @@ class BRC_MVC(QtWidgets.QWidget):
             )
             return
         self.setStatus(run.summary())
-        self.selected_run_uid = run.get_run_md("start", "uid")
 
         # Clear reference to old widget (if any)
         self.current_field_widget = None
@@ -290,6 +291,8 @@ class BRC_MVC(QtWidgets.QWidget):
         if run.is_active:
             logger.info(f"Refreshing active run {run.uid[:7]} to get latest data")
             # Note: is_active refreshes metadata
+
+        self.selected_run_uid = run.get_run_md("start", "uid")
 
         run_md = run.run_md
         self.brc_run_viz.setMetadata(yaml.dump(dict(run_md), indent=4))
