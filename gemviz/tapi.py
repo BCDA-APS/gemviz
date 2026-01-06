@@ -366,7 +366,7 @@ class RunMetadata:
                 data = data_node[field].read()
             except (KeyError, AttributeError) as exc:
                 # Field doesn't exist yet - skip it
-                logger.warning(
+                logger.debug(
                     f"Field {field} not yet available for {stream_name}: {exc}"
                 )
                 continue
