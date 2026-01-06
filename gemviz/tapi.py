@@ -16,7 +16,7 @@ import logging
 import numpy
 import tiled
 import tiled.queries
-from httpx import HTTPStatusError
+from httpx import ConnectError, HTTPStatusError
 
 logger = logging.getLogger(__name__)
 
@@ -254,6 +254,9 @@ class RunMetadata:
                 else:
                     logger.error(f"Failed to read stream data for {stream_name}: {exc}")
                     raise
+            except ConnectError as exc:
+                logger.warning(f"Connection error reading stream {stream_name}: {exc}")
+                raise
             except Exception as exc:
                 logger.error(f"Error reading stream data for {stream_name}: {exc}")
                 raise
