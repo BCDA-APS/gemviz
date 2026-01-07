@@ -84,9 +84,29 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         x_names = self.analysis["plot_axes"]
         y_name = self.analysis["plot_signal"]
 
+        # Check if we have an existing table with fields
+        has_existing_table = (
+            self.table_view is not None
+            and hasattr(self.table_view, "tableView")
+            and self.table_view.tableView.model() is not None
+            and len(self.table_view.tableView.model().fields()) > 0
+        )
+
         # describe the data fields for the dialog.
-        sdf = self.run.stream_data_fields(stream_name)
-        # print(f"{__name__}.{__class__.__name__}: {sdf=}")
+        try:
+            sdf = self.run.stream_data_fields(stream_name)
+            # print(f"{__name__}.{__class__.__name__}: {sdf=}")
+        except Exception as exc:
+            # If we can't get fields and we have an existing table, skip rebuild
+            if has_existing_table:
+                logger.debug(
+                    f"Could not get fields for {stream_name}: {exc}, "
+                    "skipping rebuild to avoid empty flash"
+                )
+                return
+            # If no existing table, we need to try building one
+            sdf = []
+
         fields = []
         for field_name in sdf:
             selection = None
@@ -106,6 +126,18 @@ class SelectFieldsWidget(QtWidgets.QWidget):
             field = TableField(field_name, selection=selection, shape=shape)
             fields.append(field)
         logger.debug("fields=%s", fields)
+
+        # Check if any fields have valid (non-empty) shapes
+        # If all fields have empty shapes, they're not readable yet (Container objects)
+        has_readable_fields = any(len(field.shape) > 0 for field in fields)
+
+        # If no readable fields AND we have an existing table, skip rebuild
+        if not has_readable_fields and has_existing_table:
+            logger.debug(
+                f"No readable fields available for {stream_name} (all have empty shapes), "
+                "skipping rebuild to avoid empty flash"
+            )
+            return
 
         # build the view of this stream
         view = SelectFieldsTableView(self)
@@ -142,6 +174,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
                     saved = {}
 
             # Rebuild the table for the current stream using fresh data.
+            # setStream() will check if fields are readable before rebuilding
             current_stream = self.stream_name
             self.setStream(current_stream)
 

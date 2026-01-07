@@ -217,6 +217,14 @@ class BRCTableView(QtWidgets.QWidget):
         # Send the page of runs to the model now.
         self.model.setRuns(page)
 
+        # Restore selection based on selected_run_uid
+        selected_uid = self.parent.selected_run_uid
+        if selected_uid and selected_uid in page:
+            row_index = list(page.keys()).index(selected_uid)
+            self.tableView.selectRow(row_index)
+        elif selected_uid:
+            self.tableView.clearSelection()
+
     def setPagerStatus(self, text=None):
         if text is None:
             total = self.catalogLength()  # filtered catalog
