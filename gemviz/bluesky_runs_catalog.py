@@ -304,7 +304,6 @@ class BRC_MVC(QtWidgets.QWidget):
             )
             return
         self.setStatus(run.summary())
-        self.selected_run_uid = run.get_run_md("start", "uid")
 
         # Clear reference to old widget (if any)
         self.current_field_widget = None
