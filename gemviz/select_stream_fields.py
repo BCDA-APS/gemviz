@@ -135,7 +135,6 @@ class SelectFieldsWidget(QtWidgets.QWidget):
             has_preferred_y = any(field in sdf for field in preferred_y)
 
         for field_name in sdf:
-
             selection = None
             # First check if this field is in preferred selections (remembered from previous scan)
             if self.preferred_fields is not None:
