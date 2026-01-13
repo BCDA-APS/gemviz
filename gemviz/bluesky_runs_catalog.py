@@ -44,6 +44,8 @@ class BRC_MVC(QtWidgets.QWidget):
 
         self.selected_run_uid = None
         self.current_field_widget = None
+        self.last_selected_fields = {}
+        self.last_selected_stream = None
 
         self.brc_search_panel = BRCSearchPanel(self)
         layout = self.tab_filter.layout()
@@ -162,6 +164,13 @@ class BRC_MVC(QtWidgets.QWidget):
             return
 
         if action in ("replace", "add"):
+            # Store the selected fields and stream to remember them when switching scans
+            self.last_selected_fields[stream_name] = {
+                "X": selections.get("X"),  # Can be None
+                "Y": selections.get("Y", []).copy(),  # Copy to avoid reference issues
+            }
+            self.last_selected_stream = stream_name
+
             if key not in self._title_keys:
                 self._title_keys.append(key)
             title = f"scan(s): {', '.join(sorted(self._title_keys))}"
@@ -267,8 +276,32 @@ class BRC_MVC(QtWidgets.QWidget):
                 widget.setParent(None)
                 widget.deleteLater()
 
-        # Now create the new widget
-        widget = SelectFieldsWidget(self, run)
+        # Get remembered stream and selections (if any)
+        analysis = run.plottable_signals()
+        default_stream_name = analysis.get("stream", "primary")
+
+        # Check if there is a remembered stream
+        remembered_stream = None
+        remembered_selections = None
+        if self.last_selected_stream:
+            # Check if the new scan has this stream
+            available_streams = list(run.stream_metadata())
+            if self.last_selected_stream in available_streams:
+                remembered_stream = self.last_selected_stream
+                remembered_selections = self.last_selected_fields.get(remembered_stream)
+
+        # If no remembered stream, use default stream and check for remembered selections
+        if remembered_stream is None:
+            remembered_stream = default_stream_name
+            remembered_selections = self.last_selected_fields.get(default_stream_name)
+
+        # Now create the new widget with preferred stream and fields
+        widget = SelectFieldsWidget(
+            self,
+            run,
+            preferred_stream=remembered_stream,
+            preferred_fields=remembered_selections,
+        )
         self.current_field_widget = widget
         widget.selected.connect(partial(self.doPlotSlot, run))
         layout.addWidget(widget)
@@ -317,8 +350,32 @@ class BRC_MVC(QtWidgets.QWidget):
                 widget.setParent(None)
                 widget.deleteLater()
 
-        # Now create the new widget
-        widget = SelectFieldsWidget(self, run)
+        # Get remembered stream and selections (if any)
+        analysis = run.plottable_signals()
+        default_stream_name = analysis.get("stream", "primary")
+
+        # Check if there is a remembered stream
+        remembered_stream = None
+        remembered_selections = None
+        if self.last_selected_stream:
+            # Check if the new scan has this stream
+            available_streams = list(run.stream_metadata())
+            if self.last_selected_stream in available_streams:
+                remembered_stream = self.last_selected_stream
+                remembered_selections = self.last_selected_fields.get(remembered_stream)
+
+        # If no remembered stream, use default stream and check for remembered selections
+        if remembered_stream is None:
+            remembered_stream = default_stream_name
+            remembered_selections = self.last_selected_fields.get(default_stream_name)
+
+        # Now create the new widget with preferred stream and fields
+        widget = SelectFieldsWidget(
+            self,
+            run,
+            preferred_stream=remembered_stream,
+            preferred_fields=remembered_selections,
+        )
         self.current_field_widget = widget
         widget.selected.connect(partial(self.doPlotSlot, run))
         layout.addWidget(widget)

@@ -38,9 +38,11 @@ class SelectFieldsWidget(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, str, dict)
 
-    def __init__(self, parent, run):
+    def __init__(self, parent, run, preferred_stream=None, preferred_fields=None):
         self.parent = parent
         self.run = run  # tapi.RunMetadata object
+        self.preferred_fields = preferred_fields
+        self.preferred_stream = preferred_stream
         self.table_view = None
 
         # Force refresh of run data to get latest shapes
@@ -62,17 +64,25 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         if "baseline" in stream_list:
             # Too many signals! 2 points each.  Do not plot from "baseline" stream.
             stream_list.pop(stream_list.index("baseline"))
-        index = stream_list.index(self.stream_name)
-        if index > 0:
-            # Move the default stream to the first position.
-            stream_list.insert(0, stream_list.pop(index))
+
+        # Determine which stream to use: preferred_stream if available, otherwise default
+        stream_to_use = self.stream_name  # Default from analysis (set in __init__)
+        if self.preferred_stream and self.preferred_stream in stream_list:
+            stream_to_use = self.preferred_stream
 
         if len(stream_list) > 0:
-            self.setStream(stream_list[0])
-
+            # Add items to combobox & setup connection
             self.streams.clear()
             self.streams.addItems(stream_list)
             self.streams.currentTextChanged.connect(self.setStream)
+
+            # Select the desired stream in the combobox
+            self.streams.blockSignals(True)
+            index = stream_list.index(stream_to_use)
+            self.streams.setCurrentIndex(index)
+            self.streams.blockSignals(False)
+
+            self.setStream(stream_to_use)
 
     def setStream(self, stream_name):
         from functools import partial
@@ -108,12 +118,49 @@ class SelectFieldsWidget(QtWidgets.QWidget):
             sdf = []
 
         fields = []
+        # Get preferred fields for this stream (if any)
+        preferred_x = None
+        preferred_y = []
+        if self.preferred_fields is not None:
+            preferred_x = self.preferred_fields.get("X")
+            preferred_y = self.preferred_fields.get("Y", [])
+
+        # Check if any preferred Y detectors exist in current scan
+        has_preferred_x = False
+        if preferred_x:
+            has_preferred_x = preferred_x is not None and preferred_x in sdf
+
+        has_preferred_y = False
+        if preferred_y:
+            has_preferred_y = any(field in sdf for field in preferred_y)
+
         for field_name in sdf:
             selection = None
-            if x_names is not None and field_name in x_names:
-                selection = "X"
-            elif y_name is not None and field_name == y_name:
-                selection = "Y"
+            # First check if this field is in preferred selections (remembered from previous scan)
+            if self.preferred_fields is not None:
+                if preferred_x is not None and field_name == preferred_x:
+                    selection = "X"
+                elif field_name in preferred_y:
+                    selection = "Y"
+                # Fall back to default X if preferred_x is not in sdf
+                elif (
+                    not has_preferred_x
+                    and x_names is not None
+                    and field_name in x_names
+                ):
+                    selection = "X"
+                # Fall back to default Y only if none of preferred_y exist in sdf
+                elif (
+                    not has_preferred_y and y_name is not None and field_name == y_name
+                ):
+                    selection = "Y"
+
+            # Fall back to default selections if not in preferred
+            else:
+                if x_names is not None and field_name in x_names:
+                    selection = "X"
+                elif y_name is not None and field_name == y_name:
+                    selection = "Y"
             shape = self.run.stream_data_field_shape(stream_name, field_name)
             if len(shape) == 0:
                 # print(f"{stream_name=} {field_name=} {shape=}")
@@ -125,6 +172,7 @@ class SelectFieldsWidget(QtWidgets.QWidget):
                 )
             field = TableField(field_name, selection=selection, shape=shape)
             fields.append(field)
+
         logger.debug("fields=%s", fields)
 
         # Check if any fields have valid (non-empty) shapes

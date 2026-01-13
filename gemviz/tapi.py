@@ -367,6 +367,12 @@ class RunMetadata:
         for field in field_names:
             try:
                 data = data_node[field].read()
+                values = getattr(data, "values", getattr(data, "data", data))
+                values = numpy.asarray(values)
+                arrays[field] = values
+
+                length = values.shape[0] if values.ndim != 0 else 1
+                min_len = length if min_len is None else min(min_len, length)
             except (KeyError, AttributeError) as exc:
                 # Field doesn't exist yet - skip it
                 logger.debug(
@@ -387,13 +393,6 @@ class RunMetadata:
                     f"Failed to refresh field {field} for {stream_name}: {exc}"
                 )
                 raise
-
-            values = getattr(data, "values", getattr(data, "data", data))
-            values = numpy.asarray(values)
-            arrays[field] = values
-
-            length = values.shape[0] if values.ndim != 0 else 1
-            min_len = length if min_len is None else min(min_len, length)
 
         if min_len is None:
             return arrays
