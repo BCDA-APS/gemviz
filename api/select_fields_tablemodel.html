@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>select_fields_tablemodel &#8212; gemviz 1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/select_fields_tablemodel';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="select_fields_tableview" href="select_fields_tableview.html" />
+    <link rel="prev" title="Range Slider" href="range_slider.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gemviz 1.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bluesky_runs_catalog.html">BRC_MVC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bluesky_runs_catalog_run_viz.html">bluesky_runs_catalog_run_viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bluesky_runs_catalog_search.html">bluesky_runs_catalog_search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bluesky_runs_catalog_table_model.html">bluesky_runs_catalog_table_model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bluesky_runs_catalog_table_view.html">bluesky_runs_catalog_table_view</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="date_time_range_slider.html">DateTimeRangeSlider</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window of GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="range_slider.html">Range Slider</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">select_fields_tablemodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="select_fields_tableview.html">select_fields_tableview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="select_stream_fields.html">select_stream_fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tapi.html">TAPI: Tiled Application Programmer Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tiledserverdialog.html">tiledserverdialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Developer - Testing the Code</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">select_fields_tablemodel</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-gemviz.select_fields_tablemodel">
+<span id="select-fields-tablemodel"></span><h1>select_fields_tablemodel<a class="headerlink" href="#module-gemviz.select_fields_tablemodel" title="Link to this heading">#</a></h1>
+<p>Select data fields for 1-D plotting: QAbstractTableModel.</p>
+<p>General plot model is: Y/Mon vs X.  If X is not selected, use index number. If
+Mon is not selected, use 1.0 (trivial case, do not divide by Mon).</p>
+<p>Data Field Selection Rules:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>A data field selection could have one of four states:</dt><dd><ul class="simple">
+<li><p>unselected (<cite>None</cite>)</p></li>
+<li><p><cite>“X”</cite>: ordinate (independent axis)</p></li>
+<li><p><cite>“Y”</cite> : abcissae (dependent axes)</p></li>
+<li><p><cite>“Mon”</cite> : divide this array into each Y</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Only zero or one data field can be selected as <cite>“X”</cite>.</p></li>
+<li><p>Only zero or one data field can be selected as <cite>“Mon”</cite>.</p></li>
+<li><p>One or more data fields can be selected as <cite>“Y”</cite>.</p></li>
+</ol>
+<p>When Model/View is created, the view should call ‘model.setFields(fields)’ with
+the list of field names for selection.  (If ‘fields’ is a different structure,
+such a ‘list(object)’ or ‘dict(str=object)’, then change both ‘columns()’ and
+‘fields()’ so that each returns ‘list(str)’.)  Note that
+‘model.setFields(fields)’ can only be called once.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectFieldsTableModel</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Select fields for plots.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.ColumnDataType" title="gemviz.select_fields_tablemodel.ColumnDataType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ColumnDataType</span></code></a>()</p></td>
+<td><p>Data types expected by TableColumn.column_type.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.FieldRuleType" title="gemviz.select_fields_tablemodel.FieldRuleType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FieldRuleType</span></code></a>()</p></td>
+<td><p>Data field selection rule types.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.TableColumn" title="gemviz.select_fields_tablemodel.TableColumn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TableColumn</span></code></a>(name, column_type, *, rule)</p></td>
+<td><p>One column of the table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.TableField" title="gemviz.select_fields_tablemodel.TableField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TableField</span></code></a>(name, selection, *, description, ...)</p></td>
+<td><p>One data field candidate for user-selection.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.ColumnDataType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gemviz.select_fields_tablemodel.</span></span><span class="sig-name descname"><span class="pre">ColumnDataType</span></span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#ColumnDataType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.ColumnDataType" title="Link to this definition">#</a></dt>
+<dd><p>Data types expected by TableColumn.column_type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.FieldRuleType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gemviz.select_fields_tablemodel.</span></span><span class="sig-name descname"><span class="pre">FieldRuleType</span></span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#FieldRuleType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.FieldRuleType" title="Link to this definition">#</a></dt>
+<dd><p>Data field selection rule types.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.FieldRuleType.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#FieldRuleType.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.FieldRuleType.apply" title="Link to this definition">#</a></dt>
+<dd><p>Apply the selection rule.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gemviz.select_fields_tablemodel.</span></span><span class="sig-name descname"><span class="pre">SelectFieldsTableModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel" title="Link to this definition">#</a></dt>
+<dd><p>Select fields for plots.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.rowCount" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.rowCount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rowCount</span></code></a>([parent])</p></td>
+<td><p>Number of fields.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.columnCount" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.columnCount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">columnCount</span></code></a>([parent])</p></td>
+<td><p>Number of columns.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.data" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></a>(index[, role])</p></td>
+<td><p>Table data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.headerData" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.headerData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">headerData</span></code></a>(section, orientation[, role])</p></td>
+<td><p>Column headers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setData" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setData</span></code></a>(index, value, role)</p></td>
+<td><p>Toggle the checkboxes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.flags" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flags</span></code></a>(index)</p></td>
+<td><p>Identify the checkbox cells.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.checkbox" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.checkbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkbox</span></code></a>(index)</p></td>
+<td><p>Return the checkbox state.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.applySelectionRules" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.applySelectionRules"><code class="xref py py-obj docutils literal notranslate"><span class="pre">applySelectionRules</span></code></a>(index[, changes])</p></td>
+<td><p>Apply selection rules 2-4.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.updateCheckboxes" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.updateCheckboxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateCheckboxes</span></code></a>()</p></td>
+<td><p>Update checkboxes to agree with self.selections.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logCheckboxSelections</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">columnName</span></code>(column)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">columnNumber</span></code>(column_name)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">columns</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setColumns" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setColumns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setColumns</span></code></a>(columns)</p></td>
+<td><p>Define the columns for the table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fieldName</span></code>(row)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fieldText</span></code>(index)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.fields" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code></a>()</p></td>
+<td><p>Return a list of the field names.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setFields" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setFields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFields</span></code></a>(fields)</p></td>
+<td><p>Define the data fields (rows) for the table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.plotFields" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.plotFields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plotFields</span></code></a>()</p></td>
+<td><p>Returns a dictionary with the selected fields to be plotted.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.selections" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.selections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selections</span></code></a>()</p></td>
+<td><p>Return the plot selections dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelections" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSelections</span></code></a>([selections])</p></td>
+<td><p>Plot selections: dict(row_number=column number}</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelectionsItem" title="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelectionsItem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSelectionsItem</span></code></a>(key, value)</p></td>
+<td><p>Set the key in the plot selections dictionary.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><a class="reference external" href="https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html">https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.applySelectionRules">
+<span class="sig-name descname"><span class="pre">applySelectionRules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.applySelectionRules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.applySelectionRules" title="Link to this definition">#</a></dt>
+<dd><p>Apply selection rules 2-4.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.checkbox">
+<span class="sig-name descname"><span class="pre">checkbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.checkbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.checkbox" title="Link to this definition">#</a></dt>
+<dd><p>Return the checkbox state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.columnCount">
+<span class="sig-name descname"><span class="pre">columnCount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.columnCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.columnCount" title="Link to this definition">#</a></dt>
+<dd><p>Number of columns.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.data">
+<span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.data" title="Link to this definition">#</a></dt>
+<dd><p>Table data.  Called by QTableView.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.fields" title="Link to this definition">#</a></dt>
+<dd><p>Return a list of the field names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.flags">
+<span class="sig-name descname"><span class="pre">flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.flags" title="Link to this definition">#</a></dt>
+<dd><p>Identify the checkbox cells.  Called by QTableView.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.headerData">
+<span class="sig-name descname"><span class="pre">headerData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PyQt5.QtCore.Qt.DisplayRole</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.headerData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.headerData" title="Link to this definition">#</a></dt>
+<dd><p>Column headers.  Called by QTableView.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.plotFields">
+<span class="sig-name descname"><span class="pre">plotFields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.plotFields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.plotFields" title="Link to this definition">#</a></dt>
+<dd><p>Returns a dictionary with the selected fields to be plotted.</p>
+<p>key=column_name, value=field_name(s)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.rowCount">
+<span class="sig-name descname"><span class="pre">rowCount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.rowCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.rowCount" title="Link to this definition">#</a></dt>
+<dd><p>Number of fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.selections">
+<span class="sig-name descname"><span class="pre">selections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.selections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.selections" title="Link to this definition">#</a></dt>
+<dd><p>Return the plot selections dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setCheckbox">
+<span class="sig-name descname"><span class="pre">setCheckbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.setCheckbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setCheckbox" title="Link to this definition">#</a></dt>
+<dd><p>Set the checkbox state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setColumns">
+<span class="sig-name descname"><span class="pre">setColumns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.setColumns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setColumns" title="Link to this definition">#</a></dt>
+<dd><p>Define the columns for the table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setData">
+<span class="sig-name descname"><span class="pre">setData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.setData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setData" title="Link to this definition">#</a></dt>
+<dd><p>Toggle the checkboxes.  Called by QTableView.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setFields">
+<span class="sig-name descname"><span class="pre">setFields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.setFields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setFields" title="Link to this definition">#</a></dt>
+<dd><p>Define the data fields (rows) for the table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelections">
+<span class="sig-name descname"><span class="pre">setSelections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.setSelections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelections" title="Link to this definition">#</a></dt>
+<dd><p>Plot selections: dict(row_number=column number}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelectionsItem">
+<span class="sig-name descname"><span class="pre">setSelectionsItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.setSelectionsItem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelectionsItem" title="Link to this definition">#</a></dt>
+<dd><p>Set the key in the plot selections dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.SelectFieldsTableModel.updateCheckboxes">
+<span class="sig-name descname"><span class="pre">updateCheckboxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#SelectFieldsTableModel.updateCheckboxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.updateCheckboxes" title="Link to this definition">#</a></dt>
+<dd><p>Update checkboxes to agree with self.selections.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.TableColumn">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gemviz.select_fields_tablemodel.</span></span><span class="sig-name descname"><span class="pre">TableColumn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_type:</span> <span class="pre">~gemviz.select_fields_tablemodel.ColumnDataType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule:</span> <span class="pre">(&lt;class</span> <span class="pre">'gemviz.select_fields_tablemodel.FieldRuleType'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">None)</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#TableColumn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.TableColumn" title="Link to this definition">#</a></dt>
+<dd><p>One column of the table.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gemviz.select_fields_tablemodel.TableField">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gemviz.select_fields_tablemodel.</span></span><span class="sig-name descname"><span class="pre">TableField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection:</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">None)</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pv:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape:</span> <span class="pre">tuple</span> <span class="pre">=</span> <span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gemviz/select_fields_tablemodel.html#TableField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gemviz.select_fields_tablemodel.TableField" title="Link to this definition">#</a></dt>
+<dd><p>One data field candidate for user-selection.</p>
+<p>NOTE: Data for the “Description” and “PV” TableColumns is
+provided by the “description” and “pv” attributes here
+using <cite>cname.lower()</cite>.  (FIXME: This could break.  Easily.)</p>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="range_slider.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Range Slider</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="select_fields_tableview.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">select_fields_tableview</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.ColumnDataType"><code class="docutils literal notranslate"><span class="pre">ColumnDataType</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.FieldRuleType"><code class="docutils literal notranslate"><span class="pre">FieldRuleType</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.FieldRuleType.apply"><code class="docutils literal notranslate"><span class="pre">FieldRuleType.apply()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.applySelectionRules"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.applySelectionRules()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.checkbox"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.checkbox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.columnCount"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.columnCount()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.data"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.fields"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.fields()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.flags"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.flags()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.headerData"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.headerData()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.plotFields"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.plotFields()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.rowCount"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.rowCount()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.selections"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.selections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setCheckbox"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.setCheckbox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setColumns"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.setColumns()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setData"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.setData()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setFields"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.setFields()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelections"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.setSelections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelectionsItem"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.setSelectionsItem()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.SelectFieldsTableModel.updateCheckboxes"><code class="docutils literal notranslate"><span class="pre">SelectFieldsTableModel.updateCheckboxes()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.TableColumn"><code class="docutils literal notranslate"><span class="pre">TableColumn</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemviz.select_fields_tablemodel.TableField"><code class="docutils literal notranslate"><span class="pre">TableField</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/select_fields_tablemodel.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2025, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

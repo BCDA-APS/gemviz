@@ -1,0 +1,912 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gemviz.bluesky_runs_catalog &#8212; gemviz 1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/gemviz/bluesky_runs_catalog';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gemviz 1.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gemviz.bluesky_runs_catalog</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for gemviz.bluesky_runs_catalog</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">MVC implementation of CatalogOfBlueskyRuns.</span>
+
+<span class="sd">* BRC: BlueskyRunsCatalog</span>
+<span class="sd">* MVC: Model View Controller</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~BRC_MVC</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+
+<span class="n">PAGE_START</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">PAGE_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
+
+
+<div class="viewcode-block" id="BRC_MVC">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BRC_MVC</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MVC class for CatalogOfBlueskyRuns.&quot;&quot;&quot;</span>
+
+    <span class="c1"># UI file name matches this module, different extension</span>
+    <span class="n">ui_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getUiFileName</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">motion_wait_time</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># wait for splitter motion to stop to update settings</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># for the plot title</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">myLoadUi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.bluesky_runs_catalog_run_viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">BRCRunVisualization</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.bluesky_runs_catalog_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">BRCSearchPanel</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.bluesky_runs_catalog_table_view</span><span class="w"> </span><span class="kn">import</span> <span class="n">BRCTableView</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.user_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_run_uid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_field_widget</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_fields</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span> <span class="o">=</span> <span class="n">BRCSearchPanel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_filter</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">setupCatalog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">catalogName</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_tableview</span> <span class="o">=</span> <span class="n">BRCTableView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">(),</span> <span class="n">PAGE_START</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_matches</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_tableview</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span> <span class="o">=</span> <span class="n">BRCRunVisualization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="p">)</span>
+
+        <span class="c1"># connect search signals with tableview update</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">plan_name</span><span class="p">,</span> <span class="s2">&quot;returnPressed&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">scan_id</span><span class="p">,</span> <span class="s2">&quot;returnPressed&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="s2">&quot;returnPressed&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">positioners</span><span class="p">,</span> <span class="s2">&quot;returnPressed&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">detectors</span><span class="p">,</span> <span class="s2">&quot;returnPressed&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">date_time_widget</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="s2">&quot;released&quot;</span><span class="p">],</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">widget</span><span class="p">,</span> <span class="n">signal</span> <span class="ow">in</span> <span class="n">widgets</span><span class="p">:</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="n">signal</span><span class="p">)</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refreshFilteredCatalogView</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_tableview</span><span class="o">.</span><span class="n">run_selected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doRunSelectedSlot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_tableview</span><span class="o">.</span><span class="n">run_double_selected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doRunDoubleClickSlot</span><span class="p">)</span>
+
+        <span class="c1"># save/restore splitter sizes in application settings</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="s2">&quot;hsplitter vsplitter&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">sname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_settings_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">restoreSplitter</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="n">sname</span><span class="p">)</span>
+            <span class="n">splitter</span><span class="o">.</span><span class="n">splitterMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter_moved</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">catalog</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">catalogName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">catalogName</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BRC_MVC.doPlotSlot">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC.doPlotSlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doPlotSlot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">selections</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Slot: data field selected (for plotting) button is clicked.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.chartview</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartView</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.select_stream_fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_datasets</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="c1"># TODO: make the plots configurable</span>
+        <span class="n">scan_id</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;scan_id&quot;</span><span class="p">)</span>
+        <span class="c1"># key = f&quot;{scan_id}:{run.uid[:5]}&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># setup datasets</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Force refresh of run data before plotting to avoid shape mismatches</span>
+            <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing active run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> before plotting&quot;</span><span class="p">)</span>
+                <span class="c1"># Note: is_active refreshes metadata</span>
+
+            <span class="n">datasets</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="n">to_datasets</span><span class="p">(</span>
+                <span class="n">run</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">selections</span><span class="p">,</span> <span class="n">scan_id</span><span class="o">=</span><span class="n">scan_id</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No plot: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># get the chartview widget, if exists</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">plotPage</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># in case something changes ...</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Expected exactly one widget in this layout!&quot;</span><span class="p">)</span>
+        <span class="n">old_widget</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+
+        <span class="c1"># Stop any live updates on old widget before replacing</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_widget</span><span class="p">,</span> <span class="n">ChartView</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_widget</span><span class="o">.</span><span class="n">live_mode</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stopping live updates on old widget before replacement&quot;</span><span class="p">)</span>
+            <span class="n">old_widget</span><span class="o">.</span><span class="n">stopLiveUpdates</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_widget</span><span class="p">,</span> <span class="n">ChartView</span><span class="p">)</span> <span class="ow">or</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;replace&quot;</span><span class="p">:</span>
+            <span class="c1"># Make a blank chart</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">ChartView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+            <span class="c1"># Apply stored log scale state to the new chart</span>
+            <span class="n">stored_log_x</span><span class="p">,</span> <span class="n">stored_log_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">getLogScaleState</span><span class="p">()</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">setLogScales</span><span class="p">(</span><span class="n">stored_log_x</span><span class="p">,</span> <span class="n">stored_log_y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;add&quot;</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;replace&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">old_widget</span>
+
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;remove&quot;</span><span class="p">):</span>
+            <span class="c1"># Remove this run from the plot</span>
+            <span class="c1"># TODO: this does not work, remove always removes all curves from the graph</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed run </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> from plot&quot;</span><span class="p">)</span>
+
+            <span class="c1"># If no runs left, clear the plot completely</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All runs removed, clearing plot&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Plot cleared&quot;</span><span class="p">)</span>
+                <span class="c1"># Create an empty plot</span>
+                <span class="n">widget</span> <span class="o">=</span> <span class="n">ChartView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setPlot</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># For now, just clear the plot when removing runs</span>
+            <span class="c1"># A more sophisticated implementation would re-plot remaining runs</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plot cleared after removing run&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed run </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> from plot&quot;</span><span class="p">)</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">ChartView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setPlot</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">):</span>
+            <span class="c1"># Store the selected fields and stream to remember them when switching scans</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_fields</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">),</span>  <span class="c1"># Can be None</span>
+                <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># Copy to avoid reference issues</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span> <span class="o">=</span> <span class="n">stream_name</span>
+
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;scan(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_title_keys</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">ds</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">ds_options</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setPlot</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+
+            <span class="c1"># Enable live plotting for active runs</span>
+            <span class="n">is_active</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">is_active</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Checking live plot eligibility: run=</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2">, is_active=</span><span class="si">{</span><span class="n">is_active</span><span class="si">}</span><span class="s2">, action=</span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_active</span> <span class="ow">and</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;replace&quot;</span><span class="p">:</span>
+                <span class="c1"># Build mapping of curve labels to field names for live updates</span>
+                <span class="n">x_field</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+                <span class="n">y_fields</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Live plotting setup: x_field=</span><span class="si">{</span><span class="n">x_field</span><span class="si">}</span><span class="s2">, y_fields=</span><span class="si">{</span><span class="n">y_fields</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+                <span class="n">live_data_fields</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="n">ds_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">)</span>
+                    <span class="c1"># Map each dataset to its corresponding y_field</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_fields</span><span class="p">):</span>
+                        <span class="n">y_field</span> <span class="o">=</span> <span class="n">y_fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">live_data_fields</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_field</span><span class="p">,</span> <span class="n">y_field</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Live field mapping: </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> -&gt; (</span><span class="si">{</span><span class="n">x_field</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y_field</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">live_data_fields</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calling enableLiveMode for run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Widget type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span><span class="si">}</span><span class="s2">, live_data_fields: </span><span class="si">{</span><span class="n">live_data_fields</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🔴 Live plotting enabled for scan </span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">widget</span><span class="o">.</span><span class="n">enableLiveMode</span><span class="p">(</span>
+                        <span class="n">run</span><span class="p">,</span>
+                        <span class="n">stream_name</span><span class="p">,</span>
+                        <span class="n">live_data_fields</span><span class="p">,</span>
+                        <span class="n">field_widget</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_field_widget</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;enableLiveMode returned, widget.live_mode=</span><span class="si">{</span><span class="n">widget</span><span class="o">.</span><span class="n">live_mode</span><span class="si">}</span><span class="s2">, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;timer_active=</span><span class="si">{</span><span class="n">widget</span><span class="o">.</span><span class="n">live_timer</span><span class="o">.</span><span class="n">isActive</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">widget</span><span class="o">.</span><span class="n">live_timer</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="kc">False</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not set up live mode: no data fields mapped&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not active or action is not &#39;replace&#39;&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not active, live mode not enabled&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">!=</span> <span class="s2">&quot;replace&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Action is </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">, not &#39;replace&#39;, live mode not enabled&quot;</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BRC_MVC.doRunSelectedSlot">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC.doRunSelectedSlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doRunSelectedSlot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Slot: run is clicked in the table view.</span>
+
+<span class="sd">        run *object*:</span>
+<span class="sd">            Instance of ``tapi.RunMetadata``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.select_stream_fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectFieldsWidget</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="c1"># Force refresh of run metadata to get latest data</span>
+        <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing active run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> to get latest data&quot;</span><span class="p">)</span>
+            <span class="c1"># Note: is_active refreshes metadata</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_run_uid</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;uid&quot;</span><span class="p">)</span>
+
+        <span class="n">run_md</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">run_md</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setMetadata</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">run_md</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getDataDescription</span><span class="p">(</span><span class="n">run</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exinfo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Can&#39;t select that run: (</span><span class="si">{</span><span class="n">exinfo</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">exinfo</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+
+        <span class="c1"># Clear reference to old widget (if any)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_field_widget</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Get layout and remove any remaining widgets (safety net)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields_groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">())):</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+
+        <span class="c1"># Get remembered stream and selections (if any)</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">plottable_signals</span><span class="p">()</span>
+        <span class="n">default_stream_name</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stream&quot;</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check if there is a remembered stream</span>
+        <span class="n">remembered_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">remembered_selections</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span><span class="p">:</span>
+            <span class="c1"># Check if the new scan has this stream</span>
+            <span class="n">available_streams</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span> <span class="ow">in</span> <span class="n">available_streams</span><span class="p">:</span>
+                <span class="n">remembered_stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span>
+                <span class="n">remembered_selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remembered_stream</span><span class="p">)</span>
+
+        <span class="c1"># If no remembered stream, use default stream and check for remembered selections</span>
+        <span class="k">if</span> <span class="n">remembered_stream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">remembered_stream</span> <span class="o">=</span> <span class="n">default_stream_name</span>
+            <span class="n">remembered_selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">default_stream_name</span><span class="p">)</span>
+
+        <span class="c1"># Now create the new widget with preferred stream and fields</span>
+        <span class="n">widget</span> <span class="o">=</span> <span class="n">SelectFieldsWidget</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">run</span><span class="p">,</span>
+            <span class="n">preferred_stream</span><span class="o">=</span><span class="n">remembered_stream</span><span class="p">,</span>
+            <span class="n">preferred_fields</span><span class="o">=</span><span class="n">remembered_selections</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_field_widget</span> <span class="o">=</span> <span class="n">widget</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">selected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doPlotSlot</span><span class="p">,</span> <span class="n">run</span><span class="p">))</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BRC_MVC.doRunDoubleClickSlot">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC.doRunDoubleClickSlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doRunDoubleClickSlot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Slot: run is double clicked in the table view.</span>
+
+<span class="sd">        run *object*:</span>
+<span class="sd">            Instance of ``tapi.RunMetadata``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.select_stream_fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectFieldsWidget</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="c1"># Force refresh of run metadata to get latest data</span>
+        <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing active run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> to get latest data&quot;</span><span class="p">)</span>
+            <span class="c1"># Note: is_active refreshes metadata</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_run_uid</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;uid&quot;</span><span class="p">)</span>
+
+        <span class="n">run_md</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">run_md</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setMetadata</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">run_md</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brc_run_viz</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getDataDescription</span><span class="p">(</span><span class="n">run</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exinfo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Can&#39;t select that run: (</span><span class="si">{</span><span class="n">exinfo</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">exinfo</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+
+        <span class="c1"># Clear reference to old widget (if any)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_field_widget</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Get layout and remove any remaining widgets (safety net)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields_groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">())):</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+
+        <span class="c1"># Get remembered stream and selections (if any)</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">plottable_signals</span><span class="p">()</span>
+        <span class="n">default_stream_name</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stream&quot;</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check if there is a remembered stream</span>
+        <span class="n">remembered_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">remembered_selections</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span><span class="p">:</span>
+            <span class="c1"># Check if the new scan has this stream</span>
+            <span class="n">available_streams</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span> <span class="ow">in</span> <span class="n">available_streams</span><span class="p">:</span>
+                <span class="n">remembered_stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_stream</span>
+                <span class="n">remembered_selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remembered_stream</span><span class="p">)</span>
+
+        <span class="c1"># If no remembered stream, use default stream and check for remembered selections</span>
+        <span class="k">if</span> <span class="n">remembered_stream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">remembered_stream</span> <span class="o">=</span> <span class="n">default_stream_name</span>
+            <span class="n">remembered_selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_selected_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">default_stream_name</span><span class="p">)</span>
+
+        <span class="c1"># Now create the new widget with preferred stream and fields</span>
+        <span class="n">widget</span> <span class="o">=</span> <span class="n">SelectFieldsWidget</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">run</span><span class="p">,</span>
+            <span class="n">preferred_stream</span><span class="o">=</span><span class="n">remembered_stream</span><span class="p">,</span>
+            <span class="n">preferred_fields</span><span class="o">=</span><span class="n">remembered_selections</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_field_widget</span> <span class="o">=</span> <span class="n">widget</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">selected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doPlotSlot</span><span class="p">,</span> <span class="n">run</span><span class="p">))</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+
+        <span class="c1"># After widget is created, get current selections and trigger plot</span>
+        <span class="c1"># (equivalent to clicking the replace button)</span>
+        <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">table_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">table_view</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">selections</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">plotFields</span><span class="p">()</span>
+                <span class="n">stream_name</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">stream_name</span>
+                <span class="c1"># Trigger plot with &quot;replace&quot; action</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">doPlotSlot</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">,</span> <span class="n">selections</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BRC_MVC.getDataDescription">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC.getDataDescription">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getDataDescription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide text description of the data streams in the run.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyRestTable</span>
+
+        <span class="c1"># Describe what will be plotted.  Show in the viz panel &quot;Data&quot; tab.</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">plottable_signals</span><span class="p">()</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">pyRestTable</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="s2">&quot;item description&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;scan&quot;</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;scan_id&quot;</span><span class="p">)))</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;plan&quot;</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;plan_name&quot;</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;plot_signal&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;stream&quot;</span><span class="p">,</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;stream&quot;</span><span class="p">]))</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;plot signal&quot;</span><span class="p">,</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;plot_signal&quot;</span><span class="p">]))</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;plot axes&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;plot_axes&quot;</span><span class="p">])))</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;all detectors&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;detectors&quot;</span><span class="p">])))</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">addRow</span><span class="p">((</span><span class="s2">&quot;all positioners&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;motors&quot;</span><span class="p">])))</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;plot summary&quot;</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="o">.</span><span class="n">reST</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Show information about each stream.</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sname</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">():</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;stream: </span><span class="si">{</span><span class="n">sname</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="c1"># row = [title, &quot;-&quot; * len(title), str(run.stream_data(sname)), &quot;&quot;]</span>
+            <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="n">title</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">title</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">stream_data</span><span class="p">(</span><span class="n">sname</span><span class="p">)),</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+
+        <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="BRC_MVC.refreshFilteredCatalogView">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC.refreshFilteredCatalogView">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refreshFilteredCatalogView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the view with the new filtered catalog.&quot;&quot;&quot;</span>
+        <span class="c1"># print(f&quot;{__name__}.{__class__.__name__} {args=} {kwargs=}&quot;)</span>
+        <span class="n">filtered_catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">brc_search_panel</span><span class="o">.</span><span class="n">filteredCatalog</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brc_tableview</span><span class="o">.</span><span class="n">setCatalog</span><span class="p">(</span><span class="n">filtered_catalog</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">splitter_moved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_wait_thread&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_deadline&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">motion_wait_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">thread</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start new thread now.  </span><span class="si">{</span><span class="n">key</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_wait_thread&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_wait_changes</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+
+<div class="viewcode-block" id="BRC_MVC.splitter_settings_name">
+<a class="viewcode-back" href="../../api/bluesky_runs_catalog.html#gemviz.bluesky_runs_catalog.BRC_MVC.splitter_settings_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">splitter_settings_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Name to use with settings file for &#39;key&#39; splitter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+    <span class="nd">@utils</span><span class="o">.</span><span class="n">run_in_thread</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">splitter_wait_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wait for splitter to stop changing before updating settings.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        key *str*:</span>
+<span class="sd">            Name of splitter (either &#39;hsplitter&#39; or &#39;vsplitter&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.user_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+        <span class="n">splitter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_deadline&quot;</span><span class="p">):</span>
+            <span class="c1"># self.setStatus(</span>
+            <span class="c1">#     f&quot;Wait: {time.time()=:.3f}&quot;</span>
+            <span class="c1">#     f&quot;  {getattr(self, f&#39;{key}_deadline&#39;)=:.3f}&quot;</span>
+            <span class="c1"># )</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_wait_time</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span>
+
+        <span class="n">sname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_settings_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Update settings: </span><span class="si">{</span><span class="n">sname</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">splitter</span><span class="o">.</span><span class="n">sizes</span><span class="p">()</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">saveSplitter</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="n">sname</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :copyright: (c) 2023-2025, UChicago Argonne, LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Argonne National Laboratory Open Source License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2025, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

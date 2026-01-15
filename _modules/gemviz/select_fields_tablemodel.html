@@ -1,0 +1,852 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gemviz.select_fields_tablemodel &#8212; gemviz 1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/gemviz/select_fields_tablemodel';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gemviz 1.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gemviz.select_fields_tablemodel</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for gemviz.select_fields_tablemodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Select data fields for 1-D plotting: QAbstractTableModel.</span>
+
+<span class="sd">General plot model is: Y/Mon vs X.  If X is not selected, use index number. If</span>
+<span class="sd">Mon is not selected, use 1.0 (trivial case, do not divide by Mon).</span>
+
+<span class="sd">Data Field Selection Rules:</span>
+
+<span class="sd">1. A data field selection could have one of four states:</span>
+<span class="sd">    * unselected (`None`)</span>
+<span class="sd">    * `&quot;X&quot;`: ordinate (independent axis)</span>
+<span class="sd">    * `&quot;Y&quot;` : abcissae (dependent axes)</span>
+<span class="sd">    * `&quot;Mon&quot;` : divide this array into each Y</span>
+<span class="sd">2. Only zero or one data field can be selected as `&quot;X&quot;`.</span>
+<span class="sd">3. Only zero or one data field can be selected as `&quot;Mon&quot;`.</span>
+<span class="sd">4. One or more data fields can be selected as `&quot;Y&quot;`.</span>
+
+<span class="sd">When Model/View is created, the view should call &#39;model.setFields(fields)&#39; with</span>
+<span class="sd">the list of field names for selection.  (If &#39;fields&#39; is a different structure,</span>
+<span class="sd">such a &#39;list(object)&#39; or &#39;dict(str=object)&#39;, then change both &#39;columns()&#39; and</span>
+<span class="sd">&#39;fields()&#39; so that each returns &#39;list(str)&#39;.)  Note that</span>
+<span class="sd">&#39;model.setFields(fields)&#39; can only be called once.</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~SelectFieldsTableModel</span>
+<span class="sd">    ~ColumnDataType</span>
+<span class="sd">    ~FieldRuleType</span>
+<span class="sd">    ~TableColumn</span>
+<span class="sd">    ~TableField</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">KW_ONLY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ColumnDataType">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.ColumnDataType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ColumnDataType</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data types expected by TableColumn.column_type.&quot;&quot;&quot;</span>
+
+    <span class="n">checkbox</span> <span class="o">=</span> <span class="s2">&quot;checkbox&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FieldRuleType">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.FieldRuleType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FieldRuleType</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data field selection rule types.&quot;&quot;&quot;</span>
+
+    <span class="n">multiple</span> <span class="o">=</span> <span class="s2">&quot;multiple&quot;</span>
+    <span class="n">unique</span> <span class="o">=</span> <span class="s2">&quot;unique&quot;</span>
+
+<div class="viewcode-block" id="FieldRuleType.apply">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.FieldRuleType.apply">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the selection rule.&quot;&quot;&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TableColumn">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.TableColumn">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TableColumn</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One column of the table.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">column_type</span><span class="p">:</span> <span class="n">ColumnDataType</span>
+    <span class="n">_</span><span class="p">:</span> <span class="n">KW_ONLY</span>  <span class="c1"># all parameters below are specified by keyword</span>
+    <span class="n">rule</span><span class="p">:</span> <span class="p">(</span><span class="n">FieldRuleType</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="TableField">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.TableField">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TableField</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One data field candidate for user-selection.</span>
+
+<span class="sd">    NOTE: Data for the &quot;Description&quot; and &quot;PV&quot; TableColumns is</span>
+<span class="sd">    provided by the &quot;description&quot; and &quot;pv&quot; attributes here</span>
+<span class="sd">    using `cname.lower()`.  (FIXME: This could break.  Easily.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># the &quot;Field&quot; column</span>
+    <span class="n">selection</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># either of these, selection rule 1.</span>
+    <span class="n">_</span><span class="p">:</span> <span class="n">KW_ONLY</span>  <span class="c1"># all parameters below are specified by keyword</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># the &quot;Description&quot; column</span>
+    <span class="n">pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># the &quot;PV&quot; column</span>
+    <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">()</span>  <span class="c1"># the &quot;Shape&quot; column</span></div>
+
+
+
+<span class="c1"># fmt: off</span>
+<span class="c1"># Example lists of columns &amp; fields.</span>
+<span class="n">XY_COLUMNS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">unique</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">multiple</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="n">XY_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">TableField</span><span class="p">(</span><span class="s2">&quot;motor&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;some motor&quot;</span><span class="p">),</span>
+    <span class="n">TableField</span><span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">),</span>
+    <span class="n">TableField</span><span class="p">(</span><span class="s2">&quot;I00&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">),</span>
+    <span class="n">TableField</span><span class="p">(</span><span class="s2">&quot;scint&quot;</span><span class="p">),</span>
+    <span class="n">TableField</span><span class="p">(</span><span class="s2">&quot;diode&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="c1"># fmt: on</span>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SelectFieldsTableModel</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QAbstractTableModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select fields for plots.</span>
+
+<span class="sd">    .. autosummary::</span>
+
+<span class="sd">        ~rowCount</span>
+<span class="sd">        ~columnCount</span>
+<span class="sd">        ~data</span>
+<span class="sd">        ~headerData</span>
+<span class="sd">        ~setData</span>
+<span class="sd">        ~flags</span>
+<span class="sd">        ~checkbox</span>
+<span class="sd">        ~applySelectionRules</span>
+<span class="sd">        ~updateCheckboxes</span>
+<span class="sd">        ~logCheckboxSelections</span>
+<span class="sd">        ~columnName</span>
+<span class="sd">        ~columnNumber</span>
+<span class="sd">        ~columns</span>
+<span class="sd">        ~setColumns</span>
+<span class="sd">        ~fieldName</span>
+<span class="sd">        ~fieldText</span>
+<span class="sd">        ~fields</span>
+<span class="sd">        ~setFields</span>
+<span class="sd">        ~plotFields</span>
+<span class="sd">        ~selections</span>
+<span class="sd">        ~setSelections</span>
+<span class="sd">        ~setSelectionsItem</span>
+
+<span class="sd">    https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelections</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_columns_locked</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields_locked</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setColumns</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFields</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_columns_locked</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields_locked</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateCheckboxes</span><span class="p">()</span>
+
+    <span class="c1"># ------------ methods required by Qt&#39;s view</span>
+
+<div class="viewcode-block" id="SelectFieldsTableModel.rowCount">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.rowCount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of fields.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.columnCount">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.columnCount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of columns.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.data">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Table data.  Called by QTableView.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CheckStateRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">textColumns</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldText</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.headerData">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.headerData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">headerData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Column headers.  Called by QTableView.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnName</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">section</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># may want to alter at some point</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.setData">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle the checkboxes.  Called by QTableView.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CheckStateRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setCheckbox</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.flags">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.flags">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify the checkbox cells.  Called by QTableView.&quot;&quot;&quot;</span>
+        <span class="n">original_flags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">flags</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">:</span>
+            <span class="c1"># use a checkbox in this column</span>
+            <span class="k">return</span> <span class="n">original_flags</span> <span class="o">|</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ItemIsUserCheckable</span>
+        <span class="k">return</span> <span class="n">original_flags</span></div>
+
+
+    <span class="c1"># ------------ checkbox methods</span>
+
+<div class="viewcode-block" id="SelectFieldsTableModel.checkbox">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.checkbox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the checkbox state.&quot;&quot;&quot;</span>
+        <span class="n">nm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnName</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">())</span>  <span class="c1"># selection name of THIS column</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">())</span>  <span class="c1"># user selection</span>
+        <span class="k">return</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span> <span class="k">if</span> <span class="n">selection</span> <span class="o">==</span> <span class="n">nm</span> <span class="k">else</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Unchecked</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.setCheckbox">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setCheckbox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setCheckbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the checkbox state.&quot;&quot;&quot;</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+        <span class="n">column_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnName</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="n">checked</span> <span class="o">=</span> <span class="n">state</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionsItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column_name</span> <span class="k">if</span> <span class="n">checked</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Rule 1</span>
+        <span class="n">changes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">()[</span><span class="n">row</span><span class="p">]</span> <span class="o">!=</span> <span class="n">prior</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;selections: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">())</span>
+
+        <span class="n">changes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">applySelectionRules</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">changes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">changes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateCheckboxes</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logCheckboxSelections</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plotFields</span><span class="p">())</span>  <span class="c1"># plotter should call plotFields()</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.applySelectionRules">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.applySelectionRules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">applySelectionRules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply selection rules 2-4.&quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span>
+        <span class="n">column_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnName</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnNumber</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniqueSelectionColumns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">r</span> <span class="o">!=</span> <span class="n">row</span> <span class="ow">and</span> <span class="n">column_name</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionsItem</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="n">changes</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">changes</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.updateCheckboxes">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.updateCheckboxes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateCheckboxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update checkboxes to agree with self.selections.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">()),</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;corners: (</span><span class="si">%d</span><span class="s2">,</span><span class="si">%d</span><span class="s2">)  (</span><span class="si">%d</span><span class="s2">,</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+        <span class="c1"># Re-evaluate the checkboxes bounded by the two corners (inclusive).</span>
+        <span class="n">corner1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">)</span>
+        <span class="n">corner2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">corner1</span><span class="p">,</span> <span class="n">corner2</span><span class="p">,</span> <span class="p">[</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CheckStateRole</span><span class="p">])</span>
+
+        <span class="c1"># prune empty data from self.selections</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">())</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">logCheckboxSelections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;checkbox selections:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">:</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+                <span class="n">choices</span> <span class="o">=</span> <span class="p">{</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Unchecked</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">}</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="n">choices</span><span class="p">[</span><span class="n">state</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldName</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="c1"># ------------ local methods</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">columnName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">()[</span><span class="n">column</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">columnNumber</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span>  <span class="c1"># return list(str)</span>
+
+<div class="viewcode-block" id="SelectFieldsTableModel.setColumns">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setColumns">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setColumns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define the columns for the table.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns_locked</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Once defined, cannot change columns.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span> <span class="o">=</span> <span class="p">{</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">}</span>
+        <span class="c1"># NOTE: list(int), not list(str): column _number_ (not column name)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">column_number</span>
+            <span class="k">for</span> <span class="n">column_number</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">column_type</span> <span class="o">==</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniqueSelectionColumns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">column_number</span>
+            <span class="k">for</span> <span class="n">column_number</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">column_type</span> <span class="o">==</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">rule</span> <span class="o">==</span> <span class="n">FieldRuleType</span><span class="o">.</span><span class="n">unique</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multipleSelectionColumns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">column_number</span>
+            <span class="k">for</span> <span class="n">column_number</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">column_type</span> <span class="o">==</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">rule</span> <span class="o">==</span> <span class="n">FieldRuleType</span><span class="o">.</span><span class="n">multiple</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textColumns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">column_number</span>
+            <span class="k">for</span> <span class="n">column_number</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">column_type</span> <span class="o">==</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span>
+        <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fieldName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">()[</span><span class="n">row</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fieldText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">textColumns</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">=}</span><span class="s2"> is not text&quot;</span>
+
+        <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldName</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fname</span>  <span class="c1"># special case</span>
+
+        <span class="n">cname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnName</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">fname</span><span class="p">],</span> <span class="n">cname</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">text</span>
+
+<div class="viewcode-block" id="SelectFieldsTableModel.fields">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of the field names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span>  <span class="c1"># return list(str)</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.setFields">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setFields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setFields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define the data fields (rows) for the table.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields_locked</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Once defined, cannot change fields.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">field</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+
+        <span class="c1"># Pre-select fields with columns, where fields is list(Field).</span>
+        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fields</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">column_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnNumber</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">column_number</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkboxColumns</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionsItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.selections">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.selections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">selections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the plot selections dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selections</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.setSelections">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setSelections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selections</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot selections: dict(row_number=column number}&quot;&quot;&quot;</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="n">selections</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selections</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">selections</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsTableModel.setSelectionsItem">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.setSelectionsItem">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setSelectionsItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the key in the plot selections dictionary.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+    <span class="c1"># ------------ reporting</span>
+
+<div class="viewcode-block" id="SelectFieldsTableModel.plotFields">
+<a class="viewcode-back" href="../../api/select_fields_tablemodel.html#gemviz.select_fields_tablemodel.SelectFieldsTableModel.plotFields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plotFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary with the selected fields to be plotted.</span>
+
+<span class="sd">        key=column_name, value=field_name(s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Y</span><span class="o">=</span><span class="p">[])</span>
+        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">field_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldName</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">column_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columnNumber</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">column_number</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniqueSelectionColumns</span><span class="p">:</span>
+                <span class="n">choices</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_name</span>
+            <span class="k">elif</span> <span class="n">column_number</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multipleSelectionColumns</span><span class="p">:</span>
+                <span class="n">choices</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">choices</span></div>
+</div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :copyright: (c) 2023-2025, UChicago Argonne, LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Argonne National Laboratory Open Source License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2025, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,705 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gemviz.range_slider &#8212; gemviz 1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/gemviz/range_slider';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gemviz 1.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gemviz.range_slider</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for gemviz.range_slider</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtGui</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span>
+
+<span class="c1"># Originated from</span>
+<span class="c1"># https://www.mail-archive.com/pyqt@riverbankcomputing.com/msg22889.html</span>
+<span class="c1"># Modification refered from</span>
+<span class="c1"># https://gist.github.com/Riateche/27e36977f7d5ea72cf4f</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RangeSlider">
+<a class="viewcode-back" href="../../api/range_slider.html#gemviz.range_slider.RangeSlider">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RangeSlider</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QSlider</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A slider for ranges.</span>
+
+<span class="sd">    This class provides a dual-slider for ranges, where there is a defined</span>
+<span class="sd">    maximum and minimum, as is a normal slider, but instead of having a</span>
+<span class="sd">    single slider value, there are 2 slider values.</span>
+
+<span class="sd">    This class emits the same signals as the QSlider base class, with the</span>
+<span class="sd">    exception of valueChanged</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sliderMoved</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RangeSlider</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pressed_control</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tick_interval</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tick_position</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QSlider</span><span class="o">.</span><span class="n">NoTicks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hover_control</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">click_offset</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># 0 for the low, 1 for the high, -1 for both</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_slider</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">high</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setHigh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">=</span> <span class="n">high</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">low</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setLow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">=</span> <span class="n">low</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">paintEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="c1"># based on http://qt.gitorious.org/qt/qt/blobs/master/src/gui/widgets/qslider.cpp</span>
+
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">style</span><span class="p">()</span>
+
+        <span class="c1"># draw groove</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyleOptionSlider</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initStyleOption</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">siderValue</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">sliderPosition</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">subControls</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderGroove</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tickPosition</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NoTicks</span><span class="p">:</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">subControls</span> <span class="o">|=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderTickmarks</span>
+        <span class="n">style</span><span class="o">.</span><span class="n">drawComplexControl</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">groove</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">subControlRect</span><span class="p">(</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderGroove</span><span class="p">,</span> <span class="bp">self</span>
+        <span class="p">)</span>
+
+        <span class="c1"># drawSpan</span>
+        <span class="c1"># opt = QtWidgets.QStyleOptionSlider()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initStyleOption</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">subControls</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderGroove</span>
+        <span class="c1"># if self.tickPosition() != self.NoTicks:</span>
+        <span class="c1">#    opt.subControls |= QtWidgets.QStyle.SC_SliderTickmarks</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">siderValue</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;low=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">sliderPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span>
+        <span class="n">low_rect</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">subControlRect</span><span class="p">(</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderHandle</span><span class="p">,</span> <span class="bp">self</span>
+        <span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">sliderPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span>
+        <span class="n">high_rect</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">subControlRect</span><span class="p">(</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderHandle</span><span class="p">,</span> <span class="bp">self</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;low_rect=</span><span class="si">%s</span><span class="s2">, high_rect=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">low_rect</span><span class="p">,</span> <span class="n">high_rect</span><span class="p">)</span>
+        <span class="n">low_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pick</span><span class="p">(</span><span class="n">low_rect</span><span class="o">.</span><span class="n">center</span><span class="p">())</span>
+        <span class="n">high_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pick</span><span class="p">(</span><span class="n">high_rect</span><span class="o">.</span><span class="n">center</span><span class="p">())</span>
+
+        <span class="n">min_pos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">low_pos</span><span class="p">,</span> <span class="n">high_pos</span><span class="p">)</span>
+        <span class="n">max_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">low_pos</span><span class="p">,</span> <span class="n">high_pos</span><span class="p">)</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRect</span><span class="p">(</span><span class="n">low_rect</span><span class="o">.</span><span class="n">center</span><span class="p">(),</span> <span class="n">high_rect</span><span class="o">.</span><span class="n">center</span><span class="p">())</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;min_pos=</span><span class="si">%s</span><span class="s2">, max_pos=</span><span class="si">%s</span><span class="s2">, c=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">min_pos</span><span class="p">,</span> <span class="n">max_pos</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+            <span class="n">span_rect</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRect</span><span class="p">(</span>
+                <span class="n">QtCore</span><span class="o">.</span><span class="n">QPoint</span><span class="p">(</span><span class="n">min_pos</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="mi">2</span><span class="p">),</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPoint</span><span class="p">(</span><span class="n">max_pos</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">span_rect</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRect</span><span class="p">(</span>
+                <span class="n">QtCore</span><span class="o">.</span><span class="n">QPoint</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">min_pos</span><span class="p">),</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPoint</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_pos</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># self.initStyleOption(opt)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;groove: x=</span><span class="si">%s</span><span class="s2"> y=</span><span class="si">%s</span><span class="s2"> w=</span><span class="si">%s</span><span class="s2"> h=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">groove</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+            <span class="n">groove</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+            <span class="n">groove</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span>
+            <span class="n">groove</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+            <span class="n">groove</span><span class="o">.</span><span class="n">adjust</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">groove</span><span class="o">.</span><span class="n">adjust</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># self.isEnabled():</span>
+            <span class="n">highlight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">palette</span><span class="p">()</span><span class="o">.</span><span class="n">color</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPalette</span><span class="o">.</span><span class="n">Highlight</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">highlight</span><span class="p">))</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">highlight</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="c1"># painter.setPen(QtGui.QPen(self.palette().color(QtGui.QPalette.Dark), 0))</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            if opt.orientation == QtCore.Qt.Horizontal:</span>
+<span class="sd">                self.setupPainter(painter, opt.orientation, groove.center().x(), groove.top(), groove.center().x(), groove.bottom())</span>
+<span class="sd">            else:</span>
+<span class="sd">                self.setupPainter(painter, opt.orientation, groove.left(), groove.center().y(), groove.right(), groove.center().y())</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1"># spanRect =</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="n">span_rect</span><span class="o">.</span><span class="n">intersected</span><span class="p">(</span><span class="n">groove</span><span class="p">))</span>
+            <span class="c1"># painter.drawRect(groove)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span><span class="p">]):</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyleOptionSlider</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initStyleOption</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+
+            <span class="c1"># Only draw the groove for the first slider so it doesn&#39;t get drawn</span>
+            <span class="c1"># on top of the existing ones every time</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">opt</span><span class="o">.</span><span class="n">subControls</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderHandle</span>
+                <span class="p">)</span>  <span class="c1"># | QtWidgets.QStyle.SC_SliderGroove</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">opt</span><span class="o">.</span><span class="n">subControls</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderHandle</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tickPosition</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NoTicks</span><span class="p">:</span>
+                <span class="n">opt</span><span class="o">.</span><span class="n">subControls</span> <span class="o">|=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderTickmarks</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pressed_control</span><span class="p">:</span>
+                <span class="n">opt</span><span class="o">.</span><span class="n">activeSubControls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pressed_control</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">opt</span><span class="o">.</span><span class="n">activeSubControls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hover_control</span>
+
+            <span class="n">opt</span><span class="o">.</span><span class="n">sliderPosition</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">sliderValue</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">style</span><span class="o">.</span><span class="n">drawComplexControl</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">style</span><span class="p">()</span>
+        <span class="n">button</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span>
+
+        <span class="c1"># In a normal slider control, when the user clicks on a point in the</span>
+        <span class="c1"># slider&#39;s total range, but not on the slider part of the control the</span>
+        <span class="c1"># control would jump the slider value to where the user clicked.</span>
+        <span class="c1"># For this control, clicks which are not direct hits will slide both</span>
+        <span class="c1"># slider parts</span>
+
+        <span class="k">if</span> <span class="n">button</span><span class="p">:</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyleOptionSlider</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initStyleOption</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_slider</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span><span class="p">]):</span>
+                <span class="n">opt</span><span class="o">.</span><span class="n">sliderPosition</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="n">hit</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">hitTestComplexControl</span><span class="p">(</span>
+                    <span class="n">style</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">(),</span> <span class="bp">self</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">hit</span> <span class="o">==</span> <span class="n">style</span><span class="o">.</span><span class="n">SC_SliderHandle</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">active_slider</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pressed_control</span> <span class="o">=</span> <span class="n">hit</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">triggerAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SliderMove</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setRepeatAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SliderNoAction</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_slider</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pressed_control</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderHandle</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">click_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pixelPosToRangeValue</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__pick</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">triggerAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SliderMove</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setRepeatAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SliderNoAction</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">ignore</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pressed_control</span> <span class="o">!=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyle</span><span class="o">.</span><span class="n">SC_SliderHandle</span><span class="p">:</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">ignore</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="n">new_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pixelPosToRangeValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pick</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()))</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyleOptionSlider</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initStyleOption</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_slider</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">new_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">click_offset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">+=</span> <span class="n">offset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">+=</span> <span class="n">offset</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum</span><span class="p">():</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">+=</span> <span class="n">diff</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">+=</span> <span class="n">diff</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum</span><span class="p">():</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">+=</span> <span class="n">diff</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">+=</span> <span class="n">diff</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_slider</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_pos</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span><span class="p">:</span>
+                <span class="n">new_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">=</span> <span class="n">new_pos</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_pos</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span><span class="p">:</span>
+                <span class="n">new_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_low</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_high</span> <span class="o">=</span> <span class="n">new_pos</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">click_offset</span> <span class="o">=</span> <span class="n">new_pos</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="c1"># self.emit(QtCore.SIGNAL(&#39;sliderMoved(int)&#39;), new_pos)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliderMoved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_high</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pixelPosToRangeValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QStyleOptionSlider</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initStyleOption</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">style</span><span class="p">()</span>
+
+        <span class="n">gr</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">subControlRect</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">style</span><span class="o">.</span><span class="n">SC_SliderGroove</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">subControlRect</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">CC_Slider</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">style</span><span class="o">.</span><span class="n">SC_SliderHandle</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+            <span class="n">slider_length</span> <span class="o">=</span> <span class="n">sr</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+            <span class="n">slider_min</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+            <span class="n">slider_max</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">right</span><span class="p">()</span> <span class="o">-</span> <span class="n">slider_length</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slider_length</span> <span class="o">=</span> <span class="n">sr</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+            <span class="n">slider_min</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+            <span class="n">slider_max</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span> <span class="o">-</span> <span class="n">slider_length</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">style</span><span class="o">.</span><span class="n">sliderValueFromPosition</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minimum</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maximum</span><span class="p">(),</span>
+            <span class="n">pos</span> <span class="o">-</span> <span class="n">slider_min</span><span class="p">,</span>
+            <span class="n">slider_max</span> <span class="o">-</span> <span class="n">slider_min</span><span class="p">,</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">upsideDown</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :copyright: (c) 2023-2025, UChicago Argonne, LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Argonne National Laboratory Open Source License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2025, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,818 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gemviz.select_stream_fields &#8212; gemviz 1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/gemviz/select_stream_fields';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gemviz 1.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gemviz.select_stream_fields</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for gemviz.select_stream_fields</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">QWidget to select stream data fields for plotting.</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~SelectFieldsWidget</span>
+<span class="sd">    ~to_datasets</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.select_fields_tablemodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnDataType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.select_fields_tablemodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldRuleType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.select_fields_tablemodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableColumn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.select_fields_tablemodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.select_fields_tableview</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectFieldsTableView</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">DEFAULT_STREAM</span> <span class="o">=</span> <span class="s2">&quot;primary&quot;</span>
+
+<span class="n">STREAM_COLUMNS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">unique</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">multiple</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Shape&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="SelectFieldsWidget">
+<a class="viewcode-back" href="../../api/select_stream_fields.html#gemviz.select_stream_fields.SelectFieldsWidget">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SelectFieldsWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Panel to select fields (signals) for plotting.&quot;&quot;&quot;</span>
+
+    <span class="n">ui_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getUiFileName</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">preferred_stream</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">preferred_fields</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="n">run</span>  <span class="c1"># tapi.RunMetadata object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferred_fields</span> <span class="o">=</span> <span class="n">preferred_fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferred_stream</span> <span class="o">=</span> <span class="n">preferred_stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Force refresh of run data to get latest shapes</span>
+        <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing active run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> for field selection&quot;</span><span class="p">)</span>
+            <span class="c1"># Note: is_active force refresh the run metadata</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">plottable_signals</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stream&quot;</span><span class="p">,</span> <span class="n">DEFAULT_STREAM</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">myLoadUi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_summary</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+
+        <span class="n">stream_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">())</span>
+        <span class="k">if</span> <span class="s2">&quot;baseline&quot;</span> <span class="ow">in</span> <span class="n">stream_list</span><span class="p">:</span>
+            <span class="c1"># Too many signals! 2 points each.  Do not plot from &quot;baseline&quot; stream.</span>
+            <span class="n">stream_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">stream_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;baseline&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Determine which stream to use: preferred_stream if available, otherwise default</span>
+        <span class="n">stream_to_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_name</span>  <span class="c1"># Default from analysis (set in __init__)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_stream</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_stream</span> <span class="ow">in</span> <span class="n">stream_list</span><span class="p">:</span>
+            <span class="n">stream_to_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_stream</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Add items to combobox &amp; setup connection</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">stream_list</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">currentTextChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setStream</span><span class="p">)</span>
+
+            <span class="c1"># Select the desired stream in the combobox</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">stream_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">stream_to_use</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStream</span><span class="p">(</span><span class="n">stream_to_use</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setStream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_name</span> <span class="o">=</span> <span class="n">stream_name</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">run</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;stream_name=</span><span class="si">%s</span><span class="s2">, stream=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span>
+
+        <span class="n">x_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;plot_axes&quot;</span><span class="p">]</span>
+        <span class="n">y_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;plot_signal&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Check if we have an existing table with fields</span>
+        <span class="n">has_existing_table</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_view</span><span class="p">,</span> <span class="s2">&quot;tableView&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_view</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">fields</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="c1"># describe the data fields for the dialog.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">stream_data_fields</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+            <span class="c1"># print(f&quot;{__name__}.{__class__.__name__}: {sdf=}&quot;)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># If we can&#39;t get fields and we have an existing table, skip rebuild</span>
+            <span class="k">if</span> <span class="n">has_existing_table</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Could not get fields for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="s2">&quot;skipping rebuild to avoid empty flash&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+            <span class="c1"># If no existing table, we need to try building one</span>
+            <span class="n">sdf</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Get preferred fields for this stream (if any)</span>
+        <span class="n">preferred_x</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">preferred_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_fields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">preferred_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+            <span class="n">preferred_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="c1"># Check if any preferred Y detectors exist in current scan</span>
+        <span class="n">has_preferred_x</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">preferred_x</span><span class="p">:</span>
+            <span class="n">has_preferred_x</span> <span class="o">=</span> <span class="n">preferred_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">preferred_x</span> <span class="ow">in</span> <span class="n">sdf</span>
+
+        <span class="n">has_preferred_y</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">preferred_y</span><span class="p">:</span>
+            <span class="n">has_preferred_y</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">sdf</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">preferred_y</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">sdf</span><span class="p">:</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># First check if this field is in preferred selections (remembered from previous scan)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferred_fields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">preferred_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field_name</span> <span class="o">==</span> <span class="n">preferred_x</span><span class="p">:</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+                <span class="k">elif</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">preferred_y</span><span class="p">:</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+                <span class="c1"># Fall back to default X if preferred_x is not in sdf</span>
+                <span class="k">elif</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="n">has_preferred_x</span>
+                    <span class="ow">and</span> <span class="n">x_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">and</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">x_names</span>
+                <span class="p">):</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+                <span class="c1"># Fall back to default Y only if none of preferred_y exist in sdf</span>
+                <span class="k">elif</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="n">has_preferred_y</span> <span class="ow">and</span> <span class="n">y_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field_name</span> <span class="o">==</span> <span class="n">y_name</span>
+                <span class="p">):</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+
+            <span class="c1"># Fall back to default selections if not in preferred</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">x_names</span><span class="p">:</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+                <span class="k">elif</span> <span class="n">y_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">field_name</span> <span class="o">==</span> <span class="n">y_name</span><span class="p">:</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">stream_data_field_shape</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># print(f&quot;{stream_name=} {field_name=} {shape=}&quot;)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;stream_name=</span><span class="si">%s</span><span class="s2"> field_name=</span><span class="si">%s</span><span class="s2"> shape=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">stream_name</span><span class="p">,</span>
+                    <span class="n">field_name</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">TableField</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="n">selection</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;fields=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+
+        <span class="c1"># Check if any fields have valid (non-empty) shapes</span>
+        <span class="c1"># If all fields have empty shapes, they&#39;re not readable yet (Container objects)</span>
+        <span class="n">has_readable_fields</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)</span>
+
+        <span class="c1"># If no readable fields AND we have an existing table, skip rebuild</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_readable_fields</span> <span class="ow">and</span> <span class="n">has_existing_table</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No readable fields available for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> (all have empty shapes), &quot;</span>
+                <span class="s2">&quot;skipping rebuild to avoid empty flash&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># build the view of this stream</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">SelectFieldsTableView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="o">=</span> <span class="n">view</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">displayTable</span><span class="p">(</span><span class="n">STREAM_COLUMNS</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">selected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relayPlotSelections</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">))</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">removeAllLayoutWidgets</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SelectFieldsWidget.relayPlotSelections">
+<a class="viewcode-back" href="../../api/select_stream_fields.html#gemviz.select_stream_fields.SelectFieldsWidget.relayPlotSelections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">relayPlotSelections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">selections</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Receive selections from the dialog and relay to the caller.&quot;&quot;&quot;</span>
+        <span class="c1"># selections[&quot;stream_name&quot;] = self.stream_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">selections</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SelectFieldsWidget.refreshFieldData">
+<a class="viewcode-back" href="../../api/select_stream_fields.html#gemviz.select_stream_fields.SelectFieldsWidget.refreshFieldData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refreshFieldData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refresh the field data to get latest shapes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing field data for active run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Note: is_active force refresh the run metadata</span>
+
+            <span class="c1"># Remember which fields are currently selected (if we have a table).</span>
+            <span class="n">saved</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">saved</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">plotFields</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                    <span class="c1"># Widget was deleted, skip saving selections</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;table_view widget was deleted, skipping save&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">saved</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="c1"># Rebuild the table for the current stream using fresh data.</span>
+            <span class="c1"># setStream() will check if fields are readable before rebuilding</span>
+            <span class="n">current_stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStream</span><span class="p">(</span><span class="n">current_stream</span><span class="p">)</span>
+
+            <span class="c1"># Restore the previous selections on the new model.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">saved</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">fields</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fields</span><span class="p">()</span>
+                        <span class="n">x_field</span> <span class="o">=</span> <span class="n">saved</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">x_field</span> <span class="ow">and</span> <span class="n">x_field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                            <span class="n">model</span><span class="o">.</span><span class="n">setSelectionsItem</span><span class="p">(</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x_field</span><span class="p">),</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">y_field</span> <span class="ow">in</span> <span class="n">saved</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                            <span class="k">if</span> <span class="n">y_field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                                <span class="n">model</span><span class="o">.</span><span class="n">setSelectionsItem</span><span class="p">(</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">y_field</span><span class="p">),</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+                        <span class="n">model</span><span class="o">.</span><span class="n">updateCheckboxes</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;table_view widget was deleted during restore, skipping&quot;</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table_view</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Skipping field refresh: run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> is no longer active&quot;</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="to_datasets">
+<a class="viewcode-back" href="../../api/select_stream_fields.html#gemviz.select_stream_fields.to_datasets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_datasets</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">selections</span><span class="p">,</span> <span class="n">scan_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare datasets and options for plotting.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">chartview</span>
+
+    <span class="c1"># Return empty datasets if stream_name is not provided</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stream_name</span> <span class="ow">or</span> <span class="n">stream_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="p">{}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># For active runs, read raw arrays to avoid shape mismatches</span>
+        <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Force refreshing stream data for active run </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">force_refresh_stream_data</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">stream_data</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> not found in run data: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> not found in run data&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="n">raw_stream</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="n">raw_stream</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Stream data not yet available for live run.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_field_array</span><span class="p">(</span><span class="n">field_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raw_stream</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="n">field_name</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_obj</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data_obj</span><span class="p">,</span> <span class="s2">&quot;compute&quot;</span><span class="p">):</span>
+                    <span class="n">data_obj</span> <span class="o">=</span> <span class="n">data_obj</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data_obj</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data_obj</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading data for </span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">available</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;unknown&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stream data keys: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading field &#39;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="n">x_axis</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+    <span class="n">x_datetime</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># special scaling using datetime</span>
+    <span class="k">if</span> <span class="n">x_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">x_units</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">x_axis</span> <span class="o">=</span> <span class="s2">&quot;data point number&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x_data</span> <span class="o">=</span> <span class="n">get_field_array</span><span class="p">(</span><span class="n">x_axis</span><span class="p">)</span>
+        <span class="n">x_shape</span> <span class="o">=</span> <span class="n">x_data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">x_units</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">stream_data_field_units</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Can only plot 1-D data now.&quot;</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">x_axis</span><span class="si">}</span><span class="s2"> shape is </span><span class="si">{</span><span class="n">x_shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">x_axis</span> <span class="o">==</span> <span class="s2">&quot;time&quot;</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">chartview</span><span class="o">.</span><span class="n">TIMESTAMP_LIMIT</span><span class="p">:</span>
+            <span class="n">x_units</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">x_datetime</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">x_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x_data</span><span class="p">)))</span>
+            <span class="p">)</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_selections</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_selections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No Y data selected.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">y_axis</span> <span class="ow">in</span> <span class="n">y_selections</span><span class="p">:</span>
+        <span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">chartview</span><span class="o">.</span><span class="n">auto_color</span><span class="p">()</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="n">chartview</span><span class="o">.</span><span class="n">auto_symbol</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">y_data</span> <span class="o">=</span> <span class="n">get_field_array</span><span class="p">(</span><span class="n">y_axis</span><span class="p">)</span>
+            <span class="n">y_units</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">stream_data_field_units</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
+            <span class="n">y_shape</span> <span class="o">=</span> <span class="n">y_data</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># fmt: off</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Can only plot 1-D data now.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">y_axis</span><span class="si">}</span><span class="s2"> shape is </span><span class="si">{</span><span class="n">y_shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get fresh data for </span><span class="si">{</span><span class="n">y_axis</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># keys used here must match the plotting back-end (matplotlib)</span>
+        <span class="n">scan_id</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;scan_id&quot;</span><span class="p">)</span>
+        <span class="c1"># verbose labels</span>
+        <span class="c1"># ds_options[&quot;label&quot;] = f&quot;{y_axis} ({run.summary()} {run.uid[:7]})&quot;</span>
+        <span class="c1"># terse labels</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2">) - </span><span class="si">{</span><span class="n">y_axis</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>  <span class="c1"># line color</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;marker&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">symbol</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;markersize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># default: 10</span>
+
+        <span class="c1"># Add metadata for CurveManager</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;run_uid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">uid</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;y_field&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_axis</span>  <span class="c1"># y_axis is the field name</span>
+        <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;stream_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream_name</span>
+
+        <span class="k">if</span> <span class="n">x_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="p">[</span><span class="n">y_data</span><span class="p">]</span>  <span class="c1"># , title=f&quot;{y_axis} v index&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x_shape</span> <span class="o">!=</span> <span class="n">y_shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot plot.  Different shapes for&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; X (</span><span class="si">{</span><span class="n">x_shape</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; and Y (</span><span class="si">{</span><span class="n">y_shape</span><span class="si">!r}</span><span class="s2">) data.&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># Sort by x_data to avoid artifacts when data is not in order</span>
+            <span class="c1"># (happens with batch_size=1 incremental writes)</span>
+            <span class="n">sort_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+            <span class="n">x_data</span> <span class="o">=</span> <span class="n">x_data</span><span class="p">[</span><span class="n">sort_indices</span><span class="p">]</span>
+            <span class="n">y_data</span> <span class="o">=</span> <span class="n">y_data</span><span class="p">[</span><span class="n">sort_indices</span><span class="p">]</span>
+
+            <span class="n">ds</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">]</span>
+        <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span><span class="p">))</span>
+
+    <span class="n">plot_options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;x_datetime&quot;</span><span class="p">:</span> <span class="n">x_datetime</span><span class="p">,</span>
+        <span class="s2">&quot;x_units&quot;</span><span class="p">:</span> <span class="n">x_units</span><span class="p">,</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x_axis</span><span class="p">,</span>
+        <span class="s2">&quot;y_units&quot;</span><span class="p">:</span> <span class="n">y_units</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span></div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :copyright: (c) 2023-2025, UChicago Argonne, LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Argonne National Laboratory Open Source License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2025, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

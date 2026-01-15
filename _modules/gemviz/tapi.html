@@ -1,0 +1,1349 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gemviz.tapi &#8212; gemviz 1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/gemviz/tapi';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gemviz 1.0</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Change History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gemviz.tapi</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for gemviz.tapi</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TAPI: Local support for the tiled API &amp; data structures.</span>
+
+<span class="sd">.. autosummary:</span>
+
+<span class="sd">    ~connect_tiled_server</span>
+<span class="sd">    ~get_tiled_runs</span>
+<span class="sd">    ~QueryTimeSince</span>
+<span class="sd">    ~QueryTimeUntil</span>
+<span class="sd">    ~RunMetadata</span>
+<span class="sd">    ~TiledServerError</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tiled</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tiled.queries</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">httpx</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectError</span><span class="p">,</span> <span class="n">HTTPStatusError</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TiledServerError">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.TiledServerError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TiledServerError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An error from the tiled server.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RunMetadata">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunMetadata</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache the metadata for a single run.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">uid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">=</span> <span class="n">cat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">uid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request_from_tiled_server</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(catalog=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">!r}</span><span class="s2">,&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; uid7=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">!r}</span><span class="s2">,&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; active=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="RunMetadata.request_from_tiled_server">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.request_from_tiled_server">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">request_from_tiled_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get run details from server.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="c1"># Update active status - run is active if it has no stop document or stop is None</span>
+        <span class="c1"># (Note: use is_active property instead of this attribute for accurate status)</span>
+        <span class="n">stop_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">stop_doc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">stop_doc</span> <span class="o">==</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streams_md</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> active status: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this run is currently active (not stopped).</span>
+
+<span class="sd">        A run is active if it has no stop document. This is the definitive</span>
+<span class="sd">        indicator that a run is still acquiring data, regardless of its</span>
+<span class="sd">        position in the catalog (which may change as new runs are added).</span>
+
+<span class="sd">        Note: This property refreshes metadata from the server to ensure</span>
+<span class="sd">        accurate status.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Refresh metadata to get latest status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request_from_tiled_server</span><span class="p">()</span>
+
+        <span class="c1"># A run is active if there&#39;s no stop document OR if stop is None</span>
+        <span class="c1"># (stop key existing with None value means the run is still active)</span>
+        <span class="n">stop_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">)</span>
+        <span class="n">has_stop</span> <span class="o">=</span> <span class="n">stop_doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop_doc</span> <span class="o">!=</span> <span class="p">{}</span>
+        <span class="n">is_active</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">has_stop</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2">: has_stop=</span><span class="si">{</span><span class="n">has_stop</span><span class="si">}</span><span class="s2">, is_active=</span><span class="si">{</span><span class="n">is_active</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_stop</span><span class="p">:</span>
+            <span class="n">stop_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stop_doc</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_doc</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> has stop document with keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">stop_doc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span><span class="si">}</span><span class="s2"> has &#39;stop&#39; key in metadata but value is: </span><span class="si">{</span><span class="n">stop_doc</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">stop_doc</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">is_active</span>
+
+<div class="viewcode-block" id="RunMetadata.get_run_md">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.get_run_md">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_run_md</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get metadata by key from run document.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.plottable_signals">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.plottable_signals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plottable_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a dict with the plottable data for this run.</span>
+
+<span class="sd">        * field: any available numeric data keys</span>
+<span class="sd">        * motors: any data keys for motors declared by the run</span>
+<span class="sd">        * detectors: any numeric data keys that are not motors or excluded names</span>
+<span class="sd">        * plot_signal: the first detector signal</span>
+<span class="sd">        * plot_axes: the first motor signal for each dimension</span>
+
+<span class="sd">        * run.metadata[hints][dimensions] show the independent axes object names</span>
+<span class="sd">        * Any given dimension may have more than one motor object (a2scan, ...)</span>
+<span class="sd">        * This code chooses to only use the first motor of each dimension.</span>
+<span class="sd">        * The stream descriptor list is usually length = 1.</span>
+<span class="sd">        * object_keys are used to get lists of data_keys (fields)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">find_name_device_or_signal</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">stream_hints</span><span class="p">:</span>  <span class="c1"># from ophyd.Device</span>
+                <span class="k">return</span> <span class="n">stream_hints</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;fields&quot;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_keys</span><span class="p">:</span>  <span class="c1"># from ophyd.Signal</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find </span><span class="si">{</span><span class="n">key</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_signal</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">find_name_device_or_signal</span><span class="p">(</span><span class="n">key</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># just the first one</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected key: </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">key</span>  <span class="c1"># &quot;time&quot; is a special case</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_numeric</span><span class="p">(</span><span class="n">signal</span><span class="p">):</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">data_keys</span><span class="p">[</span><span class="n">signal</span><span class="p">][</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;array&quot;</span><span class="p">:</span>
+                <span class="n">stream_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_name</span><span class="p">)</span>
+                <span class="n">ntype</span> <span class="o">=</span> <span class="n">stream_data</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">signal</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">if</span> <span class="n">ntype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ntype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">):</span>
+                    <span class="n">dtype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+            <span class="k">return</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span>
+
+        <span class="c1"># dimensions of the run</span>
+        <span class="n">run_dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;hints&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dimensions&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="c1"># data stream to be used</span>
+        <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">run_dims</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">streams</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># All hinted dimensions should come from the same stream.</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not handling hinted dimensions: </span><span class="si">{</span><span class="n">run_dims</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">streams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># description of the data stream objects</span>
+        <span class="n">stream_md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+        <span class="c1"># Handle both old (with descriptors) and new (flattened) structures</span>
+        <span class="k">if</span> <span class="s2">&quot;descriptors&quot;</span> <span class="ow">in</span> <span class="n">stream_md</span><span class="p">:</span>
+            <span class="n">descriptors</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;descriptors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not handling situation of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">descriptor</span> <span class="o">=</span> <span class="n">descriptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Mapping from object_keys to data_keys.</span>
+            <span class="n">stream_hints</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hints&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">data_keys</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">object_keys</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;object_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stream_hints</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hints&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">data_keys</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="c1"># Derive object_keys by grouping data_keys by object_name</span>
+            <span class="n">object_keys</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field_info</span> <span class="ow">in</span> <span class="n">data_keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">obj_name</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;object_name&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">obj_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">object_keys</span><span class="p">:</span>
+                    <span class="n">object_keys</span><span class="p">[</span><span class="n">obj_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">object_keys</span><span class="p">[</span><span class="n">obj_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span>
+            <span class="c1"># Create descriptor-like structure for compability</span>
+            <span class="n">descriptor</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;hints&quot;</span><span class="p">:</span> <span class="n">stream_hints</span><span class="p">,</span>
+                <span class="s2">&quot;data_keys&quot;</span><span class="p">:</span> <span class="n">data_keys</span><span class="p">,</span>
+                <span class="s2">&quot;object_keys&quot;</span><span class="p">:</span> <span class="n">object_keys</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">descriptors</span> <span class="o">=</span> <span class="p">[</span><span class="n">descriptor</span><span class="p">]</span>
+
+        <span class="c1"># First motor signal for each dimension.</span>
+        <span class="c1"># Handle dimensions with empty motor lists by using &quot;time&quot; as fallback</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_signal</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;time&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">run_dims</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">exc</span>
+
+        <span class="c1"># All motor signals.</span>
+        <span class="n">motors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">signal</span>
+            <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;motors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="n">find_name_device_or_signal</span><span class="p">(</span><span class="n">motor</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># All detector signals.</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">signal</span>
+            <span class="k">for</span> <span class="n">detector</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;detectors&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="n">find_name_device_or_signal</span><span class="p">(</span><span class="n">detector</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">descriptors</span><span class="p">:</span>
+            <span class="n">hints</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hints&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">for</span> <span class="n">obj_name</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;object_keys&quot;</span><span class="p">]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">signals</span> <span class="o">=</span> <span class="n">hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj_name</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">&quot;fields&quot;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="c1"># ``ophyd.Device`` can have multiple signals</span>
+                    <span class="n">signals</span> <span class="o">=</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;object_keys&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj_name</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">fields</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">signals</span> <span class="k">if</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">k</span><span class="p">)])</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="s2">&quot;exit_status&quot;</span><span class="p">)</span>
+        <span class="n">plot_signal</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;fail&quot;</span><span class="p">:</span>
+            <span class="c1"># These runs probably have plottable data fields.</span>
+
+            <span class="c1"># Do not choose any of these fields as the default</span>
+            <span class="c1"># (NeXus-style plottable) signal data.</span>
+            <span class="n">not_plottable_signals</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                timebase</span>
+<span class="s2">                preset_time</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+            <span class="n">names_to_avoid</span> <span class="o">=</span> <span class="n">motors</span> <span class="o">+</span> <span class="n">not_plottable_signals</span>
+            <span class="n">possible_signals</span> <span class="o">=</span> <span class="n">detectors</span> <span class="o">+</span> <span class="n">fields</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">possible_signals</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names_to_avoid</span><span class="p">:</span>
+                    <span class="n">plot_signal</span> <span class="o">=</span> <span class="n">field</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;catalog&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uid</span><span class="p">,</span>
+            <span class="s2">&quot;stream&quot;</span><span class="p">:</span> <span class="n">stream</span><span class="p">,</span>
+            <span class="s2">&quot;plot_signal&quot;</span><span class="p">:</span> <span class="n">plot_signal</span><span class="p">,</span>
+            <span class="s2">&quot;plot_axes&quot;</span><span class="p">:</span> <span class="n">axes</span><span class="p">,</span>
+            <span class="s2">&quot;motors&quot;</span><span class="p">:</span> <span class="n">motors</span><span class="p">,</span>
+            <span class="s2">&quot;detectors&quot;</span><span class="p">:</span> <span class="n">detectors</span><span class="p">,</span>
+            <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="n">fields</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.stream_data">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.stream_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stream_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the data structure for this stream.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">stream_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s2">&quot;conflicting sizes&quot;</span> <span class="ow">in</span> <span class="n">error_msg</span> <span class="ow">or</span> <span class="s2">&quot;columns&quot;</span> <span class="ow">in</span> <span class="n">error_msg</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> not aligned during read; returning raw arrays&quot;</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_stream_arrays</span><span class="p">(</span>
+                        <span class="n">stream_name</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read stream data for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span>
+            <span class="k">except</span> <span class="n">ConnectError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection error reading stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading stream data for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.force_refresh_stream_data">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.force_refresh_stream_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">force_refresh_stream_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Force refresh of stream data from server.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Force refreshing stream data for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># First, refresh the run metadata to get latest run info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request_from_tiled_server</span><span class="p">()</span>
+
+        <span class="c1"># Clear the cache completely</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streams_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streams_md</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Force fresh data read from server</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading fresh data from run[</span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">][data]&quot;</span><span class="p">)</span>
+            <span class="n">fresh_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
+                <span class="n">arrays</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_to_arrays</span><span class="p">(</span><span class="n">fresh_data</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Returning </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> data as arrays with fields </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">arrays</span>
+
+            <span class="c1"># Don&#39;t cache this data - return it directly</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Successfully refreshed </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> data, shape: </span><span class="si">{</span><span class="n">fresh_data</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">fresh_data</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;shape&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fresh_data</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">raw</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;conflicting sizes&quot;</span> <span class="ow">in</span> <span class="n">error_msg</span> <span class="ow">or</span> <span class="s2">&quot;columns&quot;</span> <span class="ow">in</span> <span class="n">error_msg</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> data not aligned yet (conflicting sizes); reading fields individually&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_stream_arrays</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to refresh stream data for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error refreshing stream data for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata._dataset_to_arrays">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata._dataset_to_arrays">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_to_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert xarray Dataset to dict of numpy arrays trimmed to shared length.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">arrays</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">min_len</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_array</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data_array</span><span class="p">))</span>
+            <span class="n">arrays</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">min_len</span> <span class="o">=</span> <span class="n">length</span> <span class="k">if</span> <span class="n">min_len</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_len</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">coord</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">coord</span><span class="p">))</span>
+            <span class="n">arrays</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">min_len</span> <span class="o">=</span> <span class="n">length</span> <span class="k">if</span> <span class="n">min_len</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_len</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">min_len</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arrays</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">arrays</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">min_len</span><span class="p">:</span>
+                <span class="n">arrays</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[:</span><span class="n">min_len</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">arrays</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata._read_stream_arrays">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata._read_stream_arrays">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_stream_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read each stream field individually and trim to shared length.&quot;&quot;&quot;</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">min_len</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">data_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span>
+
+        <span class="c1"># Try iteration first (works with batch_size=1 for both tiled versions)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_node</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">field_names</span><span class="p">:</span>
+                <span class="c1"># Fall back to metadata if iteration is empty</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_node iteration returned empty&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># Fall back to metadata-based approach</span>
+            <span class="n">stream_md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;descriptors&quot;</span> <span class="ow">in</span> <span class="n">stream_md</span><span class="p">:</span>
+                <span class="n">descriptors</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;descriptors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not handling situation of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">data_keys</span> <span class="o">=</span> <span class="n">descriptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_keys</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_keys</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No fields found for stream </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">arrays</span>
+
+        <span class="c1"># Read fields, skipping those with shape mismatches or not available yet</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data_node</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="n">arrays</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+
+                <span class="n">length</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+                <span class="n">min_len</span> <span class="o">=</span> <span class="n">length</span> <span class="k">if</span> <span class="n">min_len</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_len</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="c1"># Field doesn&#39;t exist yet - skip it</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Field </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2"> not yet available for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="c1"># Handle shape mismatch errors (conflicting sizes during live acquisition)</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="s2">&quot;conflicting sizes&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="ow">or</span> <span class="s2">&quot;expected_shape&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Field </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2"> has conflicting sizes for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">, skipping: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to refresh field </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="n">min_len</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arrays</span>
+
+        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">arrays</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">min_len</span><span class="p">:</span>
+                <span class="n">arrays</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[:</span><span class="n">min_len</span><span class="p">]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Read </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span><span class="si">}</span><span class="s2"> fields from </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2"> trimmed to length </span><span class="si">{</span><span class="n">min_len</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">arrays</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.stream_data_field_shape">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.stream_data_field_shape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stream_data_field_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shape of this data field.&quot;&quot;&quot;</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">return</span> <span class="n">shape</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.stream_data_fields">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.stream_data_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stream_data_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Data field (names) of this BlueskyEventStream.</span>
+
+<span class="sd">        Sort the list by relevance.</span>
+
+<span class="sd">        First &quot;time&quot; (epoch timestamp for each event document), then &quot;config&quot; (the</span>
+<span class="sd">        caller provided these names as parameters for this stream), then &quot;data&quot;</span>
+<span class="sd">        (other signals in this stream, usually added from a Device hint).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="p">(</span><span class="n">stream_name</span><span class="p">))</span>
+
+        <span class="c1"># Promote &quot;time&quot; field to first place.</span>
+        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">fields</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+        <span class="n">fields</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fields</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.stream_data_field_pv">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.stream_data_field_pv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stream_data_field_pv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;EPICS PV name of this field.&quot;&quot;&quot;</span>
+        <span class="n">pv</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stream_md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;descriptors&quot;</span> <span class="ow">in</span> <span class="n">stream_md</span><span class="p">:</span>
+                <span class="n">descriptors</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;descriptors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stream_name</span><span class="si">=}</span><span class="s2"> has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span>
+                <span class="n">data_keys</span> <span class="o">=</span> <span class="n">descriptors</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;data_keys&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_keys</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">data_keys</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PV:&quot;</span><span class="p">):</span>
+                <span class="n">pv</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">pv</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.stream_data_field_units">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.stream_data_field_units">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stream_data_field_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Engineering units of this field.&quot;&quot;&quot;</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stream_md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_metadata</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;descriptors&quot;</span> <span class="ow">in</span> <span class="n">stream_md</span><span class="p">:</span>
+                <span class="n">descriptors</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;descriptors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stream_name</span><span class="si">=}</span><span class="s2"> has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span>
+                <span class="n">data_keys</span> <span class="o">=</span> <span class="n">descriptors</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;data_keys&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_keys</span> <span class="o">=</span> <span class="n">stream_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">units</span> <span class="o">=</span> <span class="n">data_keys</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">units</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.stream_metadata">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.stream_metadata">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stream_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the metadata dictionary for this stream.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams_md</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Optimize with a cache.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">streams_md</span> <span class="o">=</span> <span class="p">{</span><span class="n">sname</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">[</span><span class="n">sname</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span> <span class="k">for</span> <span class="n">sname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">stream_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams_md</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams_md</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RunMetadata.summary">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.RunMetadata.summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Summary (text) of this run.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;scan_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plan_name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_run_md</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;title&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="connect_tiled_server">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.connect_tiled_server">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">connect_tiled_server</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make connection with the tiled server URI.  Return a client object.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tiled.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_uri</span>
+
+    <span class="c1"># leave out &quot;dask&quot; and get numpy by default</span>
+    <span class="c1"># https://examples.dask.org/array.html</span>
+    <span class="c1"># &gt; Call .compute() when you want your result as a NumPy array.</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="s2">&quot;dask&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">client</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tiled_slice</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">size</span>
+    <span class="n">key_gen</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">key_gen</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+    <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># fmt: off</span>
+        <span class="c1"># logger.error(&quot;HTTPStatusError: %s&quot;, exc)</span>
+        <span class="k">raise</span> <span class="n">TiledServerError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">reason_phrase</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="s2">&quot;  Adjust filters to reduce the catalog size.&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># fmt: on</span>
+
+
+<div class="viewcode-block" id="QueryTimeSince">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.QueryTimeSince">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">QueryTimeSince</span><span class="p">(</span><span class="n">isotime</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tiled client query: all runs since given date/time.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+
+    <span class="k">return</span> <span class="n">tiled</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">Key</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">utils</span><span class="o">.</span><span class="n">iso2ts</span><span class="p">(</span><span class="n">isotime</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="QueryTimeUntil">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.QueryTimeUntil">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">QueryTimeUntil</span><span class="p">(</span><span class="n">isotime</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tiled client query: all runs until given date/time.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+
+    <span class="k">return</span> <span class="n">tiled</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">Key</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">utils</span><span class="o">.</span><span class="n">iso2ts</span><span class="p">(</span><span class="n">isotime</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_run">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.get_run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_run</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="s2">&quot;training&quot;</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get referenced run from tiled server catalog.&quot;&quot;&quot;</span>
+    <span class="c1"># from gemviz.tapi import connect_tiled_server</span>
+    <span class="c1"># from gemviz.tapi import get_tiled_runs</span>
+
+    <span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span> <span class="ow">or</span> <span class="s2">&quot;http://localhost:8020&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">connect_tiled_server</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+    <span class="n">cat</span> <span class="o">=</span> <span class="n">get_tiled_runs</span><span class="p">(</span><span class="n">client</span><span class="p">[</span><span class="n">catalog</span><span class="p">],</span> <span class="n">plan_name</span><span class="o">=</span><span class="s2">&quot;scan&quot;</span><span class="p">)</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">reference</span> <span class="ow">or</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">uid</span> <span class="o">=</span> <span class="n">reference</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">cat</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">reference</span><span class="p">]</span>
+    <span class="n">run</span> <span class="o">=</span> <span class="n">cat</span><span class="p">[</span><span class="n">uid</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">run</span></div>
+
+
+
+<div class="viewcode-block" id="get_tiled_runs">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.get_tiled_runs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tiled_runs</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="p">[],</span> <span class="n">text_case</span><span class="o">=</span><span class="p">[],</span> <span class="o">**</span><span class="n">keys</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a new catalog, filtered by search terms.</span>
+
+<span class="sd">    Runs will be selected with start time `&gt;=since` and `&lt; until`.</span>
+<span class="sd">    If either is `None`, then the corresponding filter will not be</span>
+<span class="sd">    applied.</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    `cat` obj :</span>
+<span class="sd">        This is the catalog to be searched.</span>
+<span class="sd">        `Node` object returned by tiled.client.</span>
+<span class="sd">    `since` str :</span>
+<span class="sd">        Earliest start date (&amp; time), in ISO8601 format.</span>
+<span class="sd">    `until` str :</span>
+<span class="sd">        Latest start date (&amp; time), in ISO8601 format.</span>
+<span class="sd">    `text` [str] :</span>
+<span class="sd">        List of full text searches.  Not sensitive to case.</span>
+<span class="sd">    `text_case` [str] :</span>
+<span class="sd">        List of full text searches.  Case sensitive.</span>
+<span class="sd">    `keys` dict :</span>
+<span class="sd">        Dictionary of metadata keys and values to be matched.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">since</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">QueryTimeSince</span><span class="p">(</span><span class="n">since</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">until</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">QueryTimeUntil</span><span class="p">(</span><span class="n">until</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">tiled</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">Key</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">tiled</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">FullText</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">text_case</span><span class="p">:</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">tiled</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">FullText</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cat</span></div>
+
+
+
+<div class="viewcode-block" id="is_catalog_of_bluesky_runs">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.is_catalog_of_bluesky_runs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_catalog_of_bluesky_runs</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a tiled node is a CatalogOfBlueskyRuns.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    node : tiled client node</span>
+<span class="sd">        The node to check</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if node is a CatalogOfBlueskyRuns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;specs&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">specs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">specs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;CatalogOfBlueskyRuns&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="is_run">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.is_run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_run</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a tiled node is a BlueskyRun.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    node : tiled client node</span>
+<span class="sd">        The node to check</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if node is a Run (has BlueskyRun spec)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;specs&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">specs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">specs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;BlueskyRun&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="is_not_container">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.is_not_container">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_not_container</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return True if node is not a tiled container.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        node: tiled client node</span>
+<span class="sd">        The node to check</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if node is a not a container</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="p">):</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attributes&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">structure_family</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;structure_family&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">structure_family</span> <span class="o">!=</span> <span class="s2">&quot;container&quot;</span>
+        <span class="c1"># If there is no .item, treat it as not-a-container</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># On any error, be conservative and skip it as not-a-container</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="is_pure_container">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.is_pure_container">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_pure_container</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a tiled node is a pure Container (not a Catalog, not a Run).</span>
+
+<span class="sd">    A pure container has:</span>
+<span class="sd">    - structure_family == &#39;container&#39;</span>
+<span class="sd">    - specs == [] (empty)</span>
+
+<span class="sd">    Pure containers can contain other containers, files, or other items.</span>
+<span class="sd">    We want to recurse into pure containers to find nested Catalogs.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    node : tiled client node</span>
+<span class="sd">        The node to check</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if node is a pure Container (empty specs, not a Catalog or Run)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Must be a container</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="p">):</span>
+            <span class="n">structure_family</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attributes&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;structure_family&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">structure_family</span> <span class="o">!=</span> <span class="s2">&quot;container&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># Must have empty specs (not a Catalog, not a Run)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;specs&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">specs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="discover_catalogs">
+<a class="viewcode-back" href="../../api/tapi.html#gemviz.tapi.discover_catalogs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">discover_catalogs</span><span class="p">(</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">deep_search</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root_client</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively discover all CatalogOfBlueskyRuns in a tiled server.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    client : tiled client node</span>
+<span class="sd">        Starting point (server root or Container)</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Current path prefix</span>
+<span class="sd">    deep_search : bool</span>
+<span class="sd">        If True, also search inside Catalogs for nested Containers</span>
+<span class="sd">    max_depth : int, optional</span>
+<span class="sd">        Maximum recursion depth (None = unlimited)</span>
+<span class="sd">    root_client : tiled client node</span>
+<span class="sd">        Root server client. Required for path-based access when inside Catalogs.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    list of tuples</span>
+<span class="sd">        [(path, catalog_node), ...] where path is the full path to the catalog</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">root_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">root_client</span> <span class="o">=</span> <span class="n">client</span>
+    <span class="n">catalogs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">max_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_depth</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;discover_catalogs: Max depth reached at path=</span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">catalogs</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Starting discovery at path=</span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;deep_search=</span><span class="si">{</span><span class="n">deep_search</span><span class="si">}</span><span class="s2">, max_depth=</span><span class="si">{</span><span class="n">max_depth</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_catalog_of_bluesky_runs</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;discover_catalogs: Found Catalog at path=</span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">catalogs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">path</span><span class="p">,</span> <span class="n">client</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">deep_search</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Searching inside Catalog </span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)</span><span class="si">}</span><span class="s2"> children&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">children</span><span class="p">):</span>
+                        <span class="c1"># Skip &quot;processed&quot; nodes; do not contain runs</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;processed&quot;</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Skipping &#39;processed&#39; at </span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="k">continue</span>
+                        <span class="n">child_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="n">key</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">child</span> <span class="o">=</span> <span class="n">root_client</span><span class="p">[</span><span class="n">child_path</span><span class="p">]</span>
+                            <span class="c1"># Runs come after container when iterating in reversed; earlier items are all runs too → stop.</span>
+                            <span class="k">if</span> <span class="n">is_run</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Hit first run at </span><span class="si">{</span><span class="n">child_path</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;stopping iteration (containers come first in reverse)&quot;</span>
+                                <span class="p">)</span>
+                                <span class="k">break</span>
+                            <span class="c1"># Skip non-container nodes (files, etc.)</span>
+                            <span class="k">if</span> <span class="n">is_not_container</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Skipping non-container at </span><span class="si">{</span><span class="n">child_path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                                <span class="p">)</span>
+                                <span class="k">continue</span>
+                            <span class="k">if</span> <span class="n">is_catalog_of_bluesky_runs</span><span class="p">(</span><span class="n">child</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_pure_container</span><span class="p">(</span>
+                                <span class="n">child</span>
+                            <span class="p">):</span>
+                                <span class="n">node_type</span> <span class="o">=</span> <span class="p">(</span>
+                                    <span class="s2">&quot;Catalog&quot;</span>
+                                    <span class="k">if</span> <span class="n">is_catalog_of_bluesky_runs</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                                    <span class="k">else</span> <span class="s2">&quot;pure Container&quot;</span>
+                                <span class="p">)</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Recursing into </span><span class="si">{</span><span class="n">node_type</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">child_path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                                <span class="p">)</span>
+                                <span class="n">catalogs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                                    <span class="n">discover_catalogs</span><span class="p">(</span>
+                                        <span class="n">child</span><span class="p">,</span>
+                                        <span class="n">child_path</span><span class="p">,</span>
+                                        <span class="n">deep_search</span><span class="p">,</span>
+                                        <span class="n">max_depth</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">max_depth</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">root_client</span><span class="o">=</span><span class="n">root_client</span><span class="p">,</span>
+                                    <span class="p">)</span>
+                                <span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing child </span><span class="si">{</span><span class="n">child_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">continue</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error searching inside catalog </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Returning </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">catalogs</span><span class="p">)</span><span class="si">}</span><span class="s2"> catalog(s) from path=</span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">catalogs</span>
+
+        <span class="k">if</span> <span class="n">is_pure_container</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Searching pure Container at path=</span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)</span><span class="si">}</span><span class="s2"> children&quot;</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">children</span><span class="p">):</span>
+                    <span class="c1"># Skip &quot;processed&quot; nodes; do not contain runs</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;processed&quot;</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Skipping &#39;processed&#39; at </span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">child_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="n">key</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">child</span> <span class="o">=</span> <span class="n">root_client</span><span class="p">[</span><span class="n">child_path</span><span class="p">]</span>
+                        <span class="c1"># Skip Bluesky runs</span>
+                        <span class="k">if</span> <span class="n">is_run</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Skipping run at </span><span class="si">{</span><span class="n">child_path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="k">continue</span>
+                        <span class="c1"># Skip non-container nodes (files, etc.)</span>
+                        <span class="k">if</span> <span class="n">is_not_container</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Skipping non-container at </span><span class="si">{</span><span class="n">child_path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="k">continue</span>
+                        <span class="n">node_type</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="s2">&quot;Catalog&quot;</span>
+                            <span class="k">if</span> <span class="n">is_catalog_of_bluesky_runs</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                            <span class="k">else</span> <span class="s2">&quot;pure Container&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Recursing into </span><span class="si">{</span><span class="n">node_type</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">child_path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">catalogs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                            <span class="n">discover_catalogs</span><span class="p">(</span>
+                                <span class="n">child</span><span class="p">,</span>
+                                <span class="n">child_path</span><span class="p">,</span>
+                                <span class="n">deep_search</span><span class="p">,</span>
+                                <span class="n">max_depth</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">max_depth</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">root_client</span><span class="o">=</span><span class="n">root_client</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing child </span><span class="si">{</span><span class="n">child_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error searching Container </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing node at </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;discover_catalogs: Returning </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">catalogs</span><span class="p">)</span><span class="si">}</span><span class="s2"> catalog(s) from path=</span><span class="si">{</span><span class="n">path</span><span class="si">!r}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">catalogs</span></div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># :copyright: (c) 2023-2025, UChicago Argonne, LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Argonne National Laboratory Open Source License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file LICENSE.txt, distributed with this software.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2025, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
