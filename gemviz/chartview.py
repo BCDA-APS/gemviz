@@ -25,6 +25,7 @@ import logging
 from itertools import cycle
 
 import numpy
+import matplotlib.dates as mdates
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -125,7 +126,15 @@ class ChartView(QtWidgets.QWidget):
 
         # Adjust margins
         self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
-        self.setOptions()
+
+        # Store plot options first
+        self._plot_options = {
+            "x_datetime": kwargs.get("x_datetime"),
+            "x_units": kwargs.get("x_units"),
+            "x": kwargs.get("x"),
+            "y_units": kwargs.get("y_units"),
+            "y": kwargs.get("y"),
+        }
 
         config = {
             "title": self.setPlotTitle,
@@ -517,7 +526,9 @@ class ChartView(QtWidgets.QWidget):
           be the index.
         - kwargs (dict): dict(str, obj)
         """
-        self.setOptions(**kwargs.get("plot_options", {}))
+        plot_options = kwargs.get("plot_options", {})
+        if plot_options:
+            self.setOptions(**plot_options)
         ds_options = kwargs.get("ds_options", kwargs)
         self.main_axes.axis("on")
 
@@ -550,6 +561,16 @@ class ChartView(QtWidgets.QWidget):
     def setAxisDateTime(self, choice):
         pass  # data provided in datetime objects
 
+    def applyDateTimeFormatting(self):
+        """Apply datetime formatting to x-axis if enabled."""
+        if self.option("x_datetime"):
+            locator = mdates.AutoDateLocator()
+            formatter = mdates.ConciseDateFormatter(locator)
+            self.main_axes.xaxis.set_major_locator(locator)
+            self.main_axes.xaxis.set_major_formatter(formatter)
+            self.main_axes.tick_params(axis="x", rotation=30)
+            self.canvas.draw()
+
     def setAxisLabel(self, axis, text):
         set_axis_label_method = {
             "bottom": self.main_axes.set_xlabel,
@@ -574,6 +595,10 @@ class ChartView(QtWidgets.QWidget):
             self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
         else:
             self.main_axes.grid(False)
+
+        # Apply datetime formatting if needed
+        self.applyDateTimeFormatting()
+
         self.canvas.draw()
 
     def setLeftAxisText(self, text):
@@ -646,7 +671,6 @@ class ChartView(QtWidgets.QWidget):
         self.main_axes.autoscale_view()
         self.updateLegend()
         self.setConfigPlot()
-        self.canvas.draw()
 
     def xlabel(self):
         return self.option("xlabel")
@@ -679,6 +703,9 @@ class ChartView(QtWidgets.QWidget):
 
             # Redraw the canvas to apply changes
             self.canvas.draw()
+            # Re-apply datetime formatting if needed
+            self.applyDateTimeFormatting()
+
         except Exception as exc:
             logger.error(f"Error setting log scales: {exc}")
             # If setting log scale fails (e.g., negative values), revert to linear
@@ -687,6 +714,7 @@ class ChartView(QtWidgets.QWidget):
             self.main_axes.set_xscale("linear")
             self.main_axes.set_yscale("linear")
             self.canvas.draw()
+            self.applyDateTimeFormatting()
 
     def onClearAllClicked(self):
         """Handle Clear Graph button click."""
@@ -1035,12 +1063,12 @@ class ChartView(QtWidgets.QWidget):
             return
 
         self.clearBasicMath()
-
         try:
             x, y = self.curveManager.getCurveXYData(curveID)
             if x is None or y is None:
                 return
-
+            if self.option("x_datetime"):
+                return
             basic_stats = self.calculateBasicMath(x, y)
             peak_stats = self.calculateRawDataPeak(curveID)
             if peak_stats:
