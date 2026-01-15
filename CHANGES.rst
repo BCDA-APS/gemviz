@@ -30,3 +30,11 @@ describe future plans.
    -------------
 
    * BUG 'dt_cycle_ends' in apstools.devices.aps_cycle.ApsCycleDM
+
+
+1.0.0
+******
+
+Released 2026-01-15
+
+Initial public release.
