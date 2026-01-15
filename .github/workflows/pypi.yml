@@ -8,6 +8,9 @@ on:
       tags:
         - "*"  # all tags
 
+permissions:
+  id-token: write
+
 jobs:
   publish-to-pypi:
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
@@ -53,5 +56,5 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        # password: ${{ secrets.PYPI_API_TOKEN }}
         verbose: true
