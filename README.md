@@ -12,7 +12,7 @@ Python version(s) | Unit Tests | Code Coverage | License
 
 ## Goals
 
-- minimum: PyQt app that can select runs, show line charts
+- minimum: PyQt5 app that can select runs, show line charts
 - ideal: add database filters, config file, autodetect data types, and representations
 - stretch: data visualization integrate with https://github.com/BCDA-APS/qs-web2023
 
