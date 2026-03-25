@@ -273,7 +273,7 @@ class ChartView(QtWidgets.QWidget):
         self.live_timer = None
         self.live_run = None
         self.live_stream_name = None
-        self.live_data_fields = {}  # Maps label -> (x_field, y_field)
+        self.live_data_fields = {}  # Maps label -> (x_field, y_field, i0_field)
         self.field_widget = None
         self.update_interval = 2000  # milliseconds (2 seconds)
 
@@ -861,7 +861,8 @@ class ChartView(QtWidgets.QWidget):
             # Get selected curve ID
             selected_curveID = self.getSelectedCurveID()
 
-            for label, (x_field, y_field) in self.live_data_fields.items():
+            for label, (x_field, y_field, *_i0) in self.live_data_fields.items():
+                i0_field = _i0[0] if _i0 else None
                 # Get curveID from label
                 curveID = self.getCurveIDFromLabel(label)
                 if not curveID:
@@ -884,9 +885,19 @@ class ChartView(QtWidgets.QWidget):
                         )
                         continue
 
+                    if i0_field and i0_field not in stream_data:
+                        logger.debug(f"I0 field {i0_field} not yet in live stream data")
+                        continue
+
                     # Get raw data from stream (not transformed)
                     x_data = numpy.asarray(stream_data[x_field])
                     y_data = numpy.asarray(stream_data[y_field])
+
+                    if i0_field:
+                        i0_data = numpy.asarray(stream_data[i0_field])
+                        min_len = min(len(y_data), len(i0_data))
+                        y_data = y_data[:min_len] / i0_data[:min_len]
+                        x_data = x_data[:min_len]
 
                     if (
                         x_data.ndim != 0
