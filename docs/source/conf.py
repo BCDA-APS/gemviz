@@ -8,7 +8,7 @@
 import pathlib
 import sys
 import tomllib
-from importlib.metadata import version
+from importlib.metadata import version as distribution_version
 
 sys.path.insert(0, str(pathlib.Path().absolute().parent.parent))
 import gemviz  # noqa
@@ -33,7 +33,7 @@ github_url = f"https://github.com/{gh_org}/{project}"
 # -- Special handling for version numbers ------------------------------------
 # https://github.com/pypa/setuptools_scm#usage-from-sphinx
 
-release = version(project)
+release = distribution_version(project)
 version = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
@@ -71,6 +71,7 @@ autodoc_mock_imports = """
     numpy
     PyQt5
     pyRestTable
+    scipy
     spec2nexus
     tiled
     xarray
