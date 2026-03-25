@@ -85,11 +85,14 @@ class ApplicationQSettings(QtCore.QSettings):
         self.init_global_keys()
 
     def __repr__(self):
-        keys = "fileName applicationName organizationName status".split()
-        d = {k: getattr(self, k)() for k in keys}
-        d.update(self.to_dict())
-        dl = ", ".join([f"{k}={v!r}" for k, v in d.items()])
-        return f"{self.__class__.__name__}({dl})"
+        try:
+            keys = "fileName applicationName organizationName status".split()
+            d = {k: getattr(self, k)() for k in keys}
+            d.update(self.to_dict())
+            dl = ", ".join([f"{k}={v!r}" for k, v in d.items()])
+            return f"{self.__class__.__name__}({dl})"
+        except Exception:
+            return f"{self.__class__.__name__}()"
 
     def to_dict(self):
         """Return a dict with all the settings."""
