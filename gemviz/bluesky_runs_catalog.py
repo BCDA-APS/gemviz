@@ -168,6 +168,7 @@ class BRC_MVC(QtWidgets.QWidget):
             self.last_selected_fields[stream_name] = {
                 "X": selections.get("X"),  # Can be None
                 "Y": selections.get("Y", []).copy(),  # Copy to avoid reference issues
+                "I0": selections.get("I0"),  # Can be None
             }
             self.last_selected_stream = stream_name
 
@@ -187,8 +188,9 @@ class BRC_MVC(QtWidgets.QWidget):
                 # Build mapping of curve labels to field names for live updates
                 x_field = selections.get("X")
                 y_fields = selections.get("Y", [])
+                i0_field = selections.get("I0")
                 logger.info(
-                    f"Live plotting setup: x_field={x_field}, y_fields={y_fields}"
+                    f"Live plotting setup: x_field={x_field}, y_fields={y_fields}, i0_field={i0_field}"
                 )
 
                 live_data_fields = {}
@@ -197,9 +199,9 @@ class BRC_MVC(QtWidgets.QWidget):
                     # Map each dataset to its corresponding y_field
                     if len(y_fields) > 0 and i < len(y_fields):
                         y_field = y_fields[i]
-                        live_data_fields[label] = (x_field, y_field)
+                        live_data_fields[label] = (x_field, y_field, i0_field)
                         logger.info(
-                            f"Live field mapping: {label} -> ({x_field}, {y_field})"
+                            f"Live field mapping: {label} -> ({x_field}, {y_field}, {i0_field})"
                         )
 
                 if live_data_fields:

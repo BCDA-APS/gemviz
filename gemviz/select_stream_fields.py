@@ -28,6 +28,7 @@ STREAM_COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
+    TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Shape", ColumnDataType.text),
 ]
 
@@ -121,9 +122,11 @@ class SelectFieldsWidget(QtWidgets.QWidget):
         # Get preferred fields for this stream (if any)
         preferred_x = None
         preferred_y = []
+        preferred_i0 = None
         if self.preferred_fields is not None:
             preferred_x = self.preferred_fields.get("X")
             preferred_y = self.preferred_fields.get("Y", [])
+            preferred_i0 = self.preferred_fields.get("I0")
 
         # Check if any preferred Y detectors exist in current scan
         has_preferred_x = False
@@ -142,6 +145,8 @@ class SelectFieldsWidget(QtWidgets.QWidget):
                     selection = "X"
                 elif field_name in preferred_y:
                     selection = "Y"
+                elif preferred_i0 is not None and field_name == preferred_i0:
+                    selection = "I0"
                 # Fall back to default X if preferred_x is not in sdf
                 elif (
                     not has_preferred_x
@@ -199,6 +204,13 @@ class SelectFieldsWidget(QtWidgets.QWidget):
 
     def relayPlotSelections(self, stream_name, action, selections):
         """Receive selections from the dialog and relay to the caller."""
+        # Keep preferred fields synchronized with current user selections so
+        # live-table rebuilds do not revert to stale initial preferences.
+        self.preferred_fields = {
+            "X": selections.get("X"),
+            "Y": selections.get("Y", []).copy(),
+            "I0": selections.get("I0"),
+        }
         # selections["stream_name"] = self.stream_name
         self.selected.emit(stream_name, action, selections)
 
@@ -221,6 +233,17 @@ class SelectFieldsWidget(QtWidgets.QWidget):
                     self.table_view = None
                     saved = {}
 
+            # Checkbox toggles do not emit `selected` (only Replace/Add/Remove do),
+            # so `preferred_fields` can stay stale. Rebuild uses `preferred_fields`
+            # to seed TableField.selection — without this, clearing I0 during live
+            # mode would revert on the next timer tick.
+            if saved:
+                self.preferred_fields = {
+                    "X": saved.get("X"),
+                    "Y": list(saved.get("Y", [])),
+                    "I0": saved.get("I0"),
+                }
+
             # Rebuild the table for the current stream using fresh data.
             # setStream() will check if fields are readable before rebuilding
             current_stream = self.stream_name
@@ -238,6 +261,9 @@ class SelectFieldsWidget(QtWidgets.QWidget):
                         for y_field in saved.get("Y", []):
                             if y_field in fields:
                                 model.setSelectionsItem(fields.index(y_field), "Y")
+                        i0_field = saved.get("I0")
+                        if i0_field and i0_field in fields:
+                            model.setSelectionsItem(fields.index(i0_field), "I0")
                         model.updateCheckboxes()
                 except RuntimeError:
                     logger.debug(
@@ -314,6 +340,9 @@ def to_datasets(run, stream_name, selections, scan_id=None):
                 list(map(datetime.datetime.fromtimestamp, numpy.asarray(x_data)))
             )
 
+    i0_field = selections.get("I0")
+    i0_data = get_field_array(i0_field) if i0_field else None
+
     datasets = []
     y_selections = selections.get("Y", [])
     if len(y_selections) == 0:
@@ -333,6 +362,13 @@ def to_datasets(run, stream_name, selections, scan_id=None):
                     "Can only plot 1-D data now."
                     f" {y_axis} shape is {y_shape}"
                 )
+            if i0_data is not None:
+                if i0_data.shape != y_data.shape:
+                    raise ValueError(
+                        f"I0 field '{i0_field}' shape {i0_data.shape} does not match"
+                        f" Y field '{y_axis}' shape {y_data.shape}."
+                    )
+                y_data = y_data / i0_data
         except Exception as exc:
             raise ValueError(f"Failed to get fresh data for {y_axis}: {exc}")
 
@@ -341,7 +377,10 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         # verbose labels
         # ds_options["label"] = f"{y_axis} ({run.summary()} {run.uid[:7]})"
         # terse labels
-        ds_options["label"] = f"{scan_id} ({run.uid[:7]}) - {y_axis}"
+        if i0_field:
+            ds_options["label"] = f"{scan_id} ({run.uid[:7]}) - {y_axis}/{i0_field}"
+        else:
+            ds_options["label"] = f"{scan_id} ({run.uid[:7]}) - {y_axis}"
         ds_options["color"] = color  # line color
         ds_options["marker"] = symbol
         ds_options["markersize"] = 5  # default: 10
@@ -375,6 +414,7 @@ def to_datasets(run, stream_name, selections, scan_id=None):
         "x": x_axis,
         "y_units": y_units,
         "y": ", ".join(selections.get("Y", [])),
+        "i0": i0_field,
     }
 
     return datasets, plot_options
